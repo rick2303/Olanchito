@@ -10,8 +10,9 @@ type Props = {
   searchParams?: Promise<{ category?: string }>
 }
 
-const BUCKET_NAME = process.env.BUCKET_NAME
-const FALLBACK_IMAGE = process.env.FALLBACK_BUCKET_IMG
+const BUCKET_NAME: string = process.env.BUCKET_NAME ?? 'Olanchito-guide'
+const FALLBACK_IMAGE: string = process.env.FALLBACK_BUCKET_IMG ?? 'https://lvvciuhvhpjgfzediulv.supabase.co/storage/v1/object/public/Olanchito-guide/default-business.png'
+
 
 export default async function BusinessesPage({ searchParams }: Props) {
   const params = searchParams ? await searchParams : {}
@@ -59,11 +60,6 @@ export default async function BusinessesPage({ searchParams }: Props) {
       const { data: imgData } = supabase.storage.from(BUCKET_NAME).getPublicUrl(pathInBucket)
       imageUrl = imgData.publicUrl
     }
-
-    console.log('BUSINESS:', b.name)
-    console.log('IMAGE PATH (DB):', b.image)
-    console.log('PUBLIC URL:', imageUrl)
-    console.log('----------------------------')
 
     return {
       ...b,
