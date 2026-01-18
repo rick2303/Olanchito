@@ -48,11 +48,11 @@ export default async function BusinessDetail({ params }: Props) {
 
   // --- Generar URL pública de la imagen ---
   let imageUrl = FALLBACK_IMAGE
-  if (data.image && typeof data.image === 'string') {
+if (data.image && typeof data.image === 'string') {
     const cleanPath = data.image.startsWith('/') ? data.image.slice(1) : data.image
     const { data: urlData } = supabase.storage.from(BUCKET_NAME).getPublicUrl(cleanPath)
-    imageUrl = urlData.publicUrl
-  }
+    imageUrl = urlData?.publicUrl || FALLBACK_IMAGE
+}
 
   // --- Cargar categoría si existe ---
   let category = null
