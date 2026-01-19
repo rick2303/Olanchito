@@ -1,5 +1,10 @@
+// app/businesses/page.tsx
 import { supabase } from '@/lib/supabase'
 import BusinessCard from '@/components/BusinessCard'
+import { cookies } from 'next/headers'
+
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export const metadata = {
   title: 'Negocios | Directorio Olanchito',
@@ -7,40 +12,39 @@ export const metadata = {
 }
 
 type Props = {
-  searchParams?: Promise<{ category?: string }>
+  searchParams?: { category?: string }
 }
 
-const BUCKET_NAME: string = process.env.BUCKET_NAME ?? 'Olanchito-guide'
-const FALLBACK_IMAGE: string = process.env.FALLBACK_BUCKET_IMG ?? 'https://lvvciuhvhpjgfzediulv.supabase.co/storage/v1/object/public/Olanchito-guide/default-business.png'
+const BUCKET_NAME =
+  process.env.BUCKET_NAME ?? 'Olanchito-guide'
 
+const FALLBACK_IMAGE =
+  process.env.FALLBACK_BUCKET_IMG ??
+  'https://lvvciuhvhpjgfzediulv.supabase.co/storage/v1/object/public/Olanchito-guide/default-business.png'
 
 export default async function BusinessesPage({ searchParams }: Props) {
-  const params = searchParams ? await searchParams : {}
-  const categorySlug = params.category?.toLowerCase()
+  cookies()
 
-  let categoryId: string | undefined
+  const categorySlug = searchParams?.category?.toLowerCase()
+
+  let categoryId: string | null = null
 
   if (categorySlug) {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('categories')
       .select('id')
       .eq('slug', categorySlug)
       .single()
 
-    categoryId = data?.id
+    if (!error && data) {
+      categoryId = data.id
+    }
   }
 
+  // --- Obtener negocios SIEMPRE desde la BD ---
   const { data, error } = await supabase
     .from('businesses')
-    .select(`
-      id,
-      name,
-      slug,
-      category_id,
-      address,
-      image,
-      description
-    `)
+    .select('id, name, slug, category_id, address, image, description')
     .order('name', { ascending: true })
 
   if (error) {
@@ -48,21 +52,30 @@ export default async function BusinessesPage({ searchParams }: Props) {
     return <p>Error cargando negocios</p>
   }
 
-  // Filtrar por categoría si aplica
-  const filteredData = categoryId ? data?.filter((b: any) => b.category_id === categoryId) : data
+  // --- Filtrar por categoría si aplica ---
+  const filteredBusinesses = categoryId
+    ? data?.filter(b => b.category_id === categoryId)
+    : data
 
-  const businesses = filteredData?.map((b: any) => {
+  // --- Construir URLs de imágenes ---
+  const businesses = filteredBusinesses?.map(business => {
     let imageUrl = FALLBACK_IMAGE
 
-    if (b.image && typeof b.image === 'string') {
-      // Forzar ruta dentro de la carpeta business/
-      const pathInBucket = b.image.startsWith('business/') ? b.image : `business/${b.image}`
-      const { data: imgData } = supabase.storage.from(BUCKET_NAME).getPublicUrl(pathInBucket)
-      imageUrl = imgData.publicUrl
+    if (business.image && typeof business.image === 'string') {
+      const cleanPath = business.image.startsWith('business/')
+        ? business.image
+        : `business/${business.image}`
+
+      const { data: imgData } = supabase
+        .storage
+        .from(BUCKET_NAME)
+        .getPublicUrl(cleanPath)
+
+      imageUrl = imgData?.publicUrl ?? FALLBACK_IMAGE
     }
 
     return {
-      ...b,
+      ...business,
       image: imageUrl,
     }
   })
@@ -83,9 +96,9 @@ export default async function BusinessesPage({ searchParams }: Props) {
         )}
 
         <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3">
-          {businesses?.map((business: any) => (
+          {businesses?.map(business => (
             <BusinessCard
-              key={business.slug}
+              key={business.id}
               business={{
                 name: business.name,
                 slug: business.slug,
