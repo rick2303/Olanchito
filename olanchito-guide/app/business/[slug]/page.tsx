@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
+import { cookies } from 'next/headers'
 import {
   FaClock,
   FaPhoneAlt,
@@ -10,10 +11,11 @@ import {
   FaGlobe,
 } from 'react-icons/fa'
 
-export const dynamic = 'force-dynamic' // ⚡ siempre datos vivos
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 type Props = {
-  params: Promise<{ slug: string }>
+  params: { slug: string }
 }
 
 const BUCKET_NAME = process.env.BUCKET_NAME ?? 'Olanchito-guide'
@@ -22,9 +24,10 @@ const FALLBACK_IMAGE =
   'https://lvvciuhvhpjgfzediulv.supabase.co/storage/v1/object/public/Olanchito-guide/default-business.png'
 
 export default async function BusinessDetail({ params }: Props) {
-  const { slug } = await params
+  cookies()
 
-  // --- Traer negocio ---
+  const { slug } = params
+
   const { data, error } = await supabase
     .from('businesses')
     .select(`
@@ -54,12 +57,19 @@ export default async function BusinessDetail({ params }: Props) {
     )
   }
 
-  // --- Imagen ---
   let imageUrl = FALLBACK_IMAGE
-  if (typeof data.image === 'string' && data.image.length > 0) {
-    const cleanPath = data.image.startsWith('/') ? data.image.slice(1) : data.image
-    const { data: img } = supabase.storage.from(BUCKET_NAME).getPublicUrl(cleanPath)
-    imageUrl = img?.publicUrl ?? FALLBACK_IMAGE
+
+  if (data.image && typeof data.image === 'string') {
+    const cleanPath = data.image.startsWith('business/')
+      ? data.image
+      : `business/${data.image}`
+
+    const { data: imgData } = supabase
+      .storage
+      .from(BUCKET_NAME)
+      .getPublicUrl(cleanPath)
+
+    imageUrl = imgData?.publicUrl ?? FALLBACK_IMAGE
   }
 
   // --- Categoría ---
@@ -79,26 +89,39 @@ export default async function BusinessDetail({ params }: Props) {
   return (
     <main className="min-h-screen bg-jungle-50 py-10">
       <section className="max-w-4xl mx-auto px-6">
-        <Link href="/businesses" className="text-jungle-600 hover:underline text-sm font-medium">
+        <Link
+          href="/businesses"
+          className="text-jungle-600 hover:underline text-sm font-medium"
+        >
           ← Volver a negocios
         </Link>
 
         <div className="bg-white rounded-2xl shadow-lg mt-4 overflow-hidden">
           {/* Imagen */}
-          <img src={imageUrl} alt={data.name} className="w-full h-64 sm:h-80 object-cover" />
+          <img
+            src={imageUrl}
+            alt={data.name}
+            className="w-full h-64 sm:h-80 object-cover"
+          />
 
           <div className="p-6 flex flex-col gap-5">
             {/* Header */}
             <div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-jungle-900">{data.name}</h1>
+              <h1 className="text-3xl sm:text-4xl font-bold text-jungle-900">
+                {data.name}
+              </h1>
               {category?.name && (
-                <p className="text-sm text-jungle-600 font-medium mt-1">{category.name}</p>
+                <p className="text-sm text-jungle-600 font-medium mt-1">
+                  {category.name}
+                </p>
               )}
             </div>
 
             {/* Descripción */}
             {data.description && (
-              <p className="text-jungle-700 text-base sm:text-lg">{data.description}</p>
+              <p className="text-jungle-700 text-base sm:text-lg">
+                {data.description}
+              </p>
             )}
 
             {/* Dirección */}
@@ -125,7 +148,9 @@ export default async function BusinessDetail({ params }: Props) {
             {/* Servicios */}
             {Array.isArray(data.services) && data.services.length > 0 && (
               <div>
-                <h2 className="text-lg font-semibold text-jungle-900 mb-2">Servicios</h2>
+                <h2 className="text-lg font-semibold text-jungle-900 mb-2">
+                  Servicios
+                </h2>
                 <ul className="list-disc list-inside text-jungle-700 space-y-1">
                   {data.services.map((s: string, i: number) => (
                     <li key={i}>{s}</li>
@@ -139,14 +164,19 @@ export default async function BusinessDetail({ params }: Props) {
               {data.hours && (
                 <div className="flex items-center gap-3 text-jungle-700">
                   <FaClock className="text-jungle-500" />
-                  <span><strong>Horario:</strong> {data.hours}</span>
+                  <span>
+                    <strong>Horario:</strong> {data.hours}
+                  </span>
                 </div>
               )}
 
               {data.phone && (
                 <div className="flex items-center gap-3 text-jungle-700">
                   <FaPhoneAlt className="text-jungle-500" />
-                  <a href={`tel:${data.phone}`} className="text-jungle-600 hover:underline">
+                  <a
+                    href={`tel:${data.phone}`}
+                    className="text-jungle-600 hover:underline"
+                  >
                     {data.phone}
                   </a>
                 </div>
@@ -170,17 +200,29 @@ export default async function BusinessDetail({ params }: Props) {
             {socials && (
               <div className="flex gap-4 pt-4 border-t border-jungle-200">
                 {socials.instagram && (
-                  <a href={socials.instagram} target="_blank" className="text-pink-600 text-xl">
+                  <a
+                    href={socials.instagram}
+                    target="_blank"
+                    className="text-pink-600 text-xl"
+                  >
                     <FaInstagram />
                   </a>
                 )}
                 {socials.facebook && (
-                  <a href={socials.facebook} target="_blank" className="text-blue-600 text-xl">
+                  <a
+                    href={socials.facebook}
+                    target="_blank"
+                    className="text-blue-600 text-xl"
+                  >
                     <FaFacebook />
                   </a>
                 )}
                 {socials.website && (
-                  <a href={socials.website} target="_blank" className="text-jungle-700 text-xl">
+                  <a
+                    href={socials.website}
+                    target="_blank"
+                    className="text-jungle-700 text-xl"
+                  >
                     <FaGlobe />
                   </a>
                 )}

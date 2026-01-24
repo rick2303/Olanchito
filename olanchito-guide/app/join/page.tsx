@@ -1,15 +1,23 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
+import { useEffect, useState } from 'react'
 import emailjs from '@emailjs/browser'
+import { createClient } from '@supabase/supabase-js'
 
-type Category = {
-  id: string
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
+
+interface Category {
+  id: number
   name: string
 }
 
 export default function JoinPage() {
+  const [categories, setCategories] = useState<Category[]>([])
+  const [loading, setLoading] = useState(false)
+
   const [form, setForm] = useState({
     business_name: '',
     representative_name: '',
@@ -18,12 +26,10 @@ export default function JoinPage() {
     whatsapp: '',
     address: '',
     email: '',
+    description: '',
+    hours: '',
+    image: null as File | null,
   })
-
-  const [image, setImage] = useState<File | null>(null)
-  const [uploading, setUploading] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
-  const [categories, setCategories] = useState<Category[]>([])
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -39,43 +45,51 @@ export default function JoinPage() {
   }, [])
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    setForm({ ...form, [e.target.name]: e.target.value })
+    const { name, value } = e.target
+    setForm((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files?.[0]) {
+      setForm((prev) => ({ ...prev, image: e.target.files![0] }))
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    if (!image) {
-      alert('Por favor selecciona una imagen')
-      return
-    }
-
-    if (!image.type.startsWith('image/')) {
-      alert('El archivo debe ser una imagen')
-      return
-    }
-
-    setUploading(true)
+    setLoading(true)
 
     try {
-      const fileExt = image.name.split('.').pop()
-      const cleanFileName = `${Date.now()}-${crypto.randomUUID()}.${fileExt}`
-      const imagePath = `business/${cleanFileName}`
+      const selectedCategory = categories.find(
+        (cat) => cat.id === Number(form.category)
+      )
 
-      // 🔹 upload FIXED
-      const { error: uploadError } = await supabase.storage
-        .from('Olanchito-guide')
-        .upload(imagePath, image, {
-          contentType: image.type || 'image/jpeg',
-          upsert: false,
-        })
+      const categoryName = selectedCategory?.name || 'Sin categoría'
 
-      if (uploadError) {
-        console.error(uploadError)
-        alert('Error subiendo la imagen')
-        return
+      const submissionDate = new Date().toLocaleString('es-HN', {
+        dateStyle: 'full',
+        timeStyle: 'short',
+      })
+
+      let imagePath = null
+
+      if (form.image) {
+        const fileExt = form.image.name.split('.').pop()
+        const fileName = `${Date.now()}-${crypto.randomUUID()}.${fileExt}`
+        const filePath = `business/${fileName}`
+
+        const { error: uploadError } = await supabase.storage
+          .from('Olanchito-guide')
+          .upload(filePath, form.image, {
+            cacheControl: '3600',
+            upsert: false,
+          })
+
+        if (uploadError) throw uploadError
+
+        imagePath = filePath
       }
 
       const { error: insertError } = await supabase
@@ -83,20 +97,18 @@ export default function JoinPage() {
         .insert([
           {
             business_name: form.business_name,
-            category_id: form.category, // UUID
+            category_id: Number(form.category),
             contact_name: form.representative_name,
             email: form.email,
             phone: form.phone,
+            description: form.description,
+            hours: form.hours,
             image: imagePath,
             status: 'new',
           },
         ])
 
-      if (insertError) {
-        console.error(insertError)
-        alert('No se pudo registrar el negocio')
-        return
-      }
+      if (insertError) throw insertError
 
       await emailjs.send(
         process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
@@ -104,17 +116,20 @@ export default function JoinPage() {
         {
           business_name: form.business_name,
           representative_name: form.representative_name,
+          category: categoryName,
           phone: form.phone,
           whatsapp: form.whatsapp,
           address: form.address,
           email: form.email,
-          category_id: form.category,
-          image_path: imagePath,
+          description: form.description,
+          hours: form.hours,
+          date: submissionDate,
         },
         process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!
       )
 
-      setSubmitted(true)
+      alert('¡Negocio enviado correctamente!')
+
       setForm({
         business_name: '',
         representative_name: '',
@@ -123,140 +138,45 @@ export default function JoinPage() {
         whatsapp: '',
         address: '',
         email: '',
+        description: '',
+        hours: '',
+        image: null,
       })
-      setImage(null)
     } catch (err) {
       console.error(err)
-      alert('Ocurrió un error al enviar el formulario')
+      alert('Error al enviar el negocio. Intenta de nuevo.')
     } finally {
-      setUploading(false)
+      setLoading(false)
     }
   }
 
-  if (submitted) {
-    return (
-      <main className="min-h-screen flex items-center justify-center bg-jungle-50">
-        <div className="bg-white p-8 rounded-2xl shadow max-w-md text-center">
-          <h1 className="text-2xl font-bold mb-4 text-jungle-900">
-            ¡Gracias!
-          </h1>
-          <p className="text-jungle-700">
-            Recibimos tu información. Revisaremos el negocio y te
-            contactaremos pronto.
-          </p>
-        </div>
-      </main>
-    )
-  }
-
   return (
-    <main className="min-h-screen bg-jungle-50 flex items-center justify-center p-4">
-      <div className="bg-white p-8 rounded-2xl shadow max-w-md w-full">
-        <h1 className="text-2xl font-bold mb-6 text-center text-jungle-900">
-          Aparece en nuestro directorio
-        </h1>
+    <form onSubmit={handleSubmit} className="max-w-xl mx-auto space-y-4">
+      <input name="business_name" placeholder="Nombre del negocio" required onChange={handleChange} />
+      <input name="representative_name" placeholder="Representante" required onChange={handleChange} />
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            name="business_name"
-            value={form.business_name}
-            onChange={handleChange}
-            placeholder="Nombre del negocio"
-            required
-            className="w-full p-3 border rounded-xl"
-          />
+      <select name="category" required onChange={handleChange}>
+        <option value="">Selecciona una categoría</option>
+        {categories.map((cat) => (
+          <option key={cat.id} value={cat.id}>
+            {cat.name}
+          </option>
+        ))}
+      </select>
 
-          <input
-            name="representative_name"
-            value={form.representative_name}
-            onChange={handleChange}
-            placeholder="Nombre del representante"
-            required
-            className="w-full p-3 border rounded-xl"
-          />
+      <input name="phone" placeholder="Teléfono" onChange={handleChange} />
+      <input name="whatsapp" placeholder="WhatsApp" onChange={handleChange} />
+      <input name="address" placeholder="Dirección" onChange={handleChange} />
+      <input name="email" type="email" placeholder="Correo" required onChange={handleChange} />
 
-          <select
-            name="category"
-            value={form.category}
-            onChange={handleChange}
-            required
-            className="w-full p-3 border rounded-xl"
-          >
-            <option value="">Selecciona categoría</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
+      <textarea name="description" placeholder="Descripción del negocio" onChange={handleChange} />
+      <input name="hours" placeholder="Horarios de atención" onChange={handleChange} />
 
-          <input
-            name="phone"
-            value={form.phone}
-            onChange={handleChange}
-            placeholder="Teléfono"
-            required
-            className="w-full p-3 border rounded-xl"
-          />
+      <input type="file" accept="image/*" onChange={handleFileChange} />
 
-          <input
-            name="whatsapp"
-            value={form.whatsapp}
-            onChange={handleChange}
-            placeholder="WhatsApp (opcional)"
-            className="w-full p-3 border rounded-xl"
-          />
-
-          <input
-            name="address"
-            value={form.address}
-            onChange={handleChange}
-            placeholder="Dirección"
-            required
-            className="w-full p-3 border rounded-xl"
-          />
-
-          <input
-            type="email"
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            placeholder="Correo electrónico"
-            required
-            className="w-full p-3 border rounded-xl"
-          />
-
-          {/* Imagen */}
-          <div className="border-2 border-dashed rounded-xl p-4 text-center">
-            {!image ? (
-              <label className="cursor-pointer text-jungle-600">
-                Subir imagen del negocio
-                <input
-                  type="file"
-                  accept="image/*"
-                  hidden
-                  onChange={(e) =>
-                    setImage(e.target.files?.[0] || null)
-                  }
-                />
-              </label>
-            ) : (
-              <img
-                src={URL.createObjectURL(image)}
-                className="mx-auto w-40 h-40 object-cover rounded-xl"
-              />
-            )}
-          </div>
-
-          <button
-            type="submit"
-            disabled={uploading}
-            className="w-full bg-jungle-600 text-white py-3 rounded-xl hover:bg-jungle-700 disabled:opacity-50"
-          >
-            {uploading ? 'Enviando...' : 'Registrar negocio'}
-          </button>
-        </form>
-      </div>
-    </main>
+      <button disabled={loading}>
+        {loading ? 'Enviando...' : 'Enviar negocio'}
+      </button>
+    </form>
   )
 }
