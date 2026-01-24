@@ -143,32 +143,171 @@ export default function JoinPage() {
       setLoading(false)
     }
   }
+return (
+  <main className="min-h-screen bg-jungle-50 flex items-center justify-center p-4">
+    <div className="bg-white w-full max-w-xl rounded-2xl shadow-lg p-6 sm:p-8">
+      <h1 className="text-2xl font-bold text-jungle-900 text-center mb-2">
+        Aparece en el Directorio de Olanchito
+      </h1>
+      <p className="text-sm text-jungle-600 text-center mb-6">
+        Es gratis y está pensado para apoyar a los negocios locales,
+        tengan o no local físico.
+      </p>
 
-  return (
-    <form onSubmit={handleSubmit} className="max-w-xl mx-auto space-y-4">
-      <input name="business_name" placeholder="Nombre del negocio" required value={form.business_name} onChange={handleChange} />
-      <input name="representative_name" placeholder="Representante" required value={form.representative_name} onChange={handleChange} />
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Información básica */}
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Nombre del negocio
+          </label>
+          <input
+            name="business_name"
+            required
+            value={form.business_name}
+            onChange={handleChange}
+            className="w-full p-3 border rounded-xl focus:ring-2 focus:ring-jungle-500"
+          />
+        </div>
 
-      <select name="category" required value={form.category} onChange={handleChange}>
-        <option value="">Selecciona una categoría</option>
-        {categories.map(cat => (
-          <option key={cat.id} value={cat.id}>{cat.name}</option>
-        ))}
-      </select>
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Nombre del representante
+          </label>
+          <input
+            name="representative_name"
+            required
+            value={form.representative_name}
+            onChange={handleChange}
+            className="w-full p-3 border rounded-xl"
+          />
+        </div>
 
-      <textarea name="description" placeholder="Descripción del negocio" value={form.description} onChange={handleChange} />
-      <input name="hours" placeholder="Horarios de atención" value={form.hours} onChange={handleChange} />
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Categoría
+          </label>
+          <select
+            name="category"
+            required
+            value={form.category}
+            onChange={handleChange}
+            className="w-full p-3 border rounded-xl bg-white"
+          >
+            <option value="">Selecciona una categoría</option>
+            {categories.map(cat => (
+              <option key={cat.id} value={cat.id}>
+                {cat.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-      <input name="phone" placeholder="Teléfono" value={form.phone} onChange={handleChange} />
-      <input name="whatsapp" placeholder="WhatsApp" value={form.whatsapp} onChange={handleChange} />
-      <input name="address" placeholder="Dirección" value={form.address} onChange={handleChange} />
-      <input name="email" type="email" placeholder="Correo" required value={form.email} onChange={handleChange} />
+        {/* Descripción */}
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Descripción del negocio
+          </label>
+          <textarea
+            name="description"
+            rows={3}
+            value={form.description}
+            onChange={handleChange}
+            className="w-full p-3 border rounded-xl"
+            placeholder="¿A qué se dedica tu negocio?"
+          />
+        </div>
 
-      <input type="file" accept="image/*" onChange={handleFileChange} />
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Horario de atención
+          </label>
+          <input
+            name="hours"
+            value={form.hours}
+            onChange={handleChange}
+            className="w-full p-3 border rounded-xl"
+            placeholder="Ej: Lun–Vie 8am–5pm"
+          />
+        </div>
 
-      <button disabled={loading}>
-        {loading ? 'Enviando...' : 'Enviar negocio'}
-      </button>
-    </form>
-  )
+        {/* Contacto */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Teléfono
+            </label>
+            <input
+              name="phone"
+              value={form.phone}
+              onChange={handleChange}
+              className="w-full p-3 border rounded-xl"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              WhatsApp (opcional)
+            </label>
+            <input
+              name="whatsapp"
+              value={form.whatsapp}
+              onChange={handleChange}
+              className="w-full p-3 border rounded-xl"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Dirección
+          </label>
+          <input
+            name="address"
+            value={form.address}
+            onChange={handleChange}
+            className="w-full p-3 border rounded-xl"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium mb-1">
+            Correo electrónico
+          </label>
+          <input
+            type="email"
+            name="email"
+            required
+            value={form.email}
+            onChange={handleChange}
+            className="w-full p-3 border rounded-xl"
+          />
+        </div>
+
+        {/* Imagen */}
+        <div className="border-2 border-dashed rounded-xl p-4 text-center">
+          <label className="cursor-pointer text-jungle-600 font-medium">
+            {form.image ? 'Cambiar imagen' : 'Subir imagen del negocio'}
+            <input type="file" accept="image/*" hidden onChange={handleFileChange} />
+          </label>
+
+          {form.image && (
+            <img
+              src={URL.createObjectURL(form.image)}
+              className="mt-4 mx-auto w-40 h-40 object-cover rounded-xl"
+            />
+          )}
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-jungle-600 hover:bg-jungle-700 text-white py-3 rounded-xl font-semibold transition disabled:opacity-50"
+        >
+          {loading ? 'Enviando…' : 'Registrar negocio'}
+        </button>
+      </form>
+    </div>
+  </main>
+)
+
 }
