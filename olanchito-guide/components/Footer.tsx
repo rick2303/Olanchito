@@ -71,12 +71,12 @@ export default function Footer() {
                 Olanchito, Yoro, Honduras
               </span>
               <a
-                href="mailto:contact@qali-t.com"
+                href="mailto:contact@olanchito.com"
                 className="inline-flex w-fit items-center gap-1.5 text-xs transition-colors hover:text-white"
                 style={{ color: "rgba(255,255,255,0.5)" }}
               >
                 <EnvelopeIcon className="h-3.5 w-3.5" />
-                contact@qali-t.com
+                contact@olanchito.com
               </a>
             </div>
           </div>
