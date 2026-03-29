@@ -1,126 +1,160 @@
 import Image from "next/image";
 import Link from "next/link";
+import { MapPinIcon, EnvelopeIcon } from "@heroicons/react/24/outline";
+
+const navLinks = [
+  { href: "/", label: "Inicio" },
+  { href: "/categories", label: "Categorías" },
+  { href: "/businesses", label: "Negocios" },
+  { href: "/join", label: "Registrar negocio" },
+];
+
+const companyLinks = [
+  { href: "mailto:contact@qali-t.com", label: "Contacto", external: false },
+  { href: "https://qali-t.com", label: "qali-t.com", external: true },
+  { href: "https://vennq.com", label: "VennQ", external: true },
+];
 
 export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="w-full border-t border-jungle-700/25 bg-jungle-600/90 backdrop-blur supports-[backdrop-filter]:bg-jungle-600/75">
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6">
-        <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
-          {/* Branding */}
-          <div className="flex flex-col gap-3">
+    <footer
+      style={{
+        background: "var(--primary)",
+        borderTop: "1px solid rgba(255,255,255,0.06)",
+      }}
+    >
+      <div className="section-container py-14">
+        {/* Top grid */}
+        <div className="grid gap-10 lg:grid-cols-[1.6fr_1fr_1fr]">
+          {/* Brand column */}
+          <div>
             <div className="flex items-center gap-3">
-              <span className="relative grid h-10 w-10 place-items-center overflow-hidden rounded-2xl bg-white/10 ring-1 ring-white/15 shadow-sm">
-                <Image src="/colibri.png" alt="Olanchito" width={26} height={26} />
-                <span className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-white/0" />
+              <span
+                className="grid h-10 w-10 place-items-center rounded-xl border"
+                style={{
+                  background: "linear-gradient(180deg, #FFFFFF 0%, #ECF2EE 100%)",
+                  borderColor: "rgba(255,255,255,0.25)",
+                  boxShadow: "0 6px 16px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.85)",
+                }}
+              >
+                <Image src="/colibri.png" alt="Olanchito" width={22} height={22} />
               </span>
-
-              <div className="leading-tight">
-                <p className="text-sm font-black tracking-tight text-white">Directorio Olanchito</p>
-                <p className="text-xs font-semibold text-white/75">
-                  Descubra negocios y servicios locales
+              <div>
+                <p
+                  className="text-base font-bold text-white"
+                  style={{ fontFamily: "var(--font-syne)", letterSpacing: "-0.02em" }}
+                >
+                  Directorio Olanchito
+                </p>
+                <p className="text-xs" style={{ color: "rgba(255,255,255,0.5)" }}>
+                  Negocios y servicios locales
                 </p>
               </div>
             </div>
 
-            <p className="max-w-md text-sm text-white/80">
-              Una guía simple y bonita para encontrar lo mejor de Olanchito.
+            <p
+              className="mt-5 max-w-sm text-sm leading-relaxed"
+              style={{ color: "rgba(255,255,255,0.65)" }}
+            >
+              Plataforma comunitaria para conectar a personas con los negocios
+              y servicios reales de Olanchito, Honduras.
             </p>
+
+            <div className="mt-5 flex flex-col gap-2">
+              <span
+                className="inline-flex w-fit items-center gap-1.5 text-xs"
+                style={{ color: "rgba(255,255,255,0.5)" }}
+              >
+                <MapPinIcon className="h-3.5 w-3.5" style={{ color: "var(--accent)" }} />
+                Olanchito, Yoro, Honduras
+              </span>
+              <a
+                href="mailto:contact@qali-t.com"
+                className="inline-flex w-fit items-center gap-1.5 text-xs transition-colors hover:text-white"
+                style={{ color: "rgba(255,255,255,0.5)" }}
+              >
+                <EnvelopeIcon className="h-3.5 w-3.5" />
+                contact@qali-t.com
+              </a>
+            </div>
           </div>
 
-          {/* Links */}
-          <div className="grid grid-cols-2 gap-8">
-            <div className="space-y-3">
-              <p className="text-xs font-extrabold uppercase tracking-wide text-white/90">
-                Navegación
-              </p>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <Link href="/" className="text-white/80 hover:text-white transition">
-                    Inicio
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/categories" className="text-white/80 hover:text-white transition">
-                    Categorías
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/businesses" className="text-white/80 hover:text-white transition">
-                    Negocios
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            <div className="space-y-3">
-              <p className="text-xs font-extrabold uppercase tracking-wide text-white/90">
-                QALI-T
-              </p>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <Link href="/join" className="text-white/80 hover:text-white transition">
-                    Únase al directorio
-                  </Link>
-                </li>
-                <li>
-                  <a href="mailto:contact@qali-t.com" className="text-white/80 hover:text-white transition">
-                    Contacto
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://qali-t.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-white/80 hover:text-white transition"
+          {/* Nav links */}
+          <div>
+            <p
+              className="mb-4 text-[10px] font-bold uppercase tracking-[0.12em]"
+              style={{ color: "rgba(255,255,255,0.4)" }}
+            >
+              Directorio
+            </p>
+            <ul className="space-y-2.5">
+              {navLinks.map(({ href, label }) => (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    className="text-sm transition-colors hover:text-white"
+                    style={{ color: "rgba(255,255,255,0.65)" }}
                   >
-                    Sitio web
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Company links */}
+          <div>
+            <p
+              className="mb-4 text-[10px] font-bold uppercase tracking-[0.12em]"
+              style={{ color: "rgba(255,255,255,0.4)" }}
+            >
+              QALI-T
+            </p>
+            <ul className="space-y-2.5">
+              {companyLinks.map(({ href, label, external }) => (
+                <li key={href}>
+                  <a
+                    href={href}
+                    target={external ? "_blank" : undefined}
+                    rel={external ? "noopener noreferrer" : undefined}
+                    className="text-sm transition-colors hover:text-white"
+                    style={{ color: "rgba(255,255,255,0.65)" }}
+                  >
+                    {label}
                   </a>
                 </li>
-              </ul>
-            </div>
+              ))}
+            </ul>
           </div>
         </div>
 
         {/* Divider */}
-        <div className="my-8 h-px w-full bg-white/15" />
+        <div className="my-10" style={{ height: 1, background: "rgba(255,255,255,0.08)" }} />
 
-        {/* Bottom bar */}
-<div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-  <a
-    href="https://qali-t.com"
-    target="_blank"
-    rel="noopener noreferrer"
-    className={[
-      "group inline-flex w-fit items-center gap-2 rounded-2xl",
-      "bg-white/10 px-3 py-2 ring-1 ring-white/15 shadow-sm",
-      "transition hover:bg-white/15 hover:-translate-y-[1px]",
-      "self-center sm:self-auto", //en mobile no ocupa todo, y se centra
-    ].join(" ")}
-  >
-    <span className="text-xs font-semibold text-white/80">Powered by</span>
+        {/* Bottom row */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <a
+            href="https://qali-t.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex w-fit items-center gap-2 rounded-xl px-3 py-1 text-xs font-medium transition-colors"
+            style={{
+              background: "rgba(255,255,255,0.07)",
+              border: "1px solid rgba(255,255,255,0.1)",
+              color: "rgba(255,255,255,0.65)",
+            }}
+          >
+            Powered by
 
-    <span className="grid h-7 w-7 place-items-center rounded-xl bg-white/10 ring-1 ring-white/15">
-      <Image src="/logo.png" alt="QALI-T" width={16} height={16} />
-    </span>
+              <Image src="/logo_blanco.png" alt="QALI-T" width={24} height={24} />
+          </a>
 
-    {/*flecha solo en desktop para que en mobile no “alargue” */}
-    <span
-      aria-hidden
-      className="ml-1 hidden sm:inline text-white/70 transition-transform duration-200 group-hover:translate-x-0.5"
-    >
-      →
-    </span>
-  </a>
-
-  <p className="text-xs text-white/75 text-center sm:text-left">
-    © {year} Directorio Olanchito · Todos los derechos reservados ·{" "}
-    <span className="font-extrabold text-white">QALI-T</span>
-  </p>
-</div>
-
+          <p className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
+            © {year} Directorio Olanchito · Todos los derechos reservados
+          </p>
+        </div>
       </div>
     </footer>
   );

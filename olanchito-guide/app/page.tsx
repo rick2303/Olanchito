@@ -1,370 +1,404 @@
-// app/page.tsx (Home)
-//Server Component (sin "use client")
-//Home del directorio + teaser "Coming soon" de VennQ (al final)
-//Fix: icon real en botón "Ver categorías"
-//VennQ: vista previa tipo “window mock” con imagen (sin recorte)
-//Quita "Registrar mi negocio" del bloque de confianza y del bloque VennQ
-
 import Link from "next/link";
 import Image from "next/image";
+import { supabase } from "@/lib/supabase";
 import { FaUtensils, FaHammer, FaPills, FaTools } from "react-icons/fa";
 import {
+  ArrowRightIcon,
   Squares2X2Icon,
+  BuildingStorefrontIcon,
+  PhoneIcon,
+  MapPinIcon,
   SparklesIcon,
-  RocketLaunchIcon,
-  ChartBarIcon,
+  CheckBadgeIcon,
+  ArrowTopRightOnSquareIcon,
 } from "@heroicons/react/24/outline";
+import DeviceMacbookMockup from "@/components/DeviceMacbookMockup";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 const featured = [
-  { title: "Restaurantes", slug: "restaurantes", Icon: FaUtensils, hint: "Comida, cafés y más" },
-  { title: "Ferreterías", slug: "ferreterias", Icon: FaHammer, hint: "Materiales y herramientas" },
-  { title: "Farmacias", slug: "farmacias", Icon: FaPills, hint: "Salud y bienestar" },
-  { title: "Servicios técnicos", slug: "servicios-tecnicos", Icon: FaTools, hint: "Reparación y soporte" },
+  { title: "Restaurantes", slug: "restaurantes", Icon: FaUtensils, hint: "Comida, cafés y más", color: "bg-orange-50 text-orange-600 ring-orange-200" },
+  { title: "Ferreterías", slug: "ferreterias", Icon: FaHammer, hint: "Materiales y herramientas", color: "bg-yellow-50 text-yellow-700 ring-yellow-200" },
+  { title: "Farmacias", slug: "farmacias", Icon: FaPills, hint: "Salud y bienestar", color: "bg-blue-50 text-blue-600 ring-blue-200" },
+  { title: "Servicios técnicos", slug: "servicios-tecnicos", Icon: FaTools, hint: "Reparación y soporte", color: "bg-purple-50 text-purple-600 ring-purple-200" },
 ];
 
-const stats = [
-  { k: "Negocios", v: "reales y verificados" },
-  { k: "Búsqueda", v: "por categoría y nombre" },
-  { k: "Ubicación", v: "para llegar más rápido" },
+const pillars = [
+  {
+    title: "Negocios verificados",
+    text: "Información validada para encontrar servicios confiables.",
+    Icon: CheckBadgeIcon,
+  },
+  {
+    title: "Contacto directo",
+    text: "Llamada, WhatsApp y redes sociales en un solo lugar.",
+    Icon: PhoneIcon,
+  },
+  {
+    title: "Ubicación precisa",
+    text: "Direcciones y mapas integrados para llegar rápido.",
+    Icon: MapPinIcon,
+  },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const [{ count: businessCount, error: businessError }, { count: categoryCount, error: categoryError }] =
+    await Promise.all([
+      supabase.from("businesses").select("id", { count: "exact", head: true }),
+      supabase.from("categories").select("id", { count: "exact", head: true }),
+    ]);
+
+  const totalBusinesses = businessError ? 0 : businessCount ?? 0;
+  const totalCategories = categoryError ? 0 : categoryCount ?? 0;
+  const avgPerCategory = totalCategories > 0 ? (totalBusinesses / totalCategories).toFixed(1) : "0.0";
+
+  const numberFormatter = new Intl.NumberFormat("es-HN");
+  const businessesLabel = numberFormatter.format(totalBusinesses);
+  const categoriesLabel = numberFormatter.format(totalCategories);
+
   return (
-    <main className="min-h-screen bg-jungle-50 text-jungle-950">
-      {/* HERO */}
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-jungle-700 via-jungle-600 to-jungle-50" />
+    <main className="page-shell">
+
+      {/* ─── HERO ────────────────────────────────────────── */}
+      <section className="hero-home relative overflow-hidden">
+        <div aria-hidden className="hero-home-grid pointer-events-none absolute inset-0" />
         <div
           aria-hidden
-          className="pointer-events-none absolute -top-40 left-1/2 h-[34rem] w-[34rem] -translate-x-1/2 rounded-full bg-white/10 blur-3xl"
+          className="hero-home-glow hero-home-glow-left pointer-events-none absolute -left-16 top-10 h-56 w-56 rounded-full"
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute -bottom-48 right-[-10rem] h-[30rem] w-[30rem] rounded-full bg-black/10 blur-3xl"
+          className="hero-home-glow hero-home-glow-right pointer-events-none absolute -right-20 bottom-8 h-72 w-72 rounded-full"
         />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -right-20 top-1/2 hidden -translate-y-1/2 lg:block"
+        >
+          <Image
+            src="/colibri.png"
+            alt=""
+            width={620}
+            height={620}
+            className="hero-home-colibri"
+          />
+        </div>
 
-        <div className="relative mx-auto max-w-7xl px-4 pb-14 pt-14 sm:px-6 sm:pb-20 sm:pt-16">
-          <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
-            {/* texto */}
-            <div className="text-center lg:text-left">
-              <div className="mx-auto inline-flex max-w-full flex-wrap items-center justify-center gap-2 rounded-full bg-white/10 px-4 py-2 text-[11px]  text-white ring-1 ring-white/15 backdrop-blur lg:mx-0 lg:justify-start">
-                <span className="inline-block h-2 w-2 rounded-full bg-jungle-300" />
-                Directorio local · Olanchito
-                <span className="hidden sm:inline">·</span>
-                <span className="hidden sm:inline">Comida · Servicios · Compras</span>
-              </div>
-
-              <h1 className="mt-6 text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl">
-                Todo Olanchito,
-                <span className="block text-white/90">en un solo lugar</span>
-              </h1>
-
-              <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-white/85 sm:text-lg lg:mx-0">
-                Encuentre negocios reales con información útil: dirección, horarios, teléfono, WhatsApp y ubicación.
-              </p>
-
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center lg:justify-start">
-                <Link
-                  href="/businesses"
-                  className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-6 py-3 text-sm font-extrabold text-jungle-900 shadow-[0_10px_30px_rgba(0,0,0,0.18)] ring-1 ring-white/30 transition hover:-translate-y-[1px] hover:shadow-[0_18px_50px_rgba(0,0,0,0.22)] active:translate-y-[1px]"
-                >
-                  Ver negocios
-                  <span className="transition-transform group-hover:translate-x-0.5" aria-hidden>
-                    →
-                  </span>
-                </Link>
-
-                <Link
-                  href="/categories"
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white/10 px-6 py-3 text-sm font-extrabold text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-white/15"
-                >
-                  <Squares2X2Icon className="h-5 w-5 text-white/90" />
-                  Ver categorías
-                </Link>
-              </div>
-
-              {/* stats */}
-              <div className="mx-auto mt-10 grid max-w-2xl grid-cols-1 gap-3 sm:grid-cols-3 lg:mx-0">
-                {stats.map((s) => (
-                  <div
-                    key={s.k}
-                    className="rounded-3xl bg-white/10 px-4 py-4 text-left ring-1 ring-white/15 backdrop-blur"
-                  >
-                    <p className="text-xs font-extrabold text-white/80">{s.k}</p>
-                    <p className="mt-1 text-sm font-semibold text-white">{s.v}</p>
-                  </div>
-                ))}
-              </div>
+        <div className="section-container relative py-14 text-center sm:py-16 lg:py-20">
+          <div>
+            <div className="hero-home-badge mx-auto mb-4 w-fit">
+              <span
+                className="inline-block h-1.5 w-1.5 rounded-full"
+                style={{ background: "var(--accent)" }}
+              />
+              Directorio local de Olanchito, Honduras
             </div>
 
-            {/* visual / mock */}
-            <div className="relative">
-              <div aria-hidden className="absolute -inset-6 rounded-[2.25rem] bg-white/10 blur-2xl" />
-              <div className="relative overflow-hidden rounded-[2.25rem] bg-white shadow-[0_25px_80px_rgba(0,0,0,0.22)] ring-1 ring-black/5">
-                <div className="flex items-center gap-2 border-b border-black/5 bg-jungle-50 px-4 py-3">
-                  <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-yellow-400" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-green-400" />
-                  <span className="ml-2 text-xs font-extrabold text-jungle-700">Vista previa</span>
-                </div>
+            <h1
+              className="mx-auto max-w-4xl text-4xl font-semibold sm:text-[3.15rem] lg:text-[3.75rem]"
+              style={{
+                fontFamily: "var(--font-syne)",
+                letterSpacing: "-0.028em",
+                lineHeight: 1.07,
+                color: "var(--ink)",
+              }}
+            >
+              Encuentre negocios locales
+              <span className="hero-home-highlight block">
+                con datos reales y contacto directo
+              </span>
+            </h1>
 
-                <div className="relative aspect-[16/10] w-full bg-jungle-50">
-                  <Image
-                    src="/home-hero-preview.png"
-                    alt="Vista previa del directorio"
-                    fill
-                    priority={false}
-                    sizes="(max-width: 1024px) 100vw, 520px"
-                    className="object-cover"
-                  />
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent" />
-                </div>
+            <p
+              className="mx-auto mt-5 max-w-2xl text-base leading-relaxed sm:text-lg"
+              style={{ color: "var(--ink-2)" }}
+            >
+              Busque por categoría, compare opciones y contacte por teléfono o WhatsApp en segundos.
+              Todo el directorio está pensado para encontrar rápido y con confianza.
+            </p>
 
-                <div className="grid gap-3 p-4 sm:grid-cols-2">
-                  <div className="rounded-3xl bg-white p-4 ring-1 ring-black/5">
-                    <p className="text-xs font-extrabold text-jungle-700">Búsqueda</p>
-                    <p className="mt-1 text-sm font-semibold text-jungle-950">Encuentre por nombre o categoría</p>
-                  </div>
-                  <div className="rounded-3xl bg-white p-4 ring-1 ring-black/5">
-                    <p className="text-xs font-extrabold text-jungle-700">Contacto</p>
-                    <p className="mt-1 text-sm font-semibold text-jungle-950">Teléfono y WhatsApp</p>
-                  </div>
-                </div>
-              </div>
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Link href="/businesses" className="btn-primary">
+                Explorar negocios
+                <ArrowRightIcon className="h-4 w-4" />
+              </Link>
+              <Link href="/categories" className="btn-secondary">
+                <Squares2X2Icon className="h-4 w-4" />
+                Ver categorías
+              </Link>
+            </div>
 
+            <div
+              className="mx-auto mt-8 grid w-full max-w-3xl gap-3 pt-6 sm:grid-cols-3"
+              style={{ borderTop: "1px solid var(--line-strong)" }}
+            >
+              <article
+                className="rounded-2xl px-4 py-3 text-center backdrop-blur-[2px] transition-transform duration-300 hover:-translate-y-0.5"
+                style={{
+                  background: "rgba(255,255,255,0.78)",
+                  border: "1px solid var(--line)",
+                  boxShadow: "0 8px 24px rgba(10,30,20,0.06)",
+                }}
+              >
+                <p className="text-xl font-semibold sm:text-2xl" style={{ fontFamily: "var(--font-syne)", color: "var(--ink)" }}>
+                  {businessesLabel}
+                </p>
+                <p className="text-xs" style={{ color: "var(--ink-3)" }}>
+                  Negocios activos
+                </p>
+              </article>
+
+              <article
+                className="rounded-2xl px-4 py-3 text-center backdrop-blur-[2px] transition-transform duration-300 hover:-translate-y-0.5"
+                style={{
+                  background: "rgba(255,255,255,0.78)",
+                  border: "1px solid var(--line)",
+                  boxShadow: "0 8px 24px rgba(10,30,20,0.06)",
+                }}
+              >
+                <p className="text-xl font-semibold sm:text-2xl" style={{ fontFamily: "var(--font-syne)", color: "var(--ink)" }}>
+                  {categoriesLabel}
+                </p>
+                <p className="text-xs" style={{ color: "var(--ink-3)" }}>
+                  Categorías disponibles
+                </p>
+              </article>
+
+              <article
+                className="rounded-2xl px-4 py-3 text-center backdrop-blur-[2px] transition-transform duration-300 hover:-translate-y-0.5"
+                style={{
+                  background: "rgba(255,255,255,0.78)",
+                  border: "1px solid var(--line)",
+                  boxShadow: "0 8px 24px rgba(10,30,20,0.06)",
+                }}
+              >
+                <p className="text-xl font-semibold sm:text-2xl" style={{ fontFamily: "var(--font-syne)", color: "var(--ink)" }}>
+                  {avgPerCategory}
+                </p>
+                <p className="text-xs" style={{ color: "var(--ink-3)" }}>
+                  Promedio por categoría
+                </p>
+              </article>
             </div>
           </div>
         </div>
-
-        <div className="relative -mt-6 h-10 bg-gradient-to-b from-transparent to-jungle-50" />
       </section>
 
-      {/* CATEGORÍAS DESTACADAS */}
-      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
-        <div className="mx-auto max-w-3xl text-center">
-          <h2 className="text-2xl font-black tracking-tight text-jungle-950 sm:text-3xl">
-            Explore por tipo de negocio
-          </h2>
-          <p className="mt-3 text-sm leading-relaxed text-jungle-700 sm:text-base">
-            Entre más rápido al tipo de negocio que necesita.
-          </p>
+      {/* ─── PILLARS ─────────────────────────────────────── */}
+      <section className="section-container py-12 sm:py-14">
+        <div className="grid gap-4 md:grid-cols-3">
+          {pillars.map(({ title, text, Icon }, i) => (
+            <article
+              key={title}
+              className={`panel flex items-start gap-4 p-5 animate-fade-up anim-delay-${i + 1}`}
+            >
+              <div className="icon-box flex-shrink-0">
+                <Icon className="h-5 w-5" />
+              </div>
+              <div>
+                <p
+                  className="text-sm font-semibold"
+                  style={{ fontFamily: "var(--font-syne)", color: "var(--ink)" }}
+                >
+                  {title}
+                </p>
+                <p className="mt-1 text-sm" style={{ color: "var(--ink-2)" }}>{text}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* ─── FEATURED CATEGORIES ────────────────────────── */}
+      <section className="section-container pb-14 sm:pb-16">
+        <div className="mb-8 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="section-label mb-2">Categorías destacadas</p>
+            <h2 className="heading-xl">Explore por tipo de negocio</h2>
+          </div>
+          <Link
+            href="/categories"
+            className="btn-secondary !py-2 !text-xs mt-2 sm:mt-0"
+          >
+            Ver todas
+            <ArrowRightIcon className="h-3.5 w-3.5" />
+          </Link>
         </div>
 
-        <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {featured.map(({ title, slug, Icon, hint }) => (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {featured.map(({ title, slug, hint, Icon, color }, i) => (
             <Link
               key={slug}
               href={`/businesses?category=${slug}&page=1`}
-              className={[
-                "group relative overflow-hidden rounded-3xl bg-white p-6",
-                "ring-1 ring-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.06)]",
-                "transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_18px_55px_rgba(0,0,0,0.12)]",
-              ].join(" ")}
+              className={`panel group p-5 transition-all duration-300 hover:-translate-y-1 animate-fade-up anim-delay-${i + 1}`}
+              style={{ "--tw-shadow": "var(--shadow-md)" } as React.CSSProperties}
             >
-              <div
-                aria-hidden
-                className="pointer-events-none absolute -right-10 -top-10 h-44 w-44 rounded-full bg-jungle-100 blur-2xl"
-              />
-              <div className="relative flex items-start gap-4">
-                <div className="grid h-12 w-12 place-items-center rounded-2xl bg-jungle-50 text-jungle-700 ring-1 ring-jungle-200 transition group-hover:scale-[1.03]">
-                  <Icon size={22} />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="text-base font-black text-jungle-950">{title}</h3>
-                  <p className="mt-1 text-sm font-semibold text-jungle-700">{hint}</p>
+              <span
+                className={`grid h-10 w-10 place-items-center rounded-xl ring-1 ${color}`}
+              >
+                <Icon size={18} />
+              </span>
 
-                  <div className="mt-4 inline-flex items-center gap-2 text-xs font-extrabold text-jungle-700">
-                    Ver negocios
-                    <span className="transition-transform group-hover:translate-x-0.5" aria-hidden>
-                      →
-                    </span>
-                  </div>
-                </div>
+              <div className="mt-3">
+                <h3
+                  className="text-sm font-semibold"
+                  style={{ fontFamily: "var(--font-syne)", color: "var(--ink)" }}
+                >
+                  {title}
+                </h3>
+                <p className="mt-0.5 text-xs" style={{ color: "var(--ink-3)" }}>{hint}</p>
               </div>
 
-              <div className="mt-6 h-1 w-full rounded-full bg-gradient-to-r from-jungle-200 via-jungle-400 to-jungle-200 opacity-70" />
+              <div
+                className="mt-4 flex items-center gap-1 text-xs font-semibold transition-transform group-hover:translate-x-0.5"
+                style={{ color: "var(--primary-mid)" }}
+              >
+                Ver negocios
+                <ArrowRightIcon className="h-3.5 w-3.5" />
+              </div>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* BLOQUE DE CONFIANZA / INFO (sin "Registrar mi negocio") */}
-      <section className="mx-auto max-w-7xl px-4 pb-6 sm:px-6 sm:pb-10">
-        <div className="rounded-[2.25rem] bg-white p-6 ring-1 ring-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.06)] sm:p-8">
-          <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
-            <div>
-              <h3 className="text-xl font-black text-jungle-950 sm:text-2xl">Hecho para negocios reales</h3>
-              <p className="mt-2 text-sm leading-relaxed text-jungle-700 sm:text-base">
-                Información clara, botones de contacto directos y ubicación para llegar más rápido.
-              </p>
+      {/* ─── CTA JOIN ────────────────────────────────────── */}
+      <section className="section-container pb-14 sm:pb-16">
+        <div
+          className="relative overflow-hidden rounded-2xl p-8 sm:p-10"
+          style={{
+            background: "linear-gradient(135deg, var(--surface-2) 0%, var(--surface) 100%)",
+            border: "1px solid var(--line)",
+          }}
+        >
+          {/* Decorative accent */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full opacity-30"
+            style={{
+              background: "radial-gradient(circle, var(--accent) 0%, transparent 70%)",
+              filter: "blur(40px)",
+            }}
+          />
 
-              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                <Link
-                  href="/businesses"
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-jungle-600 px-6 py-3 text-sm font-extrabold text-white shadow-sm transition hover:bg-jungle-700 active:translate-y-[1px]"
-                >
-                  Explorar directorio
-                  <span aria-hidden>→</span>
-                </Link>
+          <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="max-w-xl">
+              <div className="badge-primary mb-3 w-fit">
+                <BuildingStorefrontIcon className="h-3.5 w-3.5" />
+                Para propietarios
               </div>
+              <h3
+                className="text-2xl font-bold sm:text-3xl"
+                style={{ fontFamily: "var(--font-syne)", color: "var(--ink)", letterSpacing: "-0.025em" }}
+              >
+                ¿Tiene un negocio en Olanchito?
+              </h3>
+              <p className="mt-2 text-sm" style={{ color: "var(--ink-2)" }}>
+                Aparezca en el directorio gratis y mejore su visibilidad local. Miles de vecinos buscan aquí.
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-2.5 sm:flex-row">
+              <Link href="/join" className="btn-primary">
+                Registrar negocio
+                <ArrowRightIcon className="h-4 w-4" />
+              </Link>
+              <Link href="/businesses" className="btn-secondary">
+                Ver directorio
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA FINAL (queda antes del VennQ como pidió) */}
-      <section className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
-        <div className="relative overflow-hidden rounded-[2.5rem] bg-jungle-600 p-8 text-center text-white shadow-[0_25px_80px_rgba(0,0,0,0.18)] sm:p-12">
+      {/* ─── VENNQ COMING SOON ───────────────────────────── */}
+      <section className="section-container pb-10 sm:pb-12">
+        <div
+          className="relative overflow-hidden rounded-xl"
+          style={{ background: "var(--primary)" }}
+        >
+          {/* Mesh accent */}
           <div
             aria-hidden
-            className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-white/10 blur-3xl"
+            className="pointer-events-none absolute -left-16 -top-10 h-52 w-52 rounded-full opacity-20"
+            style={{
+              background: "radial-gradient(circle, var(--accent) 0%, transparent 70%)",
+              filter: "blur(40px)",
+            }}
           />
           <div
             aria-hidden
-            className="pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-black/10 blur-3xl"
+            className="pointer-events-none absolute -right-8 -bottom-12 h-48 w-48 rounded-full opacity-10"
+            style={{
+              background: "radial-gradient(circle, rgba(255,255,255,0.4) 0%, transparent 70%)",
+              filter: "blur(48px)",
+            }}
           />
 
-          <h2 className="relative text-2xl font-black sm:text-3xl">¿Tiene un negocio en Olanchito?</h2>
-          <p className="relative mx-auto mt-3 max-w-2xl text-sm font-semibold text-white/90 sm:text-base">
-            Únase al directorio y aumente su visibilidad local. Enlace directo a WhatsApp, teléfono, ubicación y redes.
-          </p>
-
-          <div className="relative mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <Link
-              href="/join"
-              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white px-8 py-3 text-sm font-extrabold text-jungle-900 shadow-sm transition hover:-translate-y-[1px] hover:shadow-md active:translate-y-[1px]"
-            >
-              Únase ahora
-              <span aria-hidden>→</span>
-            </Link>
-
-            <Link
-              href="/businesses"
-              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-white/10 px-8 py-3 text-sm font-extrabold text-white ring-1 ring-white/20 backdrop-blur transition hover:bg-white/15"
-            >
-              Ver el directorio
-              <span aria-hidden>→</span>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/*COMING SOON: VennQ ERP (AL FINAL, sin botón de registrar negocio) */}
-      <section className="mx-auto max-w-7xl px-4 pb-14 sm:px-6 sm:pb-20">
-        <div className="relative overflow-hidden rounded-[2.25rem] bg-gradient-to-br from-white to-jungle-50 p-6 ring-1 ring-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.06)] sm:p-8">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-jungle-200/40 blur-3xl"
-          />
-          <div
-            aria-hidden
-            className="pointer-events-none absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-jungle-300/30 blur-3xl"
-          />
-
-          <div className="relative grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
-            {/* texto */}
+          <div className="relative grid items-center gap-5 p-6 sm:p-7 lg:grid-cols-[minmax(0,1fr)_minmax(0,560px)] lg:gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(0,620px)]">
             <div>
-              <div className="inline-flex items-center gap-2 rounded-full bg-jungle-600 px-3 py-1.5 text-[11px] font-extrabold text-white shadow-sm">
-                <SparklesIcon className="h-4 w-4" />
-                Coming soon
+              <div className="mb-3 flex items-center gap-2">
+                <div className="badge-dark w-fit">
+                  <SparklesIcon className="h-3.5 w-3.5" style={{ color: "var(--accent)" }} />
+                  Próximamente
+                </div>
+                <span
+                  className="text-[10px] font-bold uppercase tracking-[0.1em]"
+                  style={{ color: "rgba(255,255,255,0.35)" }}
+                >
+                  Solución para PYMEs
+                </span>
               </div>
 
-              <h3 className="mt-4 text-xl font-black tracking-tight text-jungle-950 sm:text-2xl">
-                VennQ ERP para negocios
+              <h3
+                className="text-2xl font-bold text-white sm:text-[1.9rem]"
+                style={{ fontFamily: "var(--font-syne)", letterSpacing: "-0.03em", lineHeight: 1.1 }}
+              >
+                VennQ para negocios
+                <span className="block" style={{ color: "var(--accent)" }}>
+                  Ventas, inventario y operación multi-sucursal
+                </span>
               </h3>
 
-              <p className="mt-2 text-sm leading-relaxed text-jungle-700 sm:text-base">
-                Muy pronto: un ERP completo para administrar su negocio (clientes, productos, ventas, empleados y reportes),
-                con POS moderno por industria.
+              <p
+                className="mt-2.5 max-w-2xl text-sm leading-relaxed"
+                style={{ color: "rgba(255,255,255,0.62)" }}
+              >
+                Centralice caja, inventario y control diario en una sola plataforma, diseñada para crecer con su negocio.
               </p>
 
-              <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                <div className="rounded-2xl bg-white p-4 ring-1 ring-black/5">
-                  <div className="inline-flex items-center gap-2 text-xs font-extrabold text-jungle-800">
-                    <ChartBarIcon className="h-4 w-4 text-jungle-700" />
-                    Dashboard
-                  </div>
-                  <p className="mt-1 text-xs font-semibold text-jungle-700">KPIs + reportes claros</p>
-                </div>
-
-                <div className="rounded-2xl bg-white p-4 ring-1 ring-black/5">
-                  <div className="inline-flex items-center gap-2 text-xs font-extrabold text-jungle-800">
-                    <RocketLaunchIcon className="h-4 w-4 text-jungle-700" />
-                    POS por industria
-                  </div>
-                  <p className="mt-1 text-xs font-semibold text-jungle-700">Restaurante · Súper · Automotriz y más...</p>
-                </div>
-
-                <div className="rounded-2xl bg-white p-4 ring-1 ring-black/5">
-                  <div className="inline-flex items-center gap-2 text-xs font-extrabold text-jungle-800">
-                    <SparklesIcon className="h-4 w-4 text-jungle-700" />
-                    Inventario
-                  </div>
-                  <p className="mt-1 text-xs font-semibold text-jungle-700">Control y movimientos</p>
-                </div>
-              </div>
-
-              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                <Link
+              <div className="mt-4 flex flex-wrap items-center gap-2.5">
+                <a
+                  href="https://pre-register.vennq.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-white !px-4 !py-2 !text-xs"
+                >
+                  Solicitar acceso anticipado
+                  <ArrowTopRightOnSquareIcon className="h-3.5 w-3.5" />
+                </a>
+                <a
                   href="https://vennq.com"
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl bg-jungle-600 px-6 py-3 text-sm font-extrabold text-white shadow-sm transition hover:bg-jungle-700 active:translate-y-[1px]"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-ghost !px-4 !py-2 !text-xs"
                 >
                   Conocer VennQ
-                  <span aria-hidden>→</span>
-                </Link>
+                  <ArrowRightIcon className="h-3.5 w-3.5" />
+                </a>
               </div>
-
-              <p className="mt-3 text-xs font-semibold text-jungle-700/80">
-                *VennQ es un producto aparte del directorio.
-              </p>
             </div>
 
-            {/* preview tipo “window mock” con imagen (sin recorte) */}
-            <div className="relative">
-              <div aria-hidden className="absolute -inset-6 rounded-[2.25rem] bg-jungle-200/35 blur-2xl" />
-              <div className="relative overflow-hidden rounded-[2.25rem] bg-white shadow-[0_25px_80px_rgba(0,0,0,0.14)] ring-1 ring-black/5">
-                <div className="flex items-center gap-2 border-b border-black/5 bg-jungle-50 px-4 py-3">
-                  <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-yellow-400" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-green-400" />
-                  <span className="ml-2 text-xs font-extrabold text-jungle-700">VennQ · Vista previa</span>
-
-                  <span className="ml-auto rounded-full bg-jungle-600/10 px-2 py-1 text-[10px] font-extrabold text-jungle-700 ring-1 ring-jungle-200">
-                    ERP
-                  </span>
-                </div>
-
-                <div className="bg-jungle-50 p-3 sm:p-4">
-                  <div className="relative aspect-[16/11] w-full overflow-hidden rounded-2xl bg-white ring-1 ring-black/5">
-                    <Image
-                      src="/vennq-preview.png"
-                      alt="Vista previa de VennQ ERP"
-                      fill
-                      priority={false}
-                      sizes="(max-width: 1024px) 100vw, 520px"
-                      className="object-contain"
-                    />
-                    <div className="pointer-events-none absolute inset-0 ring-1 ring-black/5" />
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-transparent" />
-                  </div>
-                </div>
-
-                <div className="grid gap-3 p-4 sm:grid-cols-2">
-                  <div className="rounded-3xl bg-white p-4 ring-1 ring-black/5">
-                    <p className="text-xs font-extrabold text-jungle-700">ERP</p>
-                    <p className="mt-1 text-sm font-semibold text-jungle-950">Ventas, inventario, clientes</p>
-                  </div>
-                  <div className="rounded-3xl bg-white p-4 ring-1 ring-black/5">
-                    <p className="text-xs font-extrabold text-jungle-700">POS</p>
-                    <p className="mt-1 text-sm font-semibold text-jungle-950">Flujos por industria</p>
-                  </div>
-                </div>
-              </div>
-
+            <div className="hidden items-center justify-end px-1 md:flex lg:pr-5 xl:pr-6">
+              <DeviceMacbookMockup
+                className="mqy-macbook-hero w-full max-w-[560px] xl:max-w-[620px]"
+                src="/vennq-preview.png"
+                alt="Vista previa de VennQ — Plataforma de operación para PYMEs"
+              />
             </div>
           </div>
         </div>
       </section>
+
     </main>
   );
 }

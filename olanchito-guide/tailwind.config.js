@@ -6,6 +6,10 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        syne: ["var(--font-syne)", "sans-serif"],
+        jakarta: ["var(--font-jakarta)", "sans-serif"],
+      },
       colors: {
         'jungle': {
           50: '#f2fbf8',

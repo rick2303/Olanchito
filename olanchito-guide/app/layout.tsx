@@ -1,11 +1,27 @@
-// app/layout.tsx
 import "./globals.css";
+import "devices.css/dist/devices.min.css";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import type { Metadata } from "next";
 import Script from "next/script";
+import { Syne, Plus_Jakarta_Sans } from "next/font/google";
+
+const syne = Syne({
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-syne",
+});
+
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  display: "swap",
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-jakarta",
+});
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://olanchito.com"),
   title: "Olanchito Honduras | Directorio de Negocios y Servicios Locales",
   description:
     "Descubre negocios, servicios, comercios y emprendimientos locales en Olanchito, Honduras. Directorio comunitario con información real y contacto directo.",
@@ -46,17 +62,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Script id="google-analytics" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
+            function gtag(){dataLayer.push(arguments);} 
             gtag('js', new Date());
             gtag('config', 'G-4JD3KFCW4J');
           `}
         </Script>
       </head>
 
-      <body className="min-h-screen bg-jungle-50 text-jungle-950">
+      <body className={`${syne.variable} ${jakarta.variable} font-jakarta page-shell`}>
         <div className="min-h-screen flex flex-col">
           <Header />
-          <main className="flex-1">{children}</main>
+          <main className="relative flex-1">{children}</main>
           <Footer />
         </div>
       </body>

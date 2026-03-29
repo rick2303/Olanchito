@@ -2,7 +2,539 @@
 @tailwind components;
 @tailwind utilities;
 
-/* opcional */
-body {
-  background-color: white;
+@layer base {
+  :root {
+    --font-syne: 'Syne', sans-serif;
+    --font-jakarta: 'Plus Jakarta Sans', sans-serif;
+
+    /* Core surfaces */
+    --bg: #F3F6F3;
+    --surface: #FFFFFF;
+    --surface-2: #EDF1EC;
+    --surface-3: #E4EBE3;
+
+    /* Ink / text */
+    --ink: #0C1E17;
+    --ink-2: #3A5749;
+    --ink-3: #6B8A7A;
+
+    /* Brand */
+    --primary: #124934;
+    --primary-hover: #0F5A3F;
+    --primary-mid: #2E6B52;
+    --accent: #35B98C;
+    --accent-soft: #DEF4EA;
+
+    /* System */
+    --line: rgba(10, 30, 20, 0.07);
+    --line-strong: rgba(10, 30, 20, 0.13);
+    --shadow-xs: 0 1px 3px rgba(10, 30, 20, 0.06), 0 1px 2px rgba(10, 30, 20, 0.04);
+    --shadow-sm: 0 4px 12px rgba(10, 30, 20, 0.07), 0 1px 4px rgba(10, 30, 20, 0.04);
+    --shadow-md: 0 12px 32px rgba(10, 30, 20, 0.09), 0 4px 10px rgba(10, 30, 20, 0.05);
+    --shadow-lg: 0 24px 60px rgba(10, 30, 20, 0.12), 0 8px 20px rgba(10, 30, 20, 0.06);
+  }
+
+  * {
+    @apply border-transparent;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-jakarta), sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-syne), sans-serif;
+    letter-spacing: -0.02em;
+  }
+
+  ::selection {
+    background: rgba(22, 184, 118, 0.18);
+    color: var(--primary);
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 99px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--ink-3); }
+}
+
+@layer components {
+
+  /* ─── Layout ─────────────────────────────────────────── */
+  .page-shell {
+    @apply min-h-screen;
+  }
+
+  .section-container {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .section-gap {
+    @apply py-14 sm:py-20;
+  }
+
+  /* ─── Surfaces ───────────────────────────────────────── */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .panel-flat {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+  }
+
+  .panel-dark {
+    background: var(--primary);
+    border-radius: 16px;
+  }
+
+  .panel-accent {
+    background: var(--accent-soft);
+    border: 1px solid rgba(22, 184, 118, 0.2);
+    border-radius: 16px;
+  }
+
+  /* ─── Typography ─────────────────────────────────────── */
+  .heading-display {
+    font-family: var(--font-syne), sans-serif;
+    @apply text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl;
+    color: var(--ink);
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+  }
+
+  .heading-xl {
+    font-family: var(--font-syne), sans-serif;
+    @apply text-3xl font-bold tracking-tight sm:text-4xl;
+    color: var(--ink);
+    letter-spacing: -0.025em;
+  }
+
+  .heading-lg {
+    font-family: var(--font-syne), sans-serif;
+    @apply text-2xl font-bold;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+
+  .heading-md {
+    font-family: var(--font-syne), sans-serif;
+    @apply text-xl font-bold;
+    color: var(--ink);
+    letter-spacing: -0.015em;
+  }
+
+  .text-muted {
+    @apply text-sm leading-relaxed sm:text-base;
+    color: var(--ink-2);
+  }
+
+  .text-caption {
+    @apply text-xs font-semibold;
+    color: var(--ink-3);
+  }
+
+  /* ─── Badges ─────────────────────────────────────────── */
+  .badge {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold;
+    background: var(--surface-2);
+    color: var(--ink-2);
+    border: 1px solid var(--line);
+  }
+
+  .badge-primary {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold;
+    background: rgba(22, 184, 118, 0.12);
+    color: var(--primary-mid);
+    border: 1px solid rgba(22, 184, 118, 0.2);
+  }
+
+  .badge-dark {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold;
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.85);
+    border: 1px solid rgba(255,255,255,0.18);
+  }
+
+  /* ─── Buttons ────────────────────────────────────────── */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold text-white transition-all duration-200;
+    background: var(--primary);
+    box-shadow: 0 1px 3px rgba(10,30,20,0.2), inset 0 1px 0 rgba(255,255,255,0.07);
+  }
+  .btn-primary:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(10,30,20,0.22);
+  }
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-200;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--line-strong);
+    box-shadow: var(--shadow-xs);
+  }
+  .btn-secondary:hover {
+    background: var(--surface-2);
+    border-color: var(--ink-3);
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-200;
+    color: rgba(255,255,255,0.85);
+    border: 1px solid rgba(255,255,255,0.22);
+    background: rgba(255,255,255,0.08);
+  }
+  .btn-ghost:hover {
+    background: rgba(255,255,255,0.14);
+    border-color: rgba(255,255,255,0.3);
+    color: white;
+  }
+
+  .btn-white {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all duration-200;
+    background: white;
+    color: var(--primary);
+    box-shadow: var(--shadow-sm);
+  }
+  .btn-white:hover {
+    background: var(--surface-2);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+
+  /* ─── Form fields ────────────────────────────────────── */
+  .field {
+    @apply w-full rounded-xl px-4 py-2.5 text-sm font-medium outline-none transition-all duration-200;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--line-strong);
+    box-shadow: var(--shadow-xs);
+  }
+  .field::placeholder { color: var(--ink-3); }
+  .field:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(22, 184, 118, 0.15);
+  }
+
+  /* ─── Category filter pills ──────────────────────────── */
+  .filter-pill {
+    @apply inline-flex flex-shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all duration-200 whitespace-nowrap;
+    background: var(--surface);
+    color: var(--ink-2);
+    border: 1px solid var(--line-strong);
+  }
+  .filter-pill:hover {
+    background: var(--surface-2);
+    color: var(--ink);
+    border-color: var(--ink-3);
+  }
+  .filter-pill.active {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+    box-shadow: 0 2px 8px rgba(10,30,20,0.2);
+  }
+
+  /* ─── Animations ─────────────────────────────────────── */
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  @keyframes slide-right {
+    from { opacity: 0; transform: translateX(-12px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  .animate-fade-up {
+    animation: fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.4s ease both;
+  }
+
+  .anim-delay-1 { animation-delay: 0.08s; }
+  .anim-delay-2 { animation-delay: 0.16s; }
+  .anim-delay-3 { animation-delay: 0.24s; }
+  .anim-delay-4 { animation-delay: 0.32s; }
+  .anim-delay-5 { animation-delay: 0.40s; }
+
+  .hero-home {
+    background:
+      linear-gradient(96deg, rgba(255,255,255,0.95) 0%, rgba(246,250,247,0.95) 56%, rgba(233,242,237,0.95) 100%),
+      linear-gradient(180deg, #f8fbf9 0%, #eff5f1 100%);
+    border-bottom: 1px solid rgba(10, 30, 20, 0.08);
+  }
+
+  .hero-home::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(110deg, transparent 0 57%, rgba(18, 73, 52, 0.06) 57% 100%);
+  }
+
+  .hero-home-grid {
+    opacity: 0.25;
+    background-image:
+      linear-gradient(rgba(18,73,52,0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(18,73,52,0.07) 1px, transparent 1px);
+    background-size: 62px 62px;
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0.15));
+  }
+
+  .hero-home-glow {
+    filter: blur(52px);
+    opacity: 0.58;
+  }
+
+  .hero-home-glow-left {
+    background: radial-gradient(circle, rgba(57, 190, 142, 0.22) 0%, rgba(57, 190, 142, 0) 72%);
+  }
+
+  .hero-home-glow-right {
+    background: radial-gradient(circle, rgba(24, 96, 70, 0.17) 0%, rgba(24, 96, 70, 0) 74%);
+  }
+
+  .hero-home-colibri {
+    width: clamp(360px, 34vw, 620px);
+    height: auto;
+    opacity: 1;
+    filter: none;
+    mix-blend-mode: normal;
+    transform: rotate(-13deg);
+    user-select: none;
+  }
+
+  .hero-home-badge {
+    @apply inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold;
+    background: rgba(18, 73, 52, 0.08);
+    color: var(--primary-mid);
+    border: 1px solid rgba(18, 73, 52, 0.16);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
+  }
+
+  .hero-home-highlight {
+    background: linear-gradient(90deg, #1c664b 0%, #2ea57f 64%, #4bb995 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  @media (max-width: 640px) {
+    .hero-home::before {
+      background: linear-gradient(110deg, transparent 0 66%, rgba(18, 73, 52, 0.05) 66% 100%);
+    }
+  }
+
+  /* ─── Nav ────────────────────────────────────────────── */
+  .nav-link {
+    @apply inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150;
+    color: var(--ink-2);
+  }
+  .nav-link:hover { color: var(--ink); background: var(--surface-2); }
+  .nav-link.active {
+    color: var(--primary);
+    background: var(--accent-soft);
+    font-weight: 600;
+  }
+
+  /* ─── Stat/pillar block ──────────────────────────────── */
+  .stat-card {
+    @apply flex flex-col gap-1 rounded-2xl p-5;
+    background: var(--surface);
+    border: 1px solid var(--line);
+  }
+
+  /* ─── Icon container ─────────────────────────────────── */
+  .icon-box {
+    @apply grid place-items-center rounded-xl;
+    width: 40px;
+    height: 40px;
+    background: var(--surface-2);
+    color: var(--primary-mid);
+    flex-shrink: 0;
+  }
+
+  .icon-box-dark {
+    @apply grid place-items-center rounded-xl;
+    width: 40px;
+    height: 40px;
+    background: rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.85);
+    flex-shrink: 0;
+  }
+
+  /* ─── Divider ────────────────────────────────────────── */
+  .divider {
+    height: 1px;
+    background: var(--line);
+  }
+
+  /* ─── Section header ─────────────────────────────────── */
+  .section-label {
+    @apply text-xs font-bold uppercase tracking-[0.1em];
+    color: var(--accent);
+  }
+
+  /* ─── Scrollable row (filter pills) ─────────────────── */
+  .scroll-row {
+    @apply flex items-center gap-2 overflow-x-auto pb-0.5;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scroll-row::-webkit-scrollbar { display: none; }
+}
+
+/* ── Device MacBook Mockup (devices.css wrapper) ───────────────────────────── */
+
+.mqy-macbook-wrap {
+  --mqy-macbook-scale: 0.78;
+  display: flex;
+  justify-content: center;
+  overflow: visible;
+  width: 100%;
+  height: calc(458px * var(--mqy-macbook-scale));
+  background: transparent !important;
+}
+
+/* In hero promo, avoid bleeding over the left text column. */
+.mqy-macbook-wrap.mqy-macbook-hero {
+  --mqy-macbook-scale: 0.5;
+  justify-content: flex-end;
+  padding-right: 8px;
+}
+
+.mqy-macbook-wrap.mqy-macbook-hero .mqy-macbook {
+  transform-origin: top right;
+}
+
+@media (min-width: 1280px) {
+  .mqy-macbook-wrap.mqy-macbook-hero {
+    --mqy-macbook-scale: 0.55;
+    padding-right: 12px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .mqy-macbook-wrap.mqy-macbook-hero {
+    --mqy-macbook-scale: 0.6;
+    padding-right: 16px;
+  }
+}
+
+.mqy-macbook {
+  transform: scale(var(--mqy-macbook-scale)) !important;
+  transform-origin: top center;
+  flex-shrink: 0;
+  filter: none;
+  background: transparent !important;
+}
+
+.mqy-macbook.device-macbook-pro .device-frame {
+  background: #181a1f !important;
+  border-radius: 20px !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 0 0 2px rgba(74, 80, 90, 0.75) !important;
+  padding: 6px 6px 16px 6px !important;
+}
+
+.mqy-macbook.device-macbook-pro .device-frame::after {
+  left: 1px !important;
+  bottom: 1px !important;
+  width: calc(100% - 2px) !important;
+  height: 16px !important;
+  border-radius: 0 0 16px 16px !important;
+  background: linear-gradient(to bottom, #2d3036, #17191d) !important;
+}
+
+.mqy-macbook.device-macbook-pro .device-header {
+  top: 7px !important;
+  width: 84px !important;
+  height: 10px !important;
+  margin-left: -42px !important;
+  border-bottom-left-radius: 8px !important;
+  border-bottom-right-radius: 8px !important;
+  background: #1e2229 !important;
+}
+
+.mqy-macbook.device-macbook-pro .device-screen {
+  width: 100% !important;
+  height: calc(100% - 16px) !important;
+  border: 1px solid #2c3139 !important;
+  border-radius: 10px 10px 0 0 !important;
+  object-fit: contain !important;
+  object-position: center center !important;
+  background: #ffffff !important;
+}
+
+.mqy-macbook.device-macbook-pro .device-power {
+  margin-top: -8px !important;
+  height: 18px !important;
+  border-width: 1px 2px 0 2px !important;
+  border-radius: 0 0 12px 12px !important;
+  background: radial-gradient(
+    circle at center,
+    #4b5059 75%,
+    #2f333a 100%
+  ) !important;
+  border-color: #3b4048 !important;
+}
+
+.mqy-macbook.device-macbook-pro .device-power::after {
+  width: 94px !important;
+  height: 7px !important;
+  margin-left: -47px !important;
+  border-radius: 0 0 8px 8px !important;
+  background: #5b626d !important;
+  box-shadow: inset 0 0 2px 1px #2f333a !important;
+}
+
+.mqy-macbook.device-macbook-pro .device-power::before {
+  box-shadow:
+    -298px 0 #343943,
+    298px 0 #343943 !important;
+}
+
+@media (max-width: 1024px) {
+  .mqy-macbook-wrap {
+    --mqy-macbook-scale: 0.64;
+  }
+}
+
+@media (max-width: 640px) {
+  .mqy-macbook-wrap {
+    --mqy-macbook-scale: 0.47;
+  }
+}
+
+@media (max-width: 480px) {
+  .mqy-macbook-wrap {
+    --mqy-macbook-scale: 0.4;
+  }
 }

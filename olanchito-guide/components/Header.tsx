@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import {
   Bars3Icon,
   XMarkIcon,
@@ -11,7 +12,6 @@ import {
   Squares2X2Icon,
   BuildingStorefrontIcon,
   MapPinIcon,
-  SparklesIcon,
 } from "@heroicons/react/24/outline";
 
 const navItems = [
@@ -20,231 +20,236 @@ const navItems = [
   { href: "/businesses", label: "Negocios", icon: BuildingStorefrontIcon },
 ];
 
-const vennqHref = "https://vennq.com"; // o "/vennq"
+function isActive(pathname: string, href: string) {
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 export default function Header() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const firstMobileLinkRef = useRef<HTMLAnchorElement | null>(null);
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const firstLinkRef = useRef<HTMLAnchorElement | null>(null);
 
   useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMenuOpen(false);
-    };
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
-    if (menuOpen) {
-      document.addEventListener("keydown", onKeyDown);
+  useEffect(() => {
+    const onEsc = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    if (open) {
       document.body.style.overflow = "hidden";
-      setTimeout(() => firstMobileLinkRef.current?.focus(), 0);
+      document.addEventListener("keydown", onEsc);
+      setTimeout(() => firstLinkRef.current?.focus(), 0);
     } else {
       document.body.style.overflow = "";
     }
-
     return () => {
-      document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = "";
+      document.removeEventListener("keydown", onEsc);
     };
-  }, [menuOpen]);
+  }, [open]);
 
-  const closeMenu = () => setMenuOpen(false);
+  const close = () => setOpen(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full">
-      {/* Top bar */}
-      <div className="bg-jungle-950 text-white/80">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 text-xs sm:px-6">
-          <span className="hidden sm:block">
-            Descubra negocios, comida y servicios en Olanchito
-          </span>
-
-          <span className="ml-auto inline-flex items-center gap-2">
-            <MapPinIcon className="h-4 w-4 text-jungle-200" />
-            <span className="inline-flex items-center gap-2">
-              <span className="inline-block h-2 w-2 rounded-full bg-jungle-400" />
-              Guía local
-            </span>
-          </span>
-        </div>
-      </div>
-
-      {/* Navbar principal */}
-      <div className="border-b border-jungle-700/25 bg-jungle-600/90 backdrop-blur supports-[backdrop-filter]:bg-jungle-600/75">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
+    <header className="sticky top-0 z-50">
+      <div
+        className="transition-all duration-300"
+        style={{
+          background: scrolled
+            ? "rgba(255,255,255,0.92)"
+            : "rgba(255,255,255,0.97)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          borderBottom: `1px solid ${scrolled ? "rgba(10,30,20,0.09)" : "rgba(10,30,20,0.06)"}`,
+          boxShadow: scrolled ? "0 4px 20px rgba(10,30,20,0.07)" : "none",
+        }}
+      >
+        <div className="section-container flex h-[3.75rem] items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="group flex items-center gap-3">
-            <span className="relative grid h-11 w-11 place-items-center overflow-hidden rounded-2xl bg-white/10 ring-1 ring-white/15 transition group-hover:bg-white/15">
-              <Image
-                src="/colibri.png"
-                alt="Colibrí Olanchito"
-                width={28}
-                height={28}
-                priority
-              />
-              <span className="pointer-events-none absolute inset-0 opacity-0 transition group-hover:opacity-100 bg-gradient-to-tr from-white/0 via-white/10 to-white/0" />
+          <Link
+            href="/"
+            onClick={close}
+            className="group flex items-center gap-2.5 outline-none"
+          >
+            <span
+              className="grid h-9 w-9 place-items-center rounded-xl border transition-transform duration-200 group-hover:scale-[1.04]"
+              style={{
+                background: "linear-gradient(180deg, #FFFFFF 0%, #F4F7F4 100%)",
+                borderColor: "rgba(10,30,20,0.13)",
+                boxShadow: "0 3px 10px rgba(10,30,20,0.16), inset 0 1px 0 rgba(255,255,255,0.9)",
+              }}
+            >
+              <Image src="/colibri.png" alt="Olanchito" width={20} height={20} priority />
             </span>
-
-            <div className="leading-tight">
-              <span className="block text-lg font-black tracking-tight text-white">
+            <span className="leading-none">
+              <span
+                className="block text-base font-bold"
+                style={{ fontFamily: "var(--font-syne)", color: "var(--ink)", letterSpacing: "-0.02em" }}
+              >
                 Olanchito
               </span>
-              <span className="block text-[11px] font-semibold text-white/75">
-                Encuentre lo mejor cerca
+              <span className="block text-[10px] font-medium" style={{ color: "var(--ink-3)" }}>
+                Guía empresarial local
               </span>
-            </div>
+            </span>
           </Link>
 
-          {/* Links escritorio */}
-          <nav className="hidden items-center gap-1 sm:flex">
+          {/* Desktop nav */}
+          <nav className="hidden items-center gap-1 md:flex" aria-label="Navegación principal">
             {navItems.map((item) => {
               const Icon = item.icon;
+              const active = isActive(pathname, item.href);
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="group relative inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-white/90 transition hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+                  onClick={close}
+                  aria-current={active ? "page" : undefined}
+                  className={`nav-link ${active ? "active" : ""}`}
                 >
-                  <Icon className="h-5 w-5 text-white/85" />
+                  <Icon className="h-4 w-4" />
                   {item.label}
-                  <span className="absolute bottom-1 left-3 right-3 h-[2px] origin-left scale-x-0 rounded-full bg-white/80 transition-transform duration-200 group-hover:scale-x-100" />
                 </Link>
               );
             })}
 
-            {/* CTA */}
-            <Link
-              href="/join"
-              className="ml-2 group relative inline-flex items-center justify-center overflow-hidden rounded-2xl px-4 py-2 text-sm font-extrabold text-jungle-950 ring-1 ring-white/20"
+            {/* Location pill */}
+            <span
+              className="mx-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium"
+              style={{
+                background: "var(--surface-2)",
+                color: "var(--ink-3)",
+                border: "1px solid var(--line)",
+              }}
             >
-              <span className="absolute inset-0 bg-gradient-to-r from-jungle-100 via-white to-jungle-100 opacity-95" />
-              <span className="absolute -left-1/3 top-0 h-full w-1/3 rotate-12 bg-white/60 blur-md transition-transform duration-500 group-hover:translate-x-[250%]" />
-              <span className="relative inline-flex items-center gap-2">
-                Únete
-                <ArrowRightIcon className="h-5 w-5 transition-transform duration-200 group-hover:translate-x-0.5" />
-              </span>
+              <MapPinIcon className="h-3 w-3" style={{ color: "var(--accent)" }} />
+              Olanchito, Yoro
+            </span>
+
+            <Link href="/join" onClick={close} className="btn-primary !py-2 !text-xs">
+              Registrar negocio
+              <ArrowRightIcon className="h-3.5 w-3.5" />
             </Link>
           </nav>
 
-          {/* Botón móvil */}
+          {/* Mobile burger */}
           <button
             type="button"
-            aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
-            aria-expanded={menuOpen}
-            onClick={() => setMenuOpen((v) => !v)}
-            className="sm:hidden inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 text-white ring-1 ring-white/15 transition hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+            onClick={() => setOpen((v) => !v)}
+            aria-expanded={open}
+            aria-label={open ? "Cerrar menú" : "Abrir menú"}
+            className="inline-flex h-9 w-9 items-center justify-center rounded-xl transition-colors duration-150 md:hidden"
+            style={{
+              background: open ? "var(--surface-2)" : "transparent",
+              border: "1px solid var(--line-strong)",
+              color: "var(--ink)",
+            }}
           >
-            {menuOpen ? (
-              <XMarkIcon className="h-6 w-6" />
-            ) : (
-              <Bars3Icon className="h-6 w-6" />
-            )}
+            {open ? <XMarkIcon className="h-5 w-5" /> : <Bars3Icon className="h-5 w-5" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile sheet */}
-      {menuOpen && (
-        <div className="sm:hidden">
-          {/* overlay */}
+      {/* Mobile drawer */}
+      {open ? (
+        <div className="md:hidden">
           <button
             type="button"
+            className="fixed inset-0 z-40"
+            style={{ background: "rgba(10,20,15,0.45)", backdropFilter: "blur(2px)" }}
             aria-label="Cerrar menú"
-            className="fixed inset-0 z-40 bg-black/45"
-            onClick={closeMenu}
+            onClick={close}
           />
 
-          {/* panel */}
-          <aside className="fixed right-0 top-0 z-50 h-[100dvh] w-[86%] max-w-sm bg-white shadow-[0_20px_80px_rgba(0,0,0,0.25)]">
-            {/* header interno */}
-            <div className="sticky top-0 z-10 border-b border-black/5 bg-white/95 backdrop-blur">
-              <div className="flex items-center justify-between p-4">
-                <div className="leading-tight">
-                  <p className="text-sm font-black text-jungle-950">Olanchito</p>
-                  <p className="text-xs font-semibold text-jungle-700/70">Menú</p>
-                </div>
-
-                <button
-                  type="button"
-                  aria-label="Cerrar"
-                  onClick={closeMenu}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-jungle-50 text-jungle-800 ring-1 ring-jungle-200"
+          <aside
+            className="fixed right-0 top-0 z-50 h-[100dvh] w-[82%] max-w-xs flex flex-col"
+            style={{
+              background: "var(--surface)",
+              borderLeft: "1px solid var(--line)",
+              boxShadow: "-8px 0 40px rgba(10,30,20,0.18)",
+            }}
+          >
+            {/* Drawer header */}
+            <div
+              className="flex items-center justify-between px-5 py-4"
+              style={{ borderBottom: "1px solid var(--line)" }}
+            >
+              <div className="flex items-center gap-2">
+                <span
+                  className="grid h-8 w-8 place-items-center rounded-lg border"
+                  style={{
+                    background: "linear-gradient(180deg, #FFFFFF 0%, #F4F7F4 100%)",
+                    borderColor: "rgba(10,30,20,0.13)",
+                    boxShadow: "0 2px 8px rgba(10,30,20,0.12), inset 0 1px 0 rgba(255,255,255,0.9)",
+                  }}
                 >
-                  <XMarkIcon className="h-6 w-6" />
-                </button>
+                  <Image src="/colibri.png" alt="Olanchito" width={16} height={16} />
+                </span>
+                <span
+                  className="text-sm font-bold"
+                  style={{ fontFamily: "var(--font-syne)", color: "var(--ink)" }}
+                >
+                  Olanchito
+                </span>
               </div>
+              <button
+                type="button"
+                onClick={close}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-lg transition-colors"
+                style={{ background: "var(--surface-2)", color: "var(--ink)" }}
+                aria-label="Cerrar"
+              >
+                <XMarkIcon className="h-4 w-4" />
+              </button>
             </div>
 
-            {/* body con scroll */}
-            <div className="h-[calc(100dvh-73px)] overflow-y-auto p-4 pb-6">
-              <nav className="space-y-2">
-                {navItems.map((item, idx) => {
-                  const Icon = item.icon;
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      ref={idx === 0 ? firstMobileLinkRef : undefined}
-                      onClick={closeMenu}
-                      className="flex items-center justify-between rounded-2xl bg-white px-4 py-3 text-sm font-extrabold text-jungle-950 ring-1 ring-black/5 transition hover:bg-jungle-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-jungle-400"
-                    >
-                      <span className="inline-flex items-center gap-3">
-                        <span className="grid h-10 w-10 place-items-center rounded-2xl bg-jungle-50 ring-1 ring-jungle-200">
-                          <Icon className="h-5 w-5 text-jungle-700" />
-                        </span>
-                        {item.label}
-                      </span>
-                      <ArrowRightIcon className="h-5 w-5 text-jungle-700" />
-                    </Link>
-                  );
-                })}
-
-                {/* CTA Únete (primero) */}
-                <Link
-                  href="/join"
-                  onClick={closeMenu}
-                  className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-jungle-600 px-4 py-3 text-sm font-extrabold text-white shadow-sm transition hover:bg-jungle-700 active:translate-y-[1px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-jungle-400 focus-visible:ring-offset-2"
-                >
-                  Únete
-                  <ArrowRightIcon className="h-5 w-5" />
-                </Link>
-
-                {/*VennQ promo (mobile) AL FINAL, más pequeña y suave */}
-                <Link
-                  href={vennqHref}
-                  target={vennqHref.startsWith("http") ? "_blank" : undefined}
-                  rel={vennqHref.startsWith("http") ? "noopener noreferrer" : undefined}
-                  onClick={closeMenu}
-                  className="mt-4 block rounded-3xl bg-jungle-50 px-4 py-3 ring-1 ring-jungle-200/60 transition hover:bg-jungle-100/60"
-                >
-                  <div className="flex items-start gap-3">
-                    <span className="grid h-10 w-10 place-items-center rounded-2xl bg-white ring-1 ring-black/5">
-                      <SparklesIcon className="h-5 w-5 text-jungle-700" />
+            {/* Drawer nav */}
+            <nav className="flex-1 space-y-1 overflow-y-auto p-4">
+              {navItems.map((item, idx) => {
+                const Icon = item.icon;
+                const active = isActive(pathname, item.href);
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={close}
+                    ref={idx === 0 ? firstLinkRef : undefined}
+                    className="flex items-center justify-between rounded-xl px-4 py-3 text-sm font-semibold transition-colors"
+                    style={
+                      active
+                        ? { background: "var(--accent-soft)", color: "var(--primary)" }
+                        : { background: "var(--surface-2)", color: "var(--ink-2)" }
+                    }
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <Icon className="h-4 w-4" />
+                      {item.label}
                     </span>
+                    <ArrowRightIcon className="h-3.5 w-3.5 opacity-50" />
+                  </Link>
+                );
+              })}
+            </nav>
 
-                    <div className="min-w-0">
-                      <div className="inline-flex items-center gap-2 rounded-full bg-white px-2 py-1 text-[10px] font-extrabold text-jungle-700 ring-1 ring-black/5">
-                        Coming soon
-                      </div>
-
-                      <p className="mt-2 text-sm font-black text-jungle-950">
-                        VennQ ERP
-                        <span className="font-semibold text-jungle-700"> · para negocios</span>
-                      </p>
-
-                      <p className="mt-1 text-xs font-semibold text-jungle-700/80">
-                        POS, inventario y reportes — por industria.
-                      </p>
-
-                      <div className="mt-2 inline-flex items-center gap-2 text-xs font-extrabold text-jungle-700">
-                        Conocer
-                        <ArrowRightIcon className="h-4 w-4" />
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              </nav>
+            {/* Drawer CTA */}
+            <div className="p-4" style={{ borderTop: "1px solid var(--line)" }}>
+              <Link href="/join" onClick={close} className="btn-primary w-full">
+                Registrar negocio
+                <ArrowRightIcon className="h-4 w-4" />
+              </Link>
+              <p className="mt-3 text-center text-[11px]" style={{ color: "var(--ink-3)" }}>
+                <MapPinIcon className="inline h-3 w-3 mr-0.5" style={{ color: "var(--accent)" }} />
+                Olanchito, Yoro, Honduras
+              </p>
             </div>
           </aside>
         </div>
-      )}
+      ) : null}
     </header>
   );
 }

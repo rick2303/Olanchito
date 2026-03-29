@@ -1,10 +1,14 @@
-// app/businesses/page.tsx
 import { supabase } from "@/lib/supabase";
 import BusinessCard from "@/components/BusinessCard";
 import BusinessFilters from "@/components/BusinessFilters";
 import Link from "next/link";
 import { cookies } from "next/headers";
-import { ChevronLeftIcon, ChevronRightIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ArrowPathIcon,
+  BuildingStorefrontIcon,
+} from "@heroicons/react/24/outline";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -19,11 +23,9 @@ type Props = {
 };
 
 const BUCKET_NAME = process.env.BUCKET_NAME ?? "Olanchito-guide";
-
 const FALLBACK_IMAGE =
   process.env.FALLBACK_BUCKET_IMG ??
   "https://lvvciuhvhpjgfzediulv.supabase.co/storage/v1/object/public/Olanchito-guide/default-business.png";
-
 const PAGE_SIZE = 12;
 
 export default async function BusinessesPage({ searchParams }: Props) {
@@ -38,18 +40,14 @@ export default async function BusinessesPage({ searchParams }: Props) {
     .select("id, name, slug")
     .order("name", { ascending: true });
 
-  // Resolver category_id si viene slug
   let categoryId: string | null = null;
+  let categoryName: string | null = null;
   if (categorySlug) {
-    const { data: cat } = await supabase
-      .from("categories")
-      .select("id")
-      .eq("slug", categorySlug)
-      .maybeSingle();
+    const { data: cat } = await supabase.from("categories").select("id, name").eq("slug", categorySlug).maybeSingle();
     categoryId = cat?.id ?? null;
+    categoryName = cat?.name ?? null;
   }
 
-  // Query base (filtra en BD)
   let query = supabase
     .from("businesses")
     .select("id, name, slug, category_id, address, image, description", { count: "exact" })
@@ -60,17 +58,17 @@ export default async function BusinessesPage({ searchParams }: Props) {
 
   const from = (page - 1) * PAGE_SIZE;
   const to = from + PAGE_SIZE - 1;
-
-  const { data, error, count } = await query.range(from, to);
+  const { data, count, error } = await query.range(from, to);
 
   if (error) {
-    console.error("Error cargando negocios:", error);
     return (
-      <main className="min-h-screen bg-jungle-50 py-10">
-        <section className="mx-auto max-w-7xl px-4 sm:px-6">
-          <p className="rounded-2xl bg-white p-5 text-jungle-800 ring-1 ring-black/5">
-            Error cargando negocios.
-          </p>
+      <main className="page-shell">
+        <section className="section-container section-gap">
+          <div className="panel p-6">
+            <p className="text-sm font-semibold" style={{ color: "var(--ink-2)" }}>
+              Error cargando negocios.
+            </p>
+          </div>
         </section>
       </main>
     );
@@ -79,19 +77,15 @@ export default async function BusinessesPage({ searchParams }: Props) {
   const total = count ?? 0;
   const totalPages = Math.max(Math.ceil(total / PAGE_SIZE), 1);
 
-  // Public URLs
-  const businesses =
-    (data ?? []).map((b) => {
-      let imageUrl = FALLBACK_IMAGE;
-
-      if (b.image && typeof b.image === "string") {
-        const cleanPath = b.image.startsWith("business/") ? b.image : `business/${b.image}`;
-        const { data: imgData } = supabase.storage.from(BUCKET_NAME).getPublicUrl(cleanPath);
-        imageUrl = imgData?.publicUrl ?? FALLBACK_IMAGE;
-      }
-
-      return { ...b, image: imageUrl };
-    }) ?? [];
+  const businesses = (data ?? []).map((b) => {
+    let imageUrl = FALLBACK_IMAGE;
+    if (b.image && typeof b.image === "string") {
+      const cleanPath = b.image.startsWith("business/") ? b.image : `business/${b.image}`;
+      const { data: imgData } = supabase.storage.from(BUCKET_NAME).getPublicUrl(cleanPath);
+      imageUrl = imgData?.publicUrl ?? FALLBACK_IMAGE;
+    }
+    return { ...b, image: imageUrl };
+  });
 
   const buildPageHref = (p: number) => {
     const params = new URLSearchParams();
@@ -101,56 +95,62 @@ export default async function BusinessesPage({ searchParams }: Props) {
     return `/businesses?${params.toString()}`;
   };
 
-  const currentTitle = categorySlug ? `Negocios: ${categorySlug.replaceAll("-", " ")}` : "Negocios";
+  const pageTitle = categoryName
+    ? categoryName
+    : q
+    ? `"${q}"`
+    : "Todos los negocios";
 
   return (
-    <main className="min-h-screen bg-jungle-50">
-      {/*Header ULTRA compacto (nada fijo, nada grande) */}
-      <section className="mx-auto max-w-7xl px-4 pt-4 sm:px-6">
-        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div className="min-w-0">
-            <h1 className="text-lg sm:text-xl font-black tracking-tight text-jungle-950 capitalize">
-              {currentTitle}
+    <main className="page-shell">
+
+      {/* ─── PAGE HEADER ─────────────────────────────── */}
+      <section
+        className="section-container pt-8 pb-6 sm:pt-10 sm:pb-7"
+      >
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <div className="badge-primary mb-3 w-fit">
+              <BuildingStorefrontIcon className="h-3.5 w-3.5" />
+              Directorio empresarial
+            </div>
+            <h1
+              className="text-3xl font-bold sm:text-4xl"
+              style={{ fontFamily: "var(--font-syne)", color: "var(--ink)", letterSpacing: "-0.025em" }}
+            >
+              {pageTitle}
             </h1>
-            <p className="mt-0.5 text-[11px] sm:text-xs text-jungle-700/90">
-              {total > 0 ? `${total} resultados` : "Sin resultados"} · Página {page} de {totalPages}
+            <p className="mt-1.5 text-sm" style={{ color: "var(--ink-3)" }}>
+              {total} resultado{total !== 1 ? "s" : ""} · Página {page} de {totalPages}
             </p>
           </div>
 
-          {/*Esto NO debe ocupar toda la pantalla: lo envolvemos y alineamos a la derecha */}
-          <div className="sm:ml-auto w-full sm:w-auto">
-            <div className="inline-flex w-full sm:w-auto justify-end">
-              <BusinessFilters categories={categories ?? []} />
-            </div>
+          <div className="w-full lg:max-w-2xl xl:max-w-3xl">
+            <BusinessFilters categories={categories ?? []} />
           </div>
         </div>
-
-        {/* separador suave y pequeño */}
-        <div className="mt-3 h-px w-full bg-jungle-200/70" />
       </section>
 
-      {/* Contenido */}
-      <section className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+      {/* ─── RESULTS ─────────────────────────────────── */}
+      <section className="section-container pb-16">
         {businesses.length === 0 ? (
-          <div className="rounded-3xl bg-white p-7 ring-1 ring-black/5">
-            <p className="text-sm font-semibold text-jungle-800">No hay negocios con esos filtros.</p>
-            <div className="mt-4 flex gap-2">
-              <Link
-                href="/businesses"
-                className="inline-flex items-center gap-2 rounded-2xl bg-jungle-600 px-4 py-2 text-xs font-extrabold text-white hover:bg-jungle-700 transition"
-              >
-                <ArrowPathIcon className="h-4 w-4" />
-                Ver todos
-              </Link>
-            </div>
+          <div className="panel p-8 text-center">
+            <BuildingStorefrontIcon className="mx-auto h-10 w-10 mb-3" style={{ color: "var(--ink-3)" }} />
+            <p className="text-sm font-semibold" style={{ color: "var(--ink)" }}>
+              No se encontraron negocios
+            </p>
+            <p className="mt-1 text-xs" style={{ color: "var(--ink-3)" }}>
+              Intente con otros filtros o busque en todas las categorías.
+            </p>
+            <Link href="/businesses" className="btn-primary mt-5 inline-flex !text-xs !py-2">
+              <ArrowPathIcon className="h-3.5 w-3.5" />
+              Ver todos
+            </Link>
           </div>
         ) : (
           <>
-            {/* paginación ARRIBA (más compacta) */}
             <PaginationBar page={page} totalPages={totalPages} buildPageHref={buildPageHref} />
-
-            {/*grid más “apretado” para que se vean más negocios */}
-            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {businesses.map((business) => (
                 <BusinessCard
                   key={business.id}
@@ -164,9 +164,9 @@ export default async function BusinessesPage({ searchParams }: Props) {
                 />
               ))}
             </div>
-
-            {/* paginación ABAJO */}
-            <PaginationBar page={page} totalPages={totalPages} buildPageHref={buildPageHref} />
+            <div className="mt-8">
+              <PaginationBar page={page} totalPages={totalPages} buildPageHref={buildPageHref} />
+            </div>
           </>
         )}
       </section>
@@ -183,68 +183,89 @@ function PaginationBar({
   totalPages: number;
   buildPageHref: (p: number) => string;
 }) {
+  if (totalPages <= 1) return null;
+
   const prev = Math.max(page - 1, 1);
   const next = Math.min(page + 1, totalPages);
 
+  // Generate page numbers to show
+  const pages: (number | "...")[] = [];
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) pages.push(i);
+  } else {
+    pages.push(1);
+    if (page > 3) pages.push("...");
+    for (let i = Math.max(2, page - 1); i <= Math.min(totalPages - 1, page + 1); i++) pages.push(i);
+    if (page < totalPages - 2) pages.push("...");
+    pages.push(totalPages);
+  }
+
   return (
-    <div className="mt-6 flex flex-col items-center gap-2">
-      <div className="flex items-center gap-2">
-        <Link
-          href={buildPageHref(prev)}
-          aria-disabled={page === 1}
-          className={[
-            "inline-flex items-center gap-2 rounded-2xl px-3 py-2 text-[11px] font-extrabold ring-1 transition",
-            page === 1
-              ? "pointer-events-none bg-white/70 text-jungle-700/50 ring-black/5"
-              : "bg-white text-jungle-900 ring-black/5 hover:bg-jungle-50",
-          ].join(" ")}
-        >
-          <ChevronLeftIcon className="h-4 w-4" />
-          Anterior
-        </Link>
+    <div className="flex items-center justify-center gap-1.5 flex-wrap">
+      <Link
+        href={buildPageHref(prev)}
+        aria-disabled={page === 1}
+        className={[
+          "inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-colors",
+          page === 1
+            ? "pointer-events-none opacity-40"
+            : "btn-secondary !py-2 !px-3",
+        ].join(" ")}
+        style={page === 1 ? {
+          background: "var(--surface)",
+          border: "1px solid var(--line)",
+          color: "var(--ink-3)",
+        } : {}}
+      >
+        <ChevronLeftIcon className="h-3.5 w-3.5" />
+        Anterior
+      </Link>
 
-        <span className="text-[11px] font-semibold text-jungle-700">
-          <span className="font-extrabold text-jungle-950">{page}</span> /{" "}
-          <span className="font-extrabold text-jungle-950">{totalPages}</span>
-        </span>
-
-        <Link
-          href={buildPageHref(next)}
-          aria-disabled={page === totalPages}
-          className={[
-            "inline-flex items-center gap-2 rounded-2xl px-3 py-2 text-[11px] font-extrabold ring-1 transition",
-            page === totalPages
-              ? "pointer-events-none bg-white/70 text-jungle-700/50 ring-black/5"
-              : "bg-white text-jungle-900 ring-black/5 hover:bg-jungle-50",
-          ].join(" ")}
-        >
-          Siguiente
-          <ChevronRightIcon className="h-4 w-4" />
-        </Link>
-      </div>
-
-      <div className="flex flex-wrap items-center justify-center gap-2">
-        {Array.from({ length: Math.min(7, totalPages) }).map((_, i) => {
-          const start = Math.max(1, Math.min(page - 3, totalPages - 6));
-          const p = start + i;
-          if (p > totalPages) return null;
-
-          return (
+      <div className="hidden items-center gap-1 sm:flex">
+        {pages.map((p, i) =>
+          p === "..." ? (
+            <span key={`ellipsis-${i}`} className="px-2 text-xs" style={{ color: "var(--ink-3)" }}>
+              ···
+            </span>
+          ) : (
             <Link
               key={p}
-              href={buildPageHref(p)}
-              className={[
-                "h-8 w-8 grid place-items-center rounded-2xl text-[11px] font-extrabold ring-1 transition",
+              href={buildPageHref(p as number)}
+              className="inline-flex h-8 w-8 items-center justify-center rounded-lg text-xs font-semibold transition-colors"
+              style={
                 p === page
-                  ? "bg-jungle-600 text-white ring-jungle-600"
-                  : "bg-white text-jungle-900 ring-black/5 hover:bg-jungle-50",
-              ].join(" ")}
+                  ? { background: "var(--primary)", color: "white" }
+                  : { background: "var(--surface)", color: "var(--ink-2)", border: "1px solid var(--line)" }
+              }
             >
               {p}
             </Link>
-          );
-        })}
+          )
+        )}
       </div>
+
+      <span className="text-xs sm:hidden" style={{ color: "var(--ink-3)" }}>
+        {page} / {totalPages}
+      </span>
+
+      <Link
+        href={buildPageHref(next)}
+        aria-disabled={page === totalPages}
+        className={[
+          "inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-colors",
+          page === totalPages
+            ? "pointer-events-none opacity-40"
+            : "btn-secondary !py-2 !px-3",
+        ].join(" ")}
+        style={page === totalPages ? {
+          background: "var(--surface)",
+          border: "1px solid var(--line)",
+          color: "var(--ink-3)",
+        } : {}}
+      >
+        Siguiente
+        <ChevronRightIcon className="h-3.5 w-3.5" />
+      </Link>
     </div>
   );
 }
