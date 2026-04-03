@@ -21,8 +21,12 @@ import {
 } from "@heroicons/react/24/outline";
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 300;
+
+export async function generateStaticParams() {
+  const { data } = await supabase.from("businesses").select("slug");
+  return (data ?? []).map(({ slug }) => ({ slug }));
+}
 
 const BASE_URL = "https://olanchito.com";
 const BUCKET_NAME = process.env.BUCKET_NAME ?? "Olanchito-guide";

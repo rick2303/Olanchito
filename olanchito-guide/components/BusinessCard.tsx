@@ -38,20 +38,12 @@ export default function BusinessCard({ business, className = "" }: BusinessCardP
 
   return (
     <article
-      className={["group overflow-hidden transition-all duration-300 hover:-translate-y-1", className].join(" ")}
+      className={["group relative overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-md", className].join(" ")}
       style={{
         background: "var(--surface)",
         border: "1px solid var(--line)",
         borderRadius: "14px",
         boxShadow: "var(--shadow-sm)",
-      }}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLElement).style.boxShadow = "var(--shadow-md)";
-        (e.currentTarget as HTMLElement).style.borderColor = "var(--line-strong)";
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLElement).style.boxShadow = "var(--shadow-sm)";
-        (e.currentTarget as HTMLElement).style.borderColor = "var(--line)";
       }}
     >
       {/* Image */}
@@ -139,9 +131,8 @@ export default function BusinessCard({ business, className = "" }: BusinessCardP
         ) : null}
 
         {/* CTA */}
-        <Link
-          href={`/negocios/${business.slug}`}
-          className="flex w-full items-center justify-between rounded-xl px-4 py-2.5 text-xs font-semibold transition-all duration-200"
+        <div
+          className="flex w-full items-center justify-between rounded-xl px-4 py-2.5 text-xs font-semibold"
           style={{
             background: "var(--surface-2)",
             color: "var(--primary)",
@@ -150,8 +141,11 @@ export default function BusinessCard({ business, className = "" }: BusinessCardP
         >
           Ver negocio
           <ArrowRightIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-        </Link>
+        </div>
       </div>
+
+      {/* Stretched link — cubre toda la tarjeta */}
+      <Link href={`/negocios/${business.slug}`} className="absolute inset-0" aria-label={business.name} />
     </article>
   );
 }
