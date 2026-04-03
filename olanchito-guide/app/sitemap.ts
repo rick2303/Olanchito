@@ -6,10 +6,11 @@ const BASE_URL = "https://olanchito.com";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { data: businesses } = await supabase
     .from("businesses")
-    .select("slug");
+    .select("slug, updated_at");
 
   const businessUrls: MetadataRoute.Sitemap = (businesses ?? []).map((b) => ({
     url: `${BASE_URL}/negocios/${b.slug}`,
+    lastModified: b.updated_at ? new Date(b.updated_at) : undefined,
     changeFrequency: "weekly",
     priority: 0.8,
   }));
@@ -19,7 +20,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .select("slug");
 
   const categoryUrls: MetadataRoute.Sitemap = (categories ?? []).map((c) => ({
-    url: `${BASE_URL}/businesses?category=${c.slug}&page=1`,
+    url: `${BASE_URL}/businesses?category=${c.slug}`,
     changeFrequency: "weekly",
     priority: 0.6,
   }));

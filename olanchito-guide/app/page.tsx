@@ -57,8 +57,37 @@ export default async function HomePage() {
   const businessesLabel = numberFormatter.format(totalBusinesses);
   const categoriesLabel = numberFormatter.format(totalCategories);
 
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Directorio Olanchito",
+    url: "https://olanchito.com",
+    description: "Directorio comunitario de negocios y servicios locales en Olanchito, Honduras.",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: "https://olanchito.com/businesses?q={search_term_string}",
+      "query-input": "required name=search_term_string",
+    },
+  };
+
+  const orgJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "Directorio Olanchito",
+    url: "https://olanchito.com",
+    logo: "https://olanchito.com/colibri.webp",
+    description: "Directorio comunitario de negocios y servicios locales en Olanchito, Honduras.",
+    areaServed: {
+      "@type": "City",
+      name: "Olanchito",
+      addressCountry: "HN",
+    },
+  };
+
   return (
     <main className="page-shell">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }} />
 
       {/* ─── HERO ────────────────────────────────────────── */}
       <section className="hero-home relative overflow-hidden">

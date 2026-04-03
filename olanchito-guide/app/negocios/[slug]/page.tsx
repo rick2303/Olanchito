@@ -217,6 +217,13 @@ export default async function BusinessDetail({ params }: Props) {
       addressRegion: "Yoro",
       addressCountry: "HN",
     },
+    ...(location?.lat && location?.lng && {
+      geo: {
+        "@type": "GeoCoordinates",
+        latitude: location.lat,
+        longitude: location.lng,
+      },
+    }),
     ...(avgRating && {
       aggregateRating: {
         "@type": "AggregateRating",
@@ -224,6 +231,18 @@ export default async function BusinessDetail({ params }: Props) {
         reviewCount: initialReviews.length,
       },
     }),
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Inicio",   item: "https://olanchito.com" },
+      { "@type": "ListItem", position: 2, name: "Negocios", item: "https://olanchito.com/businesses" },
+      ...(category ? [{ "@type": "ListItem", position: 3, name: category.name, item: `https://olanchito.com/businesses?category=${category.slug}` },
+                      { "@type": "ListItem", position: 4, name: data.name,     item: `https://olanchito.com/negocios/${data.slug}` }]
+                   : [{ "@type": "ListItem", position: 3, name: data.name,     item: `https://olanchito.com/negocios/${data.slug}` }]),
+    ],
   };
 
   // Chips con contraste fijo en desktop
@@ -238,10 +257,8 @@ export default async function BusinessDetail({ params }: Props) {
 
   return (
     <main className="min-h-screen bg-jungle-50">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
       <ViewTracker slug={data.slug} />
 
       {/* HERO (mobile-first) */}
