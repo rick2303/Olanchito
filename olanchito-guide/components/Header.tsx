@@ -12,12 +12,14 @@ import {
   Squares2X2Icon,
   BuildingStorefrontIcon,
   MapPinIcon,
+  HeartIcon,
 } from "@heroicons/react/24/outline";
 
 const navItems = [
   { href: "/", label: "Inicio", icon: HomeIcon },
   { href: "/categories", label: "Categorías", icon: Squares2X2Icon },
   { href: "/businesses", label: "Negocios", icon: BuildingStorefrontIcon },
+  { href: "/favoritos", label: "Favoritos", icon: HeartIcon },
 ];
 
 function isActive(pathname: string, href: string) {
@@ -84,7 +86,7 @@ export default function Header() {
                 boxShadow: "0 3px 10px rgba(10,30,20,0.16), inset 0 1px 0 rgba(255,255,255,0.9)",
               }}
             >
-              <Image src="/colibri.png" alt="Olanchito" width={20} height={20} priority />
+              <Image src="/colibri.webp" alt="Olanchito" width={20} height={20} priority />
             </span>
             <span className="leading-none">
               <span
@@ -188,7 +190,7 @@ export default function Header() {
                     boxShadow: "0 2px 8px rgba(10,30,20,0.12), inset 0 1px 0 rgba(255,255,255,0.9)",
                   }}
                 >
-                  <Image src="/colibri.png" alt="Olanchito" width={16} height={16} />
+                  <Image src="/colibri.webp" alt="Olanchito" width={16} height={16} />
                 </span>
                 <span
                   className="text-sm font-bold"

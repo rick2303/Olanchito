@@ -2,7 +2,6 @@ import { supabase } from "@/lib/supabase";
 import BusinessCard from "@/components/BusinessCard";
 import BusinessFilters from "@/components/BusinessFilters";
 import Link from "next/link";
-import { cookies } from "next/headers";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -15,7 +14,23 @@ export const revalidate = 0;
 
 export const metadata = {
   title: "Negocios | Directorio Olanchito",
-  description: "Explora todos los negocios registrados en el directorio de Olanchito.",
+  description: "Explora todos los negocios registrados en el directorio de Olanchito, Honduras. Encuentra ferreterías, restaurantes, farmacias y más.",
+  alternates: { canonical: "https://olanchito.com/businesses" },
+  openGraph: {
+    title: "Negocios | Directorio Olanchito",
+    description: "Explora todos los negocios registrados en el directorio de Olanchito, Honduras.",
+    url: "https://olanchito.com/businesses",
+    siteName: "Directorio Olanchito",
+    images: [{ url: "/og-image.webp", width: 1200, height: 630, alt: "Directorio Olanchito" }],
+    locale: "es_HN",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Negocios | Directorio Olanchito",
+    description: "Explora todos los negocios registrados en el directorio de Olanchito, Honduras.",
+    images: ["/og-image.webp"],
+  },
 };
 
 type Props = {
@@ -29,8 +44,6 @@ const FALLBACK_IMAGE =
 const PAGE_SIZE = 12;
 
 export default async function BusinessesPage({ searchParams }: Props) {
-  cookies();
-
   const categorySlug = (searchParams?.category ?? "").toLowerCase().trim();
   const q = (searchParams?.q ?? "").trim();
   const page = Math.max(parseInt(searchParams?.page ?? "1", 10) || 1, 1);
@@ -48,17 +61,21 @@ export default async function BusinessesPage({ searchParams }: Props) {
     categoryName = cat?.name ?? null;
   }
 
+  // Fetch all matching businesses (sort handled in JS for score-based ranking)
   let query = supabase
     .from("businesses")
-    .select("id, name, slug, category_id, address, image, description", { count: "exact" })
-    .order("name", { ascending: true });
+    .select("id, name, slug, category_id, address, image, description, featured, view_count");
 
   if (categoryId) query = query.eq("category_id", categoryId);
   if (q) query = query.ilike("name", `%${q}%`);
 
-  const from = (page - 1) * PAGE_SIZE;
-  const to = from + PAGE_SIZE - 1;
-  const { data, count, error } = await query.range(from, to);
+  const [{ data: rawData, error }, { data: allReviews }] = await Promise.all([
+    query,
+    supabase
+      .from("reviews")
+      .select("business_slug, rating")
+      .eq("is_visible", true),
+  ]);
 
   if (error) {
     return (
@@ -74,17 +91,57 @@ export default async function BusinessesPage({ searchParams }: Props) {
     );
   }
 
-  const total = count ?? 0;
-  const totalPages = Math.max(Math.ceil(total / PAGE_SIZE), 1);
+  // Compute per-business: positive count (for scoring) + avg rating + total count (for card)
+  const reviewStats: Record<string, { sum: number; count: number; positive: number }> = {};
+  for (const r of allReviews ?? []) {
+    const s = reviewStats[r.business_slug] ?? { sum: 0, count: 0, positive: 0 };
+    s.sum += r.rating;
+    s.count += 1;
+    if (r.rating >= 4) s.positive += 1;
+    reviewStats[r.business_slug] = s;
+  }
 
-  const businesses = (data ?? []).map((b) => {
+  const positiveReviewCounts: Record<string, number> = Object.fromEntries(
+    Object.entries(reviewStats).map(([slug, s]) => [slug, s.positive])
+  );
+
+  // Score = view_count + (positive_reviews * 3), then sort
+  const scored = (rawData ?? [])
+    .map((b) => ({
+      ...b,
+      _score: (b.view_count ?? 0) + (positiveReviewCounts[b.slug] ?? 0) * 3,
+    }))
+    .sort((a, b) => {
+      if (a.featured && !b.featured) return -1;
+      if (!a.featured && b.featured) return 1;
+      if (b._score !== a._score) return b._score - a._score;
+      return a.name.localeCompare(b.name, "es");
+    });
+
+  const total = scored.length;
+  const totalPages = Math.max(Math.ceil(total / PAGE_SIZE), 1);
+  const pageStart = (page - 1) * PAGE_SIZE;
+
+  const categoryMap = Object.fromEntries(
+    (categories ?? []).map((c) => [c.id, c.name])
+  );
+
+  const businesses = scored.slice(pageStart, pageStart + PAGE_SIZE).map((b) => {
     let imageUrl = FALLBACK_IMAGE;
     if (b.image && typeof b.image === "string") {
       const cleanPath = b.image.startsWith("business/") ? b.image : `business/${b.image}`;
       const { data: imgData } = supabase.storage.from(BUCKET_NAME).getPublicUrl(cleanPath);
       imageUrl = imgData?.publicUrl ?? FALLBACK_IMAGE;
     }
-    return { ...b, image: imageUrl };
+    const stats = reviewStats[b.slug];
+    const avgRating = stats && stats.count > 0 ? stats.sum / stats.count : null;
+    return {
+      ...b,
+      image: imageUrl,
+      categoryName: categoryMap[b.category_id ?? ""] ?? "",
+      avgRating,
+      reviewCount: stats?.count ?? 0,
+    };
   });
 
   const buildPageHref = (p: number) => {
@@ -160,6 +217,10 @@ export default async function BusinessesPage({ searchParams }: Props) {
                     image: business.image,
                     address: business.address ?? "",
                     description: business.description ?? "",
+                    category: business.categoryName,
+                    featured: business.featured ?? false,
+                    avgRating: business.avgRating ?? undefined,
+                    reviewCount: business.reviewCount,
                   }}
                 />
               ))}

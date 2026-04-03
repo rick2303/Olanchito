@@ -39,7 +39,7 @@ export default function Footer() {
                   boxShadow: "0 6px 16px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.85)",
                 }}
               >
-                <Image src="/colibri.png" alt="Olanchito" width={22} height={22} />
+                <Image src="/colibri.webp" alt="Olanchito" width={22} height={22} />
               </span>
               <div>
                 <p

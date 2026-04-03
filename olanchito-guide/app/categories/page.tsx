@@ -13,6 +13,22 @@ import CategoryCard from "@/components/CategoryCard";
 export const metadata = {
   title: "Categorías | Directorio Olanchito",
   description: "Explora todas las categorías de negocios en Olanchito: ferreterías, restaurantes, farmacias y más.",
+  alternates: { canonical: "https://olanchito.com/categories" },
+  openGraph: {
+    title: "Categorías | Directorio Olanchito",
+    description: "Explora todas las categorías de negocios en Olanchito: ferreterías, restaurantes, farmacias y más.",
+    url: "https://olanchito.com/categories",
+    siteName: "Directorio Olanchito",
+    images: [{ url: "/og-image.webp", width: 1200, height: 630, alt: "Directorio Olanchito" }],
+    locale: "es_HN",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Categorías | Directorio Olanchito",
+    description: "Explora todas las categorías de negocios en Olanchito.",
+    images: ["/og-image.webp"],
+  },
 };
 
 type Category = { id: string; name: string; slug: string; icon?: string | null };

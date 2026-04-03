@@ -76,7 +76,7 @@ export default async function HomePage() {
           className="pointer-events-none absolute -right-20 top-1/2 hidden -translate-y-1/2 lg:block"
         >
           <Image
-            src="/colibri.png"
+            src="/colibri.webp"
             alt=""
             width={620}
             height={620}
@@ -117,14 +117,41 @@ export default async function HomePage() {
               Todo el directorio está pensado para encontrar rápido y con confianza.
             </p>
 
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link href="/businesses" className="btn-primary">
-                Explorar negocios
-                <ArrowRightIcon className="h-4 w-4" />
-              </Link>
-              <Link href="/categories" className="btn-secondary">
-                <Squares2X2Icon className="h-4 w-4" />
+            {/* Search bar */}
+            <form
+              action="/businesses"
+              method="GET"
+              className="mx-auto mt-8 flex w-full max-w-xl items-center gap-2 rounded-2xl p-1.5"
+              style={{
+                background: "var(--surface)",
+                border: "1px solid var(--line-strong)",
+                boxShadow: "0 8px 24px rgba(10,30,20,0.08)",
+              }}
+            >
+              <input
+                name="q"
+                type="search"
+                placeholder="Buscar restaurantes, ferreterías, farmacias..."
+                className="flex-1 bg-transparent px-3 py-1.5 text-sm outline-none placeholder:text-[var(--ink-3)]"
+                style={{ color: "var(--ink)" }}
+              />
+              <button
+                type="submit"
+                className="btn-primary !py-2 !px-4 !text-xs flex-shrink-0"
+              >
+                Buscar
+                <ArrowRightIcon className="h-3.5 w-3.5" />
+              </button>
+            </form>
+
+            <div className="mt-4 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <Link href="/categories" className="btn-secondary !text-xs !py-2">
+                <Squares2X2Icon className="h-3.5 w-3.5" />
                 Ver categorías
+              </Link>
+              <Link href="/businesses" className="btn-secondary !text-xs !py-2">
+                <BuildingStorefrontIcon className="h-3.5 w-3.5" />
+                Ver todos los negocios
               </Link>
             </div>
 
@@ -391,7 +418,7 @@ export default async function HomePage() {
             <div className="hidden items-center justify-end px-1 md:flex lg:pr-5 xl:pr-6">
               <DeviceMacbookMockup
                 className="mqy-macbook-hero w-full max-w-[560px] xl:max-w-[620px]"
-                src="/vennq-preview.png"
+                src="/vennq-preview.webp"
                 alt="Vista previa de VennQ — Plataforma de operación para PYMEs"
               />
             </div>

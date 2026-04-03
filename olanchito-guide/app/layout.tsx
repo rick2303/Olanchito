@@ -5,6 +5,7 @@ import Footer from "../components/Footer";
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Syne, Plus_Jakarta_Sans } from "next/font/google";
+import { headers } from "next/headers";
 
 const syne = Syne({
   subsets: ["latin"],
@@ -35,14 +36,14 @@ export const metadata: Metadata = {
     "Emprendimientos Honduras",
   ],
   alternates: { canonical: "https://olanchito.com/" },
-  icons: { icon: "/colibri.png", shortcut: "/colibri.png", apple: "/colibri.png" },
+  icons: { icon: "/colibri.webp", shortcut: "/colibri.webp", apple: "/colibri.webp" },
   openGraph: {
     title: "Olanchito Honduras | Directorio de Negocios Locales",
     description:
       "Explora negocios y servicios locales en Olanchito, Honduras. Un directorio creado para apoyar al comercio local.",
     url: "https://olanchito.com/",
     siteName: "Directorio Olanchito",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Directorio de Negocios en Olanchito" }],
+    images: [{ url: "/og-image.webp", width: 1200, height: 630, alt: "Directorio de Negocios en Olanchito" }],
     locale: "es_HN",
     type: "website",
   },
@@ -50,11 +51,14 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Olanchito Honduras | Directorio Local",
     description: "Negocios, servicios y emprendimientos locales en Olanchito, Honduras.",
-    images: ["/og-image.png"],
+    images: ["/og-image.webp"],
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const pathname = (await headers()).get("x-pathname") ?? "";
+  const isAdmin = pathname.startsWith("/admin");
+
   return (
     <html lang="es">
       <head>
@@ -62,7 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Script id="google-analytics" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);} 
+            function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
             gtag('config', 'G-4JD3KFCW4J');
           `}
@@ -71,9 +75,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
       <body className={`${syne.variable} ${jakarta.variable} font-jakarta page-shell`}>
         <div className="min-h-screen flex flex-col">
-          <Header />
+          {!isAdmin && <Header />}
           <main className="relative flex-1">{children}</main>
-          <Footer />
+          {!isAdmin && <Footer />}
         </div>
       </body>
     </html>

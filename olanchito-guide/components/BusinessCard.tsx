@@ -8,6 +8,8 @@ import {
   ArrowRightIcon,
   PhotoIcon,
 } from "@heroicons/react/24/outline";
+import { StarIcon } from "@heroicons/react/24/solid";
+import FavoriteButton from "@/components/FavoriteButton";
 
 type BusinessCardProps = {
   business: {
@@ -17,6 +19,9 @@ type BusinessCardProps = {
     address: string;
     description?: string;
     category?: string;
+    featured?: boolean;
+    avgRating?: number;
+    reviewCount?: number;
   };
   className?: string;
 };
@@ -68,13 +73,27 @@ export default function BusinessCard({ business, className = "" }: BusinessCardP
             </span>
           </div>
         )}
+        <FavoriteButton slug={business.slug} className="absolute right-2.5 top-2.5" />
       </div>
 
       {/* Content */}
       <div className="p-4 space-y-3">
-        {/* Category tag */}
-        {business.category ? (
-          <span className="badge text-[11px]">{business.category}</span>
+        {/* Badges row */}
+        {(business.featured || business.category) ? (
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {business.featured && (
+              <span
+                className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
+                style={{ background: "var(--accent-soft)", color: "var(--primary-mid)" }}
+              >
+                <StarIcon className="h-3 w-3" />
+                Destacado
+              </span>
+            )}
+            {business.category && (
+              <span className="badge text-[11px]">{business.category}</span>
+            )}
+          </div>
         ) : null}
 
         {/* Name */}
@@ -98,6 +117,26 @@ export default function BusinessCard({ business, className = "" }: BusinessCardP
         >
           {shortDescription || <span style={{ color: "var(--ink-3)", fontStyle: "italic" }}>Sin descripción disponible.</span>}
         </p>
+
+        {/* Rating */}
+        {business.avgRating != null && business.reviewCount ? (
+          <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-0.5">
+              {[1, 2, 3, 4, 5].map((n) => (
+                <StarIcon
+                  key={n}
+                  className={`h-3 w-3 ${n <= Math.round(business.avgRating!) ? "text-amber-400" : "text-jungle-100"}`}
+                />
+              ))}
+            </div>
+            <span className="text-[11px] font-semibold" style={{ color: "var(--ink-2)" }}>
+              {business.avgRating.toFixed(1)}
+            </span>
+            <span className="text-[11px]" style={{ color: "var(--ink-3)" }}>
+              ({business.reviewCount})
+            </span>
+          </div>
+        ) : null}
 
         {/* CTA */}
         <Link
