@@ -19,6 +19,7 @@ import {
   SparklesIcon,
 } from "@heroicons/react/24/outline";
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
+import HoursInput from "@/components/HoursInput";
 
 interface Category {
   id: string;
@@ -310,15 +311,17 @@ export default function AdminAddBusiness() {
             </Field>
 
             {/* Hours */}
-            <Field label="Horario" icon={<ClockIcon className="h-4 w-4" />}>
-              <input
-                name="hours"
+            <div className="space-y-1.5">
+              <label className="flex items-center gap-1.5 text-xs font-semibold text-jungle-800">
+                <ClockIcon className="h-4 w-4 text-jungle-500" />
+                Horario
+                <span className="font-normal text-jungle-400">(opcional)</span>
+              </label>
+              <HoursInput
                 value={form.hours}
-                onChange={handleChange}
-                className="admin-field"
-                placeholder="Ej: Lun-Vie 8:00am – 6:00pm"
+                onChange={(val) => setForm((p) => ({ ...p, hours: val }))}
               />
-            </Field>
+            </div>
 
             {/* Phone + WhatsApp */}
             <div className="grid gap-4 sm:grid-cols-2">

@@ -37,6 +37,12 @@ type Submission = {
   contact_name: string;
   email: string;
   phone: string;
+  whatsapp: string | null;
+  address: string | null;
+  description: string | null;
+  hours: string | null;
+  category_id: string | null;
+  image: string | null;
   status: string;
   created_at: string;
 };
@@ -67,6 +73,28 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   rejected: { label: "Rechazado", color: "bg-red-50 text-red-700 ring-red-200" },
 };
 
+function slugify(str: string) {
+  return str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+}
+
+async function generateUniqueSlug(name: string): Promise<string> {
+  const base = slugify(name);
+  let slug = base;
+  let i = 2;
+  while (true) {
+    const { data } = await supabase.from("businesses").select("id").eq("slug", slug).maybeSingle();
+    if (!data) return slug;
+    slug = `${base}-${i++}`;
+  }
+}
+
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("es-HN", {
     day: "numeric",
@@ -94,7 +122,7 @@ export default function AdminDashboard() {
       await Promise.all([
         supabase
           .from("business_submissions")
-          .select("id, business_name, contact_name, email, phone, status, created_at")
+          .select("id, business_name, contact_name, email, phone, whatsapp, address, description, hours, category_id, image, status, created_at")
           .order("created_at", { ascending: false }),
         supabase
           .from("reviews")
@@ -130,6 +158,34 @@ export default function AdminDashboard() {
 
   const updateSubmission = async (id: string, status: string) => {
     setLoadingId(id);
+
+    if (status === "approved") {
+      const sub = submissions.find((s) => s.id === id);
+      if (sub) {
+        const slug = await generateUniqueSlug(sub.business_name);
+        const { error } = await supabase.from("businesses").insert([{
+          name: sub.business_name,
+          slug,
+          category_id: sub.category_id,
+          description: sub.description || null,
+          hours: sub.hours || null,
+          phone: sub.phone || null,
+          whatsapp: sub.whatsapp || null,
+          address: sub.address || null,
+          image: sub.image || null,
+          featured: false,
+          verified: false,
+          view_count: 0,
+          socials: {},
+        }]);
+        if (error) {
+          setLoadingId(null);
+          alert(`Error al publicar negocio: ${error.message}`);
+          return;
+        }
+      }
+    }
+
     await supabase.from("business_submissions").update({ status }).eq("id", id);
     setSubmissions((prev) => prev.map((s) => s.id === id ? { ...s, status } : s));
     setLoadingId(null);

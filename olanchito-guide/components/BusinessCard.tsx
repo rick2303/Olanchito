@@ -20,6 +20,7 @@ type BusinessCardProps = {
     description?: string;
     category?: string;
     featured?: boolean;
+    isNew?: boolean;
     avgRating?: number;
     reviewCount?: number;
   };
@@ -71,7 +72,7 @@ export default function BusinessCard({ business, className = "" }: BusinessCardP
       {/* Content */}
       <div className="p-4 space-y-3">
         {/* Badges row */}
-        {(business.featured || business.category) ? (
+        {(business.featured || business.isNew || business.category) ? (
           <div className="flex items-center gap-1.5 flex-wrap">
             {business.featured && (
               <span
@@ -80,6 +81,14 @@ export default function BusinessCard({ business, className = "" }: BusinessCardP
               >
                 <StarIcon className="h-3 w-3" />
                 Destacado
+              </span>
+            )}
+            {business.isNew && (
+              <span
+                className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
+                style={{ background: "#dcfce7", color: "#15803d" }}
+              >
+                ✨ Nuevo
               </span>
             )}
             {business.category && (

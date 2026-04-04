@@ -11,7 +11,6 @@ import {
   EnvelopeIcon,
   PhoneIcon,
   ChatBubbleLeftRightIcon,
-  ClockIcon,
   DocumentTextIcon,
   PhotoIcon,
   ArrowUpTrayIcon,
@@ -20,6 +19,7 @@ import {
   ArrowRightIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
+import HoursInput from "@/components/HoursInput";
 
 interface Category { id: string; name: string; }
 
@@ -72,37 +72,85 @@ export default function JoinPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (loading) return;
+
+    if (!form.image) {
+      setToast({ type: "error", msg: "La imagen del negocio es obligatoria." });
+      setTimeout(() => setToast(null), 4000);
+      return;
+    }
+
     setLoading(true);
     setToast(null);
+
+    let imagePath: string | null = null;
+
     try {
-      const categoryName = selectedCategoryName || "Sin categoría";
-      const submissionDate = new Date().toLocaleString("es-HN", { dateStyle: "full", timeStyle: "short" });
-      let imagePath: string | null = null;
+      // 1. Upload image first (so we can clean up if DB insert fails)
       if (form.image) {
         const fileExt = form.image.name.split(".").pop();
         const fileName = `${Date.now()}-${crypto.randomUUID()}.${fileExt}`;
         imagePath = `business/${fileName}`;
-        const { error: uploadError } = await supabase.storage.from("Olanchito-guide").upload(imagePath, form.image, { contentType: form.image.type, upsert: false });
+        const { error: uploadError } = await supabase.storage
+          .from("Olanchito-guide")
+          .upload(imagePath, form.image, { contentType: form.image.type, upsert: false });
         if (uploadError) throw uploadError;
       }
+
+      // 2. Save to DB
       const { error: insertError } = await supabase.from("business_submissions").insert([{
-        business_name: form.business_name, category_id: form.category, contact_name: form.representative_name,
-        email: form.email, phone: form.phone, description: form.description, hours: form.hours, image: imagePath, status: "new",
+        business_name: form.business_name,
+        category_id: form.category || null,
+        contact_name: form.representative_name,
+        email: form.email,
+        phone: form.phone,
+        whatsapp: form.whatsapp,
+        address: form.address,
+        description: form.description,
+        hours: form.hours,
+        image: imagePath,
+        status: "new",
       }]);
-      if (insertError) throw insertError;
-      await emailjs.send(
+
+      if (insertError) {
+        // Clean up uploaded image if DB insert fails
+        if (imagePath) {
+          await supabase.storage.from("Olanchito-guide").remove([imagePath]);
+        }
+        throw insertError;
+      }
+
+      // 3. Success — show toast and clear form immediately
+      setToast({ type: "success", msg: "¡Solicitud enviada! Revisaremos la información y publicaremos su negocio pronto." });
+      clearForm();
+
+      // 4. Send email notification in background — non-blocking
+      const categoryName = selectedCategoryName || "Sin categoría";
+      const submissionDate = new Date().toLocaleString("es-HN", { dateStyle: "full", timeStyle: "short" });
+      emailjs.send(
         process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
         process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
-        { business_name: form.business_name, representative_name: form.representative_name, category: categoryName, phone: form.phone, whatsapp: form.whatsapp, address: form.address, email: form.email, description: form.description, hours: form.hours, date: submissionDate },
+        {
+          business_name: form.business_name,
+          representative_name: form.representative_name,
+          category: categoryName,
+          phone: form.phone,
+          whatsapp: form.whatsapp,
+          address: form.address,
+          email: form.email,
+          description: form.description,
+          hours: form.hours,
+          date: submissionDate,
+        },
         process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!
-      );
-      setToast({ type: "success", msg: "Solicitud enviada exitosamente. Revisaremos la información pronto." });
-      clearForm();
+      ).catch(() => {
+        // Email failed silently — data is already saved in DB
+      });
+
     } catch {
-      setToast({ type: "error", msg: "No se pudo enviar. Revise los datos e inténtelo de nuevo." });
+      setToast({ type: "error", msg: "No se pudo enviar la solicitud. Revise los datos e inténtelo de nuevo." });
     } finally {
       setLoading(false);
-      setTimeout(() => setToast(null), 5000);
+      setTimeout(() => setToast(null), 6000);
     }
   };
 
@@ -195,14 +243,20 @@ export default function JoinPage() {
               </FormField>
 
               {/* Hours */}
-              <FormField label="Horario de atención" icon={<ClockIcon className="h-4 w-4" />}>
-                <input name="hours" value={form.hours} onChange={handleChange} className="field" placeholder="Ej: Lun-Vie 8:00am – 6:00pm" />
-              </FormField>
+              <div className="space-y-1.5">
+                <label className="flex items-center gap-1.5 text-xs font-semibold" style={{ color: "var(--ink)" }}>
+                  <span className="grid h-6 w-6 place-items-center rounded-lg" style={{ background: "var(--surface-2)", color: "var(--primary-mid)" }}>
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                  </span>
+                  Horario de atención
+                </label>
+                <HoursInput value={form.hours} onChange={(val) => setForm((p) => ({ ...p, hours: val }))} />
+              </div>
 
               {/* Row: Phone + WhatsApp */}
               <div className="grid gap-4 sm:grid-cols-2">
-                <FormField label="Teléfono" icon={<PhoneIcon className="h-4 w-4" />}>
-                  <input name="phone" value={form.phone} onChange={handleChange} className="field" placeholder="+504 0000-0000" />
+                <FormField label="Teléfono" icon={<PhoneIcon className="h-4 w-4" />} required>
+                  <input name="phone" required value={form.phone} onChange={handleChange} className="field" placeholder="+504 0000-0000" />
                 </FormField>
                 <FormField label="WhatsApp" icon={<ChatBubbleLeftRightIcon className="h-4 w-4" />}>
                   <input name="whatsapp" value={form.whatsapp} onChange={handleChange} className="field" placeholder="+504 0000-0000" />
@@ -233,7 +287,8 @@ export default function JoinPage() {
                 >
                   <PhotoIcon className="h-4 w-4" style={{ color: "var(--accent)" }} />
                   Imagen del negocio
-                  <span className="text-[11px] font-normal" style={{ color: "var(--ink-3)" }}>(opcional)</span>
+                  <span style={{ color: "var(--accent)" }}>*</span>
+                  <span className="text-[11px] font-normal" style={{ color: "var(--ink-3)" }}>obligatoria</span>
                 </p>
 
                 <div className="grid gap-3 sm:grid-cols-[1fr_140px]">
@@ -324,10 +379,10 @@ export default function JoinPage() {
             {/* Free badge */}
             <div className="panel-accent p-4">
               <p className="text-xs font-semibold" style={{ color: "var(--primary-mid)" }}>
-                100% Gratuito
+                Registro disponible para todos
               </p>
               <p className="mt-1 text-xs" style={{ color: "var(--ink-2)" }}>
-                El registro en el directorio es completamente gratis para todos los negocios de Olanchito.
+                El registro básico está disponible para todos los negocios de Olanchito.
               </p>
             </div>
           </aside>

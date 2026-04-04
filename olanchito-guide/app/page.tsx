@@ -13,6 +13,8 @@ import {
   ArrowTopRightOnSquareIcon,
 } from "@heroicons/react/24/outline";
 import DeviceMacbookMockup from "@/components/DeviceMacbookMockup";
+import FaqSection from "@/components/FaqSection";
+import NovedadesSection from "@/components/NovedadesSection";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -285,7 +287,7 @@ export default async function HomePage() {
           {featured.map(({ title, slug, hint, Icon, color }, i) => (
             <Link
               key={slug}
-              href={`/businesses?category=${slug}&page=1`}
+              href={`/categories/${slug}`}
               className={`panel group p-5 transition-all duration-300 hover:-translate-y-1 animate-fade-up anim-delay-${i + 1}`}
               style={{ "--tw-shadow": "var(--shadow-md)" } as React.CSSProperties}
             >
@@ -365,6 +367,12 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ─── NOVEDADES ───────────────────────────────────── */}
+      <NovedadesSection />
+
+      {/* ─── FAQ ─────────────────────────────────────────── */}
+      <FaqSection />
 
       {/* ─── VENNQ COMING SOON ───────────────────────────── */}
       <section className="section-container pb-10 sm:pb-12">

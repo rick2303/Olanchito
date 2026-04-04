@@ -1,12 +1,15 @@
 import { supabase } from "@/lib/supabase";
 import BusinessCard from "@/components/BusinessCard";
 import BusinessFilters from "@/components/BusinessFilters";
+import BusinessMapWrapper from "@/components/BusinessMapWrapper";
 import Link from "next/link";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ArrowPathIcon,
   BuildingStorefrontIcon,
+  ListBulletIcon,
+  MapIcon,
 } from "@heroicons/react/24/outline";
 
 export const dynamic = "force-dynamic";
@@ -34,7 +37,7 @@ export const metadata = {
 };
 
 type Props = {
-  searchParams?: { category?: string; q?: string; page?: string };
+  searchParams?: { category?: string; q?: string; page?: string; view?: string; nuevo?: string };
 };
 
 const BUCKET_NAME = process.env.BUCKET_NAME ?? "Olanchito-guide";
@@ -47,6 +50,8 @@ export default async function BusinessesPage({ searchParams }: Props) {
   const categorySlug = (searchParams?.category ?? "").toLowerCase().trim();
   const q = (searchParams?.q ?? "").trim();
   const page = Math.max(parseInt(searchParams?.page ?? "1", 10) || 1, 1);
+  const view = searchParams?.view === "map" ? "map" : "list";
+  const filterNew = searchParams?.nuevo === "1";
 
   const { data: categories } = await supabase
     .from("categories")
@@ -64,7 +69,7 @@ export default async function BusinessesPage({ searchParams }: Props) {
   // Fetch all matching businesses (sort handled in JS for score-based ranking)
   let query = supabase
     .from("businesses")
-    .select("id, name, slug, category_id, address, image, description, featured, view_count");
+    .select("id, name, slug, category_id, address, image, description, featured, view_count, created_at, location");
 
   if (categoryId) query = query.eq("category_id", categoryId);
   if (q) query = query.ilike("name", `%${q}%`);
@@ -105,20 +110,34 @@ export default async function BusinessesPage({ searchParams }: Props) {
     Object.entries(reviewStats).map(([slug, s]) => [slug, s.positive])
   );
 
-  // Score = view_count + (positive_reviews * 3), then sort
+  // "Nuevo" = created within the last 3 days
+  const now = Date.now();
+  const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
+
+  // Score = view_count + (positive_reviews * 3), then sort: featured > new > score
   const scored = (rawData ?? [])
-    .map((b) => ({
-      ...b,
-      _score: (b.view_count ?? 0) + (positiveReviewCounts[b.slug] ?? 0) * 3,
-    }))
+    .map((b) => {
+      const isNew = b.created_at
+        ? now - new Date(b.created_at).getTime() <= THREE_DAYS_MS
+        : false;
+      return {
+        ...b,
+        isNew,
+        _score: (b.view_count ?? 0) + (positiveReviewCounts[b.slug] ?? 0) * 3,
+      };
+    })
     .sort((a, b) => {
       if (a.featured && !b.featured) return -1;
       if (!a.featured && b.featured) return 1;
+      if (a.isNew && !b.isNew) return -1;
+      if (!a.isNew && b.isNew) return 1;
       if (b._score !== a._score) return b._score - a._score;
       return a.name.localeCompare(b.name, "es");
     });
 
-  const total = scored.length;
+  const filtered = filterNew ? scored.filter((b) => b.isNew) : scored;
+
+  const total = filtered.length;
   const totalPages = Math.max(Math.ceil(total / PAGE_SIZE), 1);
   const pageStart = (page - 1) * PAGE_SIZE;
 
@@ -126,7 +145,7 @@ export default async function BusinessesPage({ searchParams }: Props) {
     (categories ?? []).map((c) => [c.id, c.name])
   );
 
-  const businesses = scored.slice(pageStart, pageStart + PAGE_SIZE).map((b) => {
+  const businesses = filtered.slice(pageStart, pageStart + PAGE_SIZE).map((b) => {
     let imageUrl = FALLBACK_IMAGE;
     if (b.image && typeof b.image === "string") {
       const cleanPath = b.image.startsWith("business/") ? b.image : `business/${b.image}`;
@@ -144,11 +163,39 @@ export default async function BusinessesPage({ searchParams }: Props) {
     };
   });
 
+  // Map: only businesses with location data (respects nuevo filter too)
+  const mapBusinesses = filtered
+    .filter((b) => {
+      const loc = b.location as { lat?: number; lng?: number } | null;
+      return loc?.lat && loc?.lng;
+    })
+    .map((b) => {
+      const loc = b.location as { lat: number; lng: number };
+      return {
+        name: b.name,
+        slug: b.slug,
+        category: categoryMap[b.category_id ?? ""] ?? undefined,
+        address: b.address ?? undefined,
+        featured: b.featured ?? false,
+        isNew: b.isNew,
+        lat: loc.lat,
+        lng: loc.lng,
+      };
+    });
+
   const buildPageHref = (p: number) => {
     const params = new URLSearchParams();
     if (categorySlug) params.set("category", categorySlug);
     if (q) params.set("q", q);
     params.set("page", String(p));
+    return `/businesses?${params.toString()}`;
+  };
+
+  const buildViewHref = (v: "list" | "map") => {
+    const params = new URLSearchParams();
+    if (categorySlug) params.set("category", categorySlug);
+    if (q) params.set("q", q);
+    if (v === "map") params.set("view", "map");
     return `/businesses?${params.toString()}`;
   };
 
@@ -162,9 +209,7 @@ export default async function BusinessesPage({ searchParams }: Props) {
     <main className="page-shell">
 
       {/* ─── PAGE HEADER ─────────────────────────────── */}
-      <section
-        className="section-container pt-8 pb-6 sm:pt-10 sm:pb-7"
-      >
+      <section className="section-container pt-8 pb-6 sm:pt-10 sm:pb-7">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <div className="badge-primary mb-3 w-fit">
@@ -178,57 +223,109 @@ export default async function BusinessesPage({ searchParams }: Props) {
               {pageTitle}
             </h1>
             <p className="mt-1.5 text-sm" style={{ color: "var(--ink-3)" }}>
-              {total} resultado{total !== 1 ? "s" : ""} · Página {page} de {totalPages}
+              {total} resultado{total !== 1 ? "s" : ""}
+              {view === "list" && ` · Página ${page} de ${totalPages}`}
             </p>
           </div>
 
-          <div className="w-full lg:max-w-2xl xl:max-w-3xl">
+          <div className="w-full lg:max-w-2xl xl:max-w-3xl flex flex-col gap-3">
             <BusinessFilters categories={categories ?? []} />
+            {/* View toggle */}
+            <div className="flex gap-2">
+              <Link
+                href={buildViewHref("list")}
+                className={[
+                  "inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-colors",
+                  view === "list" ? "btn-primary !py-2 !px-3" : "btn-secondary !py-2 !px-3",
+                ].join(" ")}
+              >
+                <ListBulletIcon className="h-3.5 w-3.5" />
+                Lista
+              </Link>
+              <Link
+                href={buildViewHref("map")}
+                className={[
+                  "inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-colors",
+                  view === "map" ? "btn-primary !py-2 !px-3" : "btn-secondary !py-2 !px-3",
+                ].join(" ")}
+              >
+                <MapIcon className="h-3.5 w-3.5" />
+                Mapa
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ─── RESULTS ─────────────────────────────────── */}
       <section className="section-container pb-16">
-        {businesses.length === 0 ? (
-          <div className="panel p-8 text-center">
-            <BuildingStorefrontIcon className="mx-auto h-10 w-10 mb-3" style={{ color: "var(--ink-3)" }} />
-            <p className="text-sm font-semibold" style={{ color: "var(--ink)" }}>
-              No se encontraron negocios
-            </p>
-            <p className="mt-1 text-xs" style={{ color: "var(--ink-3)" }}>
-              Intente con otros filtros o busque en todas las categorías.
-            </p>
-            <Link href="/businesses" className="btn-primary mt-5 inline-flex !text-xs !py-2">
-              <ArrowPathIcon className="h-3.5 w-3.5" />
-              Ver todos
-            </Link>
-          </div>
+        {view === "map" ? (
+          /* ── MAP VIEW ── */
+          mapBusinesses.length === 0 ? (
+            <div className="panel p-8 text-center">
+              <MapIcon className="mx-auto h-10 w-10 mb-3" style={{ color: "var(--ink-3)" }} />
+              <p className="text-sm font-semibold" style={{ color: "var(--ink)" }}>
+                Sin ubicación disponible
+              </p>
+              <p className="mt-1 text-xs" style={{ color: "var(--ink-3)" }}>
+                Los negocios filtrados aún no tienen coordenadas en el mapa.
+              </p>
+              <Link href={buildViewHref("list")} className="btn-secondary mt-5 inline-flex !text-xs !py-2">
+                <ListBulletIcon className="h-3.5 w-3.5" />
+                Ver en lista
+              </Link>
+            </div>
+          ) : (
+            <div>
+              <p className="mb-3 text-xs" style={{ color: "var(--ink-3)" }}>
+                {mapBusinesses.length} negocio{mapBusinesses.length !== 1 ? "s" : ""} con ubicación en el mapa
+              </p>
+              <BusinessMapWrapper businesses={mapBusinesses} />
+            </div>
+          )
         ) : (
-          <>
-            <PaginationBar page={page} totalPages={totalPages} buildPageHref={buildPageHref} />
-            <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {businesses.map((business) => (
-                <BusinessCard
-                  key={business.id}
-                  business={{
-                    name: business.name,
-                    slug: business.slug,
-                    image: business.image,
-                    address: business.address ?? "",
-                    description: business.description ?? "",
-                    category: business.categoryName,
-                    featured: business.featured ?? false,
-                    avgRating: business.avgRating ?? undefined,
-                    reviewCount: business.reviewCount,
-                  }}
-                />
-              ))}
+          /* ── LIST VIEW ── */
+          businesses.length === 0 ? (
+            <div className="panel p-8 text-center">
+              <BuildingStorefrontIcon className="mx-auto h-10 w-10 mb-3" style={{ color: "var(--ink-3)" }} />
+              <p className="text-sm font-semibold" style={{ color: "var(--ink)" }}>
+                No se encontraron negocios
+              </p>
+              <p className="mt-1 text-xs" style={{ color: "var(--ink-3)" }}>
+                Intente con otros filtros o busque en todas las categorías.
+              </p>
+              <Link href="/businesses" className="btn-primary mt-5 inline-flex !text-xs !py-2">
+                <ArrowPathIcon className="h-3.5 w-3.5" />
+                Ver todos
+              </Link>
             </div>
-            <div className="mt-8">
+          ) : (
+            <>
               <PaginationBar page={page} totalPages={totalPages} buildPageHref={buildPageHref} />
-            </div>
-          </>
+              <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {businesses.map((business) => (
+                  <BusinessCard
+                    key={business.id}
+                    business={{
+                      name: business.name,
+                      slug: business.slug,
+                      image: business.image,
+                      address: business.address ?? "",
+                      description: business.description ?? "",
+                      category: business.categoryName,
+                      featured: business.featured ?? false,
+                      isNew: business.isNew,
+                      avgRating: business.avgRating ?? undefined,
+                      reviewCount: business.reviewCount,
+                    }}
+                  />
+                ))}
+              </div>
+              <div className="mt-8">
+                <PaginationBar page={page} totalPages={totalPages} buildPageHref={buildPageHref} />
+              </div>
+            </>
+          )
         )}
       </section>
     </main>

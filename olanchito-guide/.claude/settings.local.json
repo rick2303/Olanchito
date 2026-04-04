@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc:*)",
+      "Bash(node -e \"const m = require\\('react-qr-code'\\); console.log\\(Object.keys\\(m\\)\\)\")"
+    ]
+  }
+}
