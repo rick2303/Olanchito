@@ -4,19 +4,18 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
+import InactivityGuard from "@/components/InactivityGuard";
 import {
   BuildingStorefrontIcon,
   StarIcon,
   ArrowRightOnRectangleIcon,
   CheckCircleIcon,
-  XCircleIcon,
   EyeIcon,
   EyeSlashIcon,
   ChartBarIcon,
   ClockIcon,
   EnvelopeIcon,
   PhoneIcon,
-  UserIcon,
   PlusCircleIcon,
   TrashIcon,
   FlagIcon,
@@ -31,19 +30,14 @@ type TopBusiness = {
   view_count: number;
 };
 
-type Submission = {
+type UnverifiedBusiness = {
   id: string;
-  business_name: string;
-  contact_name: string;
-  email: string;
-  phone: string;
-  whatsapp: string | null;
+  name: string;
+  slug: string;
+  owner_email: string | null;
+  phone: string | null;
   address: string | null;
-  description: string | null;
-  hours: string | null;
   category_id: string | null;
-  image: string | null;
-  status: string;
   created_at: string;
 };
 
@@ -66,35 +60,6 @@ type Suggestion = {
   created_at: string;
 };
 
-const STATUS_LABELS: Record<string, { label: string; color: string }> = {
-  new:      { label: "Nuevo",     color: "bg-amber-50 text-amber-700 ring-amber-200" },
-  reviewed: { label: "Revisado",  color: "bg-blue-50 text-blue-700 ring-blue-200" },
-  approved: { label: "Aprobado",  color: "bg-green-50 text-green-700 ring-green-200" },
-  rejected: { label: "Rechazado", color: "bg-red-50 text-red-700 ring-red-200" },
-};
-
-function slugify(str: string) {
-  return str
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "-")
-    .replace(/-+/g, "-");
-}
-
-async function generateUniqueSlug(name: string): Promise<string> {
-  const base = slugify(name);
-  let slug = base;
-  let i = 2;
-  while (true) {
-    const { data } = await supabase.from("businesses").select("id").eq("slug", slug).maybeSingle();
-    if (!data) return slug;
-    slug = `${base}-${i++}`;
-  }
-}
-
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString("es-HN", {
     day: "numeric",
@@ -105,24 +70,25 @@ function formatDate(iso: string) {
 
 export default function AdminDashboard() {
   const router = useRouter();
-  const [authChecked, setAuthChecked]     = useState(false);
-  const [submissions, setSubmissions]     = useState<Submission[]>([]);
-  const [reviews, setReviews]             = useState<Review[]>([]);
-  const [topBusinesses, setTopBusinesses] = useState<TopBusiness[]>([]);
-  const [totalViews, setTotalViews]       = useState(0);
-  const [suggestions, setSuggestions]     = useState<Suggestion[]>([]);
-  const [tab, setTab]                     = useState<"submissions" | "reviews" | "add" | "businesses" | "suggestions">("submissions");
-  const [loadingData, setLoadingData]     = useState(true);
-  const [loadingId, setLoadingId]         = useState<string | null>(null);
-  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [authChecked, setAuthChecked]           = useState(false);
+  const [unverified, setUnverified]             = useState<UnverifiedBusiness[]>([]);
+  const [reviews, setReviews]                   = useState<Review[]>([]);
+  const [topBusinesses, setTopBusinesses]       = useState<TopBusiness[]>([]);
+  const [totalViews, setTotalViews]             = useState(0);
+  const [suggestions, setSuggestions]           = useState<Suggestion[]>([]);
+  const [tab, setTab]                           = useState<"unverified" | "reviews" | "add" | "businesses" | "suggestions">("unverified");
+  const [loadingData, setLoadingData]           = useState(true);
+  const [loadingId, setLoadingId]               = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId]   = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     setLoadingData(true);
-    const [{ data: subs }, { data: revs }, { data: top }, { data: views }, { data: suggs }] =
+    const [{ data: unverifiedData }, { data: revs }, { data: top }, { data: views }, { data: suggs }] =
       await Promise.all([
         supabase
-          .from("business_submissions")
-          .select("id, business_name, contact_name, email, phone, whatsapp, address, description, hours, category_id, image, status, created_at")
+          .from("businesses")
+          .select("id, name, slug, owner_email, phone, address, category_id, created_at")
+          .eq("verified", false)
           .order("created_at", { ascending: false }),
         supabase
           .from("reviews")
@@ -140,7 +106,7 @@ export default function AdminDashboard() {
           .select("id, business_name, business_slug, field, description, created_at")
           .order("created_at", { ascending: false }),
       ]);
-    setSubmissions(subs ?? []);
+    setUnverified(unverifiedData ?? []);
     setReviews(revs ?? []);
     setSuggestions(suggs ?? []);
     setTopBusinesses(top ?? []);
@@ -156,38 +122,10 @@ export default function AdminDashboard() {
     });
   }, [router, fetchData]);
 
-  const updateSubmission = async (id: string, status: string) => {
+  const verifyBusiness = async (id: string) => {
     setLoadingId(id);
-
-    if (status === "approved") {
-      const sub = submissions.find((s) => s.id === id);
-      if (sub) {
-        const slug = await generateUniqueSlug(sub.business_name);
-        const { error } = await supabase.from("businesses").insert([{
-          name: sub.business_name,
-          slug,
-          category_id: sub.category_id,
-          description: sub.description || null,
-          hours: sub.hours || null,
-          phone: sub.phone || null,
-          whatsapp: sub.whatsapp || null,
-          address: sub.address || null,
-          image: sub.image || null,
-          featured: false,
-          verified: false,
-          view_count: 0,
-          socials: {},
-        }]);
-        if (error) {
-          setLoadingId(null);
-          alert(`Error al publicar negocio: ${error.message}`);
-          return;
-        }
-      }
-    }
-
-    await supabase.from("business_submissions").update({ status }).eq("id", id);
-    setSubmissions((prev) => prev.map((s) => s.id === id ? { ...s, status } : s));
+    await supabase.from("businesses").update({ verified: true }).eq("id", id);
+    setUnverified((prev) => prev.filter((b) => b.id !== id));
     setLoadingId(null);
   };
 
@@ -218,12 +156,13 @@ export default function AdminDashboard() {
 
   if (!authChecked) return null;
 
-  const pendingCount     = submissions.filter((s) => s.status === "new").length;
+  const unverifiedCount  = unverified.length;
   const hiddenCount      = reviews.filter((r) => !r.is_visible).length;
   const suggestionsCount = suggestions.length;
 
   return (
     <main className="min-h-screen bg-jungle-50">
+      <InactivityGuard redirectTo="/admin/login" />
 
       {/* ── Header ── */}
       <header
@@ -278,10 +217,10 @@ export default function AdminDashboard() {
           </div>
 
           {[
-            { label: "Solicitudes", value: submissions.length, Icon: BuildingStorefrontIcon },
-            { label: "Pendientes",  value: pendingCount,       Icon: ClockIcon },
-            { label: "Reseñas",     value: reviews.length,     Icon: StarIcon },
-            { label: "Ocultas",     value: hiddenCount,        Icon: EyeSlashIcon },
+            { label: "Por verificar", value: unverifiedCount, Icon: BuildingStorefrontIcon },
+            { label: "Reseñas",       value: reviews.length,  Icon: StarIcon },
+            { label: "Ocultas",       value: hiddenCount,     Icon: EyeSlashIcon },
+            { label: "Sugerencias",   value: suggestionsCount, Icon: FlagIcon },
           ].map(({ label, value, Icon }) => (
             <div key={label} className="rounded-2xl bg-white p-4 ring-1 ring-black/5">
               <Icon className="mb-1.5 h-5 w-5 text-jungle-500" />
@@ -339,19 +278,19 @@ export default function AdminDashboard() {
         {/* ── Tabs ── */}
         <div className="flex gap-2 overflow-x-auto pb-1">
           <button
-            onClick={() => setTab("submissions")}
+            onClick={() => setTab("unverified")}
             className="inline-flex flex-shrink-0 items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold transition-colors"
             style={
-              tab === "submissions"
+              tab === "unverified"
                 ? { background: "var(--primary)", color: "white" }
                 : { background: "white", color: "var(--ink-2)", border: "1px solid var(--line)" }
             }
           >
             <BuildingStorefrontIcon className="h-3.5 w-3.5" />
-            Solicitudes
-            {pendingCount > 0 && (
+            Por verificar
+            {unverifiedCount > 0 && (
               <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-bold">
-                {pendingCount}
+                {unverifiedCount}
               </span>
             )}
           </button>
@@ -428,73 +367,69 @@ export default function AdminDashboard() {
           </div>
         ) : (
           <>
-            {/* Submissions */}
-            {tab === "submissions" && (
+            {/* Unverified businesses */}
+            {tab === "unverified" && (
               <div className="space-y-3">
-                {submissions.length === 0 && (
+                {unverified.length === 0 && (
                   <div className="rounded-2xl bg-white p-8 text-center ring-1 ring-black/5">
-                    <p className="text-sm text-jungle-600">No hay solicitudes.</p>
+                    <CheckCircleIcon className="mx-auto mb-2 h-8 w-8 text-jungle-400" />
+                    <p className="text-sm text-jungle-600">No hay negocios pendientes de verificación.</p>
                   </div>
                 )}
-                {submissions.map((s) => {
-                  const st   = STATUS_LABELS[s.status] ?? STATUS_LABELS.new;
-                  const busy = loadingId === s.id;
+                {unverified.map((b) => {
+                  const busy = loadingId === b.id;
                   return (
-                    <div key={s.id} className="rounded-2xl bg-white p-4 ring-1 ring-black/5 shadow-[0_4px_12px_rgba(0,0,0,0.04)] sm:p-5">
-                      {/* Name + badge */}
+                    <div key={b.id} className="rounded-2xl bg-white p-4 ring-1 ring-black/5 shadow-[0_4px_12px_rgba(0,0,0,0.04)] sm:p-5">
                       <div className="flex flex-wrap items-center gap-2">
-                        <p className="text-sm font-semibold text-jungle-950 sm:text-base">
-                          {s.business_name}
-                        </p>
-                        <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ring-1 ${st.color}`}>
-                          {st.label}
+                        <p className="text-sm font-semibold text-jungle-950 sm:text-base">{b.name}</p>
+                        <span className="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700 ring-1 ring-amber-200">
+                          Sin verificar
                         </span>
                       </div>
 
-                      {/* Contact info */}
                       <div className="mt-2 flex flex-col gap-1 text-xs text-jungle-600 sm:flex-row sm:flex-wrap sm:gap-3">
-                        <span className="flex items-center gap-1">
-                          <UserIcon className="h-3.5 w-3.5 flex-shrink-0" />
-                          <span className="truncate">{s.contact_name}</span>
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <EnvelopeIcon className="h-3.5 w-3.5 flex-shrink-0" />
-                          <span className="truncate">{s.email}</span>
-                        </span>
-                        {s.phone && (
+                        {b.owner_email && (
+                          <span className="flex items-center gap-1">
+                            <EnvelopeIcon className="h-3.5 w-3.5 flex-shrink-0" />
+                            <span className="truncate">{b.owner_email}</span>
+                          </span>
+                        )}
+                        {b.phone && (
                           <span className="flex items-center gap-1">
                             <PhoneIcon className="h-3.5 w-3.5 flex-shrink-0" />
-                            {s.phone}
+                            {b.phone}
+                          </span>
+                        )}
+                        {b.address && (
+                          <span className="flex items-center gap-1 truncate">
+                            <BuildingStorefrontIcon className="h-3.5 w-3.5 flex-shrink-0" />
+                            <span className="truncate">{b.address}</span>
                           </span>
                         )}
                         <span className="flex items-center gap-1">
                           <ClockIcon className="h-3.5 w-3.5 flex-shrink-0" />
-                          {formatDate(s.created_at)}
+                          {formatDate(b.created_at)}
                         </span>
                       </div>
 
-                      {/* Actions — full width on mobile, inline on desktop */}
                       <div className="mt-3 flex gap-2 sm:mt-0 sm:justify-end">
-                        {s.status !== "approved" && (
-                          <button
-                            onClick={() => updateSubmission(s.id, "approved")}
-                            disabled={busy}
-                            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-green-600 px-3 py-2 text-xs font-semibold text-white hover:bg-green-700 disabled:opacity-50 sm:flex-none sm:py-1.5"
-                          >
-                            <CheckCircleIcon className="h-3.5 w-3.5" />
-                            {busy ? "..." : "Aprobar"}
-                          </button>
-                        )}
-                        {s.status !== "rejected" && (
-                          <button
-                            onClick={() => updateSubmission(s.id, "rejected")}
-                            disabled={busy}
-                            className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-white px-3 py-2 text-xs font-semibold text-red-700 ring-1 ring-red-200 hover:bg-red-50 disabled:opacity-50 sm:flex-none sm:py-1.5"
-                          >
-                            <XCircleIcon className="h-3.5 w-3.5" />
-                            {busy ? "..." : "Rechazar"}
-                          </button>
-                        )}
+                        <a
+                          href={`/negocios/${b.slug}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-white px-3 py-2 text-xs font-semibold text-jungle-700 ring-1 ring-jungle-200 hover:bg-jungle-50 sm:flex-none sm:py-1.5"
+                        >
+                          <EyeIcon className="h-3.5 w-3.5" />
+                          Ver
+                        </a>
+                        <button
+                          onClick={() => verifyBusiness(b.id)}
+                          disabled={busy}
+                          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-green-600 px-3 py-2 text-xs font-semibold text-white hover:bg-green-700 disabled:opacity-50 sm:flex-none sm:py-1.5"
+                        >
+                          <CheckCircleIcon className="h-3.5 w-3.5" />
+                          {busy ? "..." : "Verificar"}
+                        </button>
                       </div>
                     </div>
                   );

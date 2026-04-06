@@ -20,6 +20,8 @@ import {
 } from "@heroicons/react/24/outline";
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 import HoursInput from "@/components/HoursInput";
+import LocationPickerWrapper from "@/components/LocationPickerWrapper";
+import type { LatLng } from "@/components/LocationPicker";
 
 interface Category {
   id: string;
@@ -68,6 +70,7 @@ export default function AdminAddBusiness() {
   const [imgError, setImgError] = useState(false);
   const [loading, setLoading] = useState(false);
   const [toast, setToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
+  const [location, setLocation] = useState<LatLng | null>(null);
 
   useEffect(() => {
     supabase
@@ -156,6 +159,7 @@ export default function AdminAddBusiness() {
           featured: form.featured,
           verified: form.verified,
           image: imagePath,
+          location: location ?? null,
           view_count: 0,
           socials: {
             instagram: form.instagram.trim() || null,
@@ -169,10 +173,25 @@ export default function AdminAddBusiness() {
 
       if (insertErr) throw insertErr;
 
+      // Send invite so owner can access their free portal
+      const { data: newBiz } = await supabase
+        .from("businesses")
+        .select("id")
+        .eq("slug", form.slug.trim())
+        .single();
+      if (newBiz) {
+        fetch("/api/owner/invite", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ business_id: newBiz.id }),
+        }).catch(() => {});
+      }
+
       showToast("success", `"${form.name}" publicado exitosamente.`);
       setForm(EMPTY_FORM);
       setSlugManual(false);
       setImgError(false);
+      setLocation(null);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Error desconocido";
       // Slug duplicate check
@@ -376,6 +395,16 @@ export default function AdminAddBusiness() {
               <Field label="Sitio web" icon={<LinkIcon className="h-4 w-4" />}>
                 <input name="website" value={form.website} onChange={handleChange} className="admin-field" placeholder="https://www.negocio.com" />
               </Field>
+            </div>
+
+            {/* Location picker */}
+            <div className="rounded-xl border border-jungle-200 bg-jungle-50/30 p-4 space-y-2">
+              <p className="flex items-center gap-1.5 text-xs font-semibold text-jungle-800">
+                <MapPinIcon className="h-4 w-4 text-jungle-500" />
+                Ubicación en el mapa
+                <span className="font-normal text-jungle-400">(opcional)</span>
+              </p>
+              <LocationPickerWrapper value={location} onChange={setLocation} />
             </div>
 
             {/* Image upload */}

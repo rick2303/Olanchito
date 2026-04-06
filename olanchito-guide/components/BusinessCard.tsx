@@ -8,7 +8,7 @@ import {
   ArrowRightIcon,
   PhotoIcon,
 } from "@heroicons/react/24/outline";
-import { StarIcon } from "@heroicons/react/24/solid";
+import { StarIcon, CheckBadgeIcon } from "@heroicons/react/24/solid";
 import FavoriteButton from "@/components/FavoriteButton";
 
 type BusinessCardProps = {
@@ -20,6 +20,7 @@ type BusinessCardProps = {
     description?: string;
     category?: string;
     featured?: boolean;
+    verified?: boolean;
     isNew?: boolean;
     avgRating?: number;
     reviewCount?: number;
@@ -39,7 +40,7 @@ export default function BusinessCard({ business, className = "" }: BusinessCardP
 
   return (
     <article
-      className={["group relative overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-md", className].join(" ")}
+      className={["group relative flex flex-col overflow-hidden transition-all duration-200 hover:-translate-y-1 hover:shadow-md", className].join(" ")}
       style={{
         background: "var(--surface)",
         border: "1px solid var(--line)",
@@ -70,9 +71,9 @@ export default function BusinessCard({ business, className = "" }: BusinessCardP
       </div>
 
       {/* Content */}
-      <div className="p-4 space-y-3">
+      <div className="flex flex-1 flex-col gap-3 p-4">
         {/* Badges row */}
-        {(business.featured || business.isNew || business.category) ? (
+        {(business.featured || business.verified || business.isNew || business.category) ? (
           <div className="flex items-center gap-1.5 flex-wrap">
             {business.featured && (
               <span
@@ -81,6 +82,15 @@ export default function BusinessCard({ business, className = "" }: BusinessCardP
               >
                 <StarIcon className="h-3 w-3" />
                 Destacado
+              </span>
+            )}
+            {business.verified && (
+              <span
+                className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
+                style={{ background: "#eff6ff", color: "#1d4ed8" }}
+              >
+                <CheckBadgeIcon className="h-3 w-3" />
+                Verificado
               </span>
             )}
             {business.isNew && (
@@ -141,7 +151,7 @@ export default function BusinessCard({ business, className = "" }: BusinessCardP
 
         {/* CTA */}
         <div
-          className="flex w-full items-center justify-between rounded-xl px-4 py-2.5 text-xs font-semibold"
+          className="mt-auto flex w-full items-center justify-between rounded-xl px-4 py-2.5 text-xs font-semibold"
           style={{
             background: "var(--surface-2)",
             color: "var(--primary)",

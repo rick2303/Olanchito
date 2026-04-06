@@ -3,7 +3,9 @@ import Image from "next/image";
 import type { Metadata } from "next";
 import { supabase } from "@/lib/supabase";
 import ReviewSection from "@/components/reviews/ReviewSection";
+import GalleryLightbox from "@/components/GalleryLightbox";
 import ContactButtons from "@/components/ContactButtons";
+import TrackingLink from "@/components/TrackingLink";
 import OpenNowBadge from "@/components/OpenNowBadge";
 import ViewTracker from "@/components/ViewTracker";
 import RelatedBusinesses from "@/components/RelatedBusinesses";
@@ -20,6 +22,8 @@ import {
   TagIcon,
   GlobeAltIcon,
   ArrowTopRightOnSquareIcon,
+  BookOpenIcon,
+  PhotoIcon,
 } from "@heroicons/react/24/outline";
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 
@@ -128,7 +132,12 @@ export default async function BusinessDetail({ params }: Props) {
       socials,
       location,
       category_id,
-      verified
+      verified,
+      subscription_active,
+      subscription_tier,
+      booking_url,
+      announcement,
+      announcement_expires_at
     `
     )
     .eq("slug", slug)
@@ -172,11 +181,49 @@ export default async function BusinessDetail({ params }: Props) {
   // Reviews
   const { data: reviewsData } = await supabase
     .from("reviews")
-    .select("id, author_name, rating, comment, created_at")
+    .select("id, author_name, rating, comment, created_at, owner_reply")
     .eq("business_slug", data.slug)
     .order("created_at", { ascending: false });
 
   const initialReviews = reviewsData ?? [];
+
+  // Gallery photos (only if business has active subscription)
+  const galleryPhotos: { id: string; image_path: string }[] = [];
+  if ((data as { subscription_active?: boolean }).subscription_active) {
+    const { data: photosData } = await supabase
+      .from("business_photos")
+      .select("id, image_path")
+      .eq("business_id", data.id)
+      .order("sort_order", { ascending: true });
+    if (photosData) galleryPhotos.push(...photosData);
+  }
+
+  // Catalog items (only if business has active subscription)
+  const catalogItems: { id: string; name: string; description: string | null; price: string | null; currency: string; image_path: string | null }[] = [];
+  if ((data as { subscription_active?: boolean }).subscription_active) {
+    const { data: catalogData } = await supabase
+      .from("catalog_items")
+      .select("id, name, description, price, currency, image_path")
+      .eq("business_id", data.id)
+      .eq("is_available", true)
+      .order("sort_order", { ascending: true });
+    if (catalogData) catalogItems.push(...catalogData);
+  }
+
+  // Offers (featured plan only)
+  type OfferRow = { id: string; title: string; description: string | null; original_price: string | null; sale_price: string | null; currency: string; badge: string | null; expires_at: string | null };
+  const offers: OfferRow[] = [];
+  if ((data as { subscription_tier?: string }).subscription_tier === "featured") {
+    const today = new Date().toISOString().split("T")[0];
+    const { data: offersData } = await supabase
+      .from("offers")
+      .select("id, title, description, original_price, sale_price, currency, badge, expires_at")
+      .eq("business_id", data.id)
+      .eq("active", true)
+      .or(`expires_at.is.null,expires_at.gte.${today}`)
+      .order("sort_order", { ascending: true });
+    if (offersData) offers.push(...offersData);
+  }
 
   const socials = (data.socials as Record<string, string> | null) ?? null;
   const location =
@@ -191,6 +238,17 @@ export default async function BusinessDetail({ params }: Props) {
   const tt  = normalizeUrl(socials?.tiktok);
 
   const hasMap = Boolean(location?.lat && location?.lng);
+
+  // Announcement — only show if not expired
+  const announcementText = (() => {
+    const raw = (data as { announcement?: string | null }).announcement;
+    const exp = (data as { announcement_expires_at?: string | null }).announcement_expires_at;
+    if (!raw) return null;
+    if (exp && new Date(exp) < new Date()) return null;
+    return raw;
+  })();
+
+  const bookingUrl = normalizeUrl((data as { booking_url?: string | null }).booking_url);
   const services = Array.isArray(data.services)
     ? (data.services as string[]).filter(Boolean)
     : [];
@@ -282,6 +340,17 @@ export default async function BusinessDetail({ params }: Props) {
       )}
       <ViewTracker slug={data.slug} />
 
+      {/* ─── ANNOUNCEMENT BANNER ─── */}
+      {announcementText && (
+        <div className="bg-amber-500">
+          <div className="mx-auto max-w-5xl px-4 py-2.5 sm:px-6">
+            <p className="text-center text-xs font-semibold text-white sm:text-sm">
+              📢 {announcementText}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* ─── BREADCRUMBS ─── */}
       <nav
         aria-label="Breadcrumb"
@@ -358,25 +427,29 @@ export default async function BusinessDetail({ params }: Props) {
 
               <div className="flex items-center gap-2">
                 {phone ? (
-                  <a
+                  <TrackingLink
                     href={`tel:${phone}`}
+                    businessId={data.id}
+                    eventType="phone_click"
                     className="inline-flex items-center gap-2 rounded-2xl bg-white px-3 py-2 text-xs font-semibold text-jungle-900 ring-1 ring-black/10 hover:bg-jungle-50"
                   >
                     <PhoneIcon className="h-4 w-4 text-jungle-700" />
                     Llamar
-                  </a>
+                  </TrackingLink>
                 ) : null}
 
                 {waLink ? (
-                  <a
+                  <TrackingLink
                     href={waLink}
+                    businessId={data.id}
+                    eventType="whatsapp_click"
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-2 rounded-2xl bg-green-600 px-3 py-2 text-xs font-semibold text-white shadow-sm hover:bg-green-700"
                   >
                     <ChatBubbleLeftRightIcon className="h-4 w-4" />
                     WhatsApp
-                  </a>
+                  </TrackingLink>
                 ) : null}
               </div>
             </div>
@@ -443,18 +516,22 @@ export default async function BusinessDetail({ params }: Props) {
 
               <div className="mt-4 hidden lg:flex flex-wrap gap-2">
                 {phone ? (
-                  <a
+                  <TrackingLink
                     href={`tel:${phone}`}
+                    businessId={data.id}
+                    eventType="phone_click"
                     className="inline-flex items-center gap-2 rounded-2xl bg-black/45 px-4 py-2 text-sm font-semibold text-white ring-1 ring-white/20 backdrop-blur hover:bg-black/55"
                   >
                     <PhoneIcon className="h-5 w-5" />
                     Llamar
-                  </a>
+                  </TrackingLink>
                 ) : null}
 
                 {waLink ? (
-                  <a
+                  <TrackingLink
                     href={waLink}
+                    businessId={data.id}
+                    eventType="whatsapp_click"
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-2 rounded-2xl bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-700"
@@ -462,7 +539,7 @@ export default async function BusinessDetail({ params }: Props) {
                     <ChatBubbleLeftRightIcon className="h-5 w-5" />
                     WhatsApp
                     <ArrowTopRightOnSquareIcon className="h-5 w-5 opacity-90" />
-                  </a>
+                  </TrackingLink>
                 ) : null}
               </div>
             </div>
@@ -494,6 +571,24 @@ export default async function BusinessDetail({ params }: Props) {
               )}
             </div>
 
+            {/* Galería de fotos */}
+            {galleryPhotos.length > 0 && (
+              <div className="rounded-3xl bg-white p-6 ring-1 ring-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.06)] sm:p-7">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="grid h-10 w-10 place-items-center rounded-2xl bg-jungle-50 ring-1 ring-jungle-200">
+                    <PhotoIcon className="h-5 w-5 text-jungle-700" />
+                  </div>
+                  <h2 className="text-lg font-bold text-jungle-950">Galería</h2>
+                </div>
+                <GalleryLightbox
+                  photos={galleryPhotos.map(p => ({
+                    id: p.id,
+                    url: supabase.storage.from(BUCKET_NAME).getPublicUrl(p.image_path).data.publicUrl,
+                  }))}
+                />
+              </div>
+            )}
+
             {/* Servicios */}
             {services.length > 0 ? (
               <div className="rounded-3xl bg-white p-6 ring-1 ring-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.06)] sm:p-7">
@@ -516,6 +611,93 @@ export default async function BusinessDetail({ params }: Props) {
                 </div>
               </div>
             ) : null}
+
+            {/* Catálogo */}
+            {catalogItems.length > 0 && (
+              <div className="rounded-3xl bg-white p-6 ring-1 ring-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.06)] sm:p-7">
+                <div className="flex items-center gap-2">
+                  <div className="grid h-10 w-10 place-items-center rounded-2xl bg-jungle-50 ring-1 ring-jungle-200">
+                    <BookOpenIcon className="h-5 w-5 text-jungle-700" />
+                  </div>
+                  <h2 className="text-lg font-bold text-jungle-950">Catálogo</h2>
+                </div>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  {catalogItems.map((item) => {
+                    const imgUrl = item.image_path
+                      ? supabase.storage.from(BUCKET_NAME).getPublicUrl(item.image_path).data.publicUrl
+                      : null;
+                    return (
+                      <div key={item.id} className="flex items-start gap-3 rounded-2xl bg-jungle-50 p-3 ring-1 ring-jungle-100">
+                        {imgUrl && (
+                          <div className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl">
+                            <Image src={imgUrl} alt={item.name} fill className="object-cover" />
+                          </div>
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-bold text-jungle-950">{item.name}</p>
+                          {item.price && (
+                            <p className="text-xs font-semibold text-jungle-600">
+                              {item.currency === "USD" ? `$${item.price}` : `L. ${item.price}`}
+                            </p>
+                          )}
+                          {item.description && (
+                            <p className="mt-0.5 text-xs text-jungle-600 line-clamp-2">{item.description}</p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Ofertas y Promociones */}
+            {offers.length > 0 && (
+              <div className="rounded-3xl bg-white p-6 ring-1 ring-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.06)] sm:p-7">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="grid h-10 w-10 place-items-center rounded-2xl bg-amber-50 ring-1 ring-amber-200">
+                    <TagIcon className="h-5 w-5 text-amber-600" />
+                  </div>
+                  <h2 className="text-lg font-bold text-jungle-950">Ofertas y Promociones</h2>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {offers.map(offer => {
+                    const cur = offer.currency ?? "HNL";
+                    const fmt = (p: string | null) => p ? (cur === "USD" ? `$${p}` : `L. ${p}`) : null;
+                    return (
+                    <div key={offer.id} className="rounded-2xl bg-amber-50 p-4 ring-1 ring-amber-100">
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="text-sm font-bold text-jungle-950">{offer.title}</p>
+                        {offer.badge && (
+                          <span className="flex-shrink-0 rounded-full bg-amber-400 px-2 py-0.5 text-[10px] font-bold text-white">
+                            {offer.badge}
+                          </span>
+                        )}
+                      </div>
+                      {offer.description && (
+                        <p className="mt-1 text-xs text-jungle-700 line-clamp-2">{offer.description}</p>
+                      )}
+                      {(offer.original_price || offer.sale_price) && (
+                        <div className="mt-2 flex items-center gap-2">
+                          {offer.original_price && (
+                            <span className="text-xs text-jungle-400 line-through">{fmt(offer.original_price)}</span>
+                          )}
+                          {offer.sale_price && (
+                            <span className="text-sm font-bold text-green-700">{fmt(offer.sale_price)}</span>
+                          )}
+                        </div>
+                      )}
+                      {offer.expires_at && (
+                        <p className="mt-1.5 text-[11px] text-jungle-400">
+                          Válido hasta: {new Date(offer.expires_at + "T00:00:00").toLocaleDateString("es-HN", { day: "numeric", month: "long", year: "numeric" })}
+                        </p>
+                      )}
+                    </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Ubicacion */}
             {hasMap ? (
@@ -590,7 +772,25 @@ export default async function BusinessDetail({ params }: Props) {
                   phone={phone}
                   waLink={waLink}
                   businessName={data.name}
+                  businessId={data.id}
                 />
+
+                {bookingUrl && (
+                  <a
+                    href={bookingUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-jungle-700 px-4 py-3 text-sm font-bold text-white hover:bg-jungle-800 transition-colors"
+                  >
+                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden>
+                      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                      <line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/>
+                      <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                    Agendar cita
+                    <ArrowTopRightOnSquareIcon className="h-3.5 w-3.5 opacity-80" />
+                  </a>
+                )}
               </div>
             </div>
 
@@ -639,8 +839,10 @@ export default async function BusinessDetail({ params }: Props) {
                 </div>
               </div>
             )}
-            {/* QR */}
-            <BusinessQR slug={data.slug} name={data.name} />
+            {/* QR — featured plan only */}
+            {(data as { subscription_tier?: string }).subscription_tier === "featured" && (
+              <BusinessQR slug={data.slug} name={data.name} />
+            )}
 
             {/* Sugerir corrección */}
             <SuggestCorrection businessSlug={data.slug} businessName={data.name} />
@@ -656,6 +858,32 @@ export default async function BusinessDetail({ params }: Props) {
           categoryName={category.name}
         />
       )}
+
+      {/* CTA para el dueño */}
+      <section className="border-t border-jungle-100 bg-jungle-50 py-10">
+        <div className="section-container flex flex-col items-center gap-4 text-center sm:flex-row sm:justify-between sm:text-left">
+          <div>
+            <p className="text-sm font-bold text-jungle-950">¿Eres el dueño de {data.name}?</p>
+            <p className="mt-0.5 text-xs text-jungle-600">
+              Activa tu portal y gestiona fotos, catálogo, horarios y más — sin depender de nadie.
+            </p>
+          </div>
+          <div className="flex flex-shrink-0 items-center gap-2">
+            <Link
+              href="/owner/login"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-jungle-900 px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-jungle-800"
+            >
+              Acceder al portal
+            </Link>
+            <Link
+              href="/pricing"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-white px-4 py-2.5 text-xs font-semibold text-jungle-700 ring-1 ring-jungle-200 transition-colors hover:bg-jungle-50"
+            >
+              Ver planes
+            </Link>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }

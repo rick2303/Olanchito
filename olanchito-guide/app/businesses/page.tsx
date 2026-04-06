@@ -69,7 +69,7 @@ export default async function BusinessesPage({ searchParams }: Props) {
   // Fetch all matching businesses (sort handled in JS for score-based ranking)
   let query = supabase
     .from("businesses")
-    .select("id, name, slug, category_id, address, image, description, featured, view_count, created_at, location");
+    .select("id, name, slug, category_id, address, image, description, featured, verified, subscription_tier, view_count, created_at, location");
 
   if (categoryId) query = query.eq("category_id", categoryId);
   if (q) query = query.ilike("name", `%${q}%`);
@@ -114,21 +114,24 @@ export default async function BusinessesPage({ searchParams }: Props) {
   const now = Date.now();
   const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
 
-  // Score = view_count + (positive_reviews * 3), then sort: featured > new > score
+  // Sort: Destacado (tier=featured) > Nuevo > Score (views + reseñas positivas)
+  // Within Destacado, still sort by score so los mejores van primero entre ellos
   const scored = (rawData ?? [])
     .map((b) => {
       const isNew = b.created_at
         ? now - new Date(b.created_at).getTime() <= THREE_DAYS_MS
         : false;
+      const isDestacado = (b as { subscription_tier?: string }).subscription_tier === "featured" || b.featured;
       return {
         ...b,
         isNew,
+        isDestacado,
         _score: (b.view_count ?? 0) + (positiveReviewCounts[b.slug] ?? 0) * 3,
       };
     })
     .sort((a, b) => {
-      if (a.featured && !b.featured) return -1;
-      if (!a.featured && b.featured) return 1;
+      if (a.isDestacado && !b.isDestacado) return -1;
+      if (!a.isDestacado && b.isDestacado) return 1;
       if (a.isNew && !b.isNew) return -1;
       if (!a.isNew && b.isNew) return 1;
       if (b._score !== a._score) return b._score - a._score;
@@ -314,6 +317,7 @@ export default async function BusinessesPage({ searchParams }: Props) {
                       description: business.description ?? "",
                       category: business.categoryName,
                       featured: business.featured ?? false,
+                      verified: business.verified ?? false,
                       isNew: business.isNew,
                       avgRating: business.avgRating ?? undefined,
                       reviewCount: business.reviewCount,

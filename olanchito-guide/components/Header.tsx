@@ -11,7 +11,6 @@ import {
   HomeIcon,
   Squares2X2Icon,
   BuildingStorefrontIcon,
-  MapPinIcon,
   HeartIcon,
 } from "@heroicons/react/24/outline";
 
@@ -71,7 +70,7 @@ export default function Header() {
           boxShadow: scrolled ? "0 4px 20px rgba(10,30,20,0.07)" : "none",
         }}
       >
-        <div className="section-container flex h-[3.75rem] items-center justify-between">
+        <div className="section-container grid h-[3.75rem] grid-cols-[auto_1fr_auto] items-center gap-4">
           {/* Logo */}
           <Link
             href="/"
@@ -102,7 +101,7 @@ export default function Header() {
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden items-center gap-1 md:flex" aria-label="Navegación principal">
+          <nav className="hidden items-center justify-center gap-1 md:flex" aria-label="Navegación principal">
             {navItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(pathname, item.href);
@@ -119,25 +118,28 @@ export default function Header() {
                 </Link>
               );
             })}
+          </nav>
 
-            {/* Location pill */}
-            <span
-              className="mx-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium"
+          {/* Desktop actions */}
+          <div className="hidden items-center gap-2 md:flex">
+            <Link
+              href="/owner/login"
+              onClick={close}
+              className="inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-colors"
               style={{
                 background: "var(--surface-2)",
-                color: "var(--ink-3)",
-                border: "1px solid var(--line)",
+                color: "var(--ink-2)",
+                border: "1px solid var(--line-strong)",
               }}
             >
-              <MapPinIcon className="h-3 w-3" style={{ color: "var(--accent)" }} />
-              Olanchito, Yoro
-            </span>
-
+              <BuildingStorefrontIcon className="h-3.5 w-3.5" />
+              Mi negocio
+            </Link>
             <Link href="/join" onClick={close} className="btn-primary !py-2 !text-xs">
               Registrar negocio
               <ArrowRightIcon className="h-3.5 w-3.5" />
             </Link>
-          </nav>
+          </div>
 
           {/* Mobile burger */}
           <button
@@ -239,15 +241,24 @@ export default function Header() {
             </nav>
 
             {/* Drawer CTA */}
-            <div className="p-4" style={{ borderTop: "1px solid var(--line)" }}>
+            <div className="p-4 space-y-2" style={{ borderTop: "1px solid var(--line)" }}>
+              <Link
+                href="/owner/login"
+                onClick={close}
+                className="flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition-colors"
+                style={{
+                  background: "var(--surface-2)",
+                  color: "var(--ink-2)",
+                  border: "1px solid var(--line-strong)",
+                }}
+              >
+                <BuildingStorefrontIcon className="h-4 w-4" />
+                Mi negocio
+              </Link>
               <Link href="/join" onClick={close} className="btn-primary w-full">
                 Registrar negocio
                 <ArrowRightIcon className="h-4 w-4" />
               </Link>
-              <p className="mt-3 text-center text-[11px]" style={{ color: "var(--ink-3)" }}>
-                <MapPinIcon className="inline h-3 w-3 mr-0.5" style={{ color: "var(--accent)" }} />
-                Olanchito, Yoro, Honduras
-              </p>
             </div>
           </aside>
         </div>

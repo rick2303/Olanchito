@@ -19,6 +19,7 @@ type Review = {
   rating: number;
   comment: string | null;
   created_at: string;
+  owner_reply?: string | null;
 };
 
 type Props = {
@@ -162,6 +163,12 @@ export default function ReviewSection({ businessSlug, initialReviews }: Props) {
                 <p className="mt-2.5 text-sm leading-relaxed text-jungle-800">
                   {r.comment}
                 </p>
+              )}
+              {r.owner_reply && (
+                <div className="mt-3 rounded-xl bg-jungle-100 px-3 py-2.5 ring-1 ring-jungle-200">
+                  <p className="mb-0.5 text-[10px] font-bold uppercase tracking-wide text-jungle-600">Respuesta del negocio</p>
+                  <p className="text-xs leading-relaxed text-jungle-800">{r.owner_reply}</p>
+                </div>
               )}
             </div>
           ))}

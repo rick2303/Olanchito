@@ -74,6 +74,8 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = (await headers()).get("x-pathname") ?? "";
   const isAdmin = pathname.startsWith("/admin");
+  const isOwner = pathname.startsWith("/owner");
+  const hideShell = isAdmin || isOwner;
 
   return (
     <html lang="es">
@@ -84,11 +86,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
       <body className={`${syne.variable} ${jakarta.variable} font-jakarta page-shell`}>
         <div className="min-h-screen flex flex-col">
-          {!isAdmin && <Header />}
+          {!hideShell && <Header />}
           <main className="relative flex-1">{children}</main>
-          {!isAdmin && <Footer />}
+          {!hideShell && <Footer />}
         </div>
-        {!isAdmin && <CookieBanner />}
+        {!hideShell && <CookieBanner />}
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-4JD3KFCW4J" strategy="afterInteractive" />
         <Script id="google-analytics" strategy="afterInteractive">
           {`

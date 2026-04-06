@@ -15,6 +15,7 @@ import {
 import DeviceMacbookMockup from "@/components/DeviceMacbookMockup";
 import FaqSection from "@/components/FaqSection";
 import NovedadesSection from "@/components/NovedadesSection";
+import AnnouncementsSection from "@/components/AnnouncementsSection";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -318,6 +319,9 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* ─── ANUNCIOS ────────────────────────────────────── */}
+      <AnnouncementsSection />
 
       {/* ─── CTA JOIN ────────────────────────────────────── */}
       <section className="section-container pb-14 sm:pb-16">

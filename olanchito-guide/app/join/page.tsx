@@ -1,8 +1,23 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import emailjs from "@emailjs/browser";
 import { supabase } from "@/lib/supabase";
+
+function slugify(str: string) {
+  return str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-").replace(/-+/g, "-");
+}
+
+async function generateUniqueSlug(name: string): Promise<string> {
+  const base = slugify(name);
+  let slug = base;
+  let i = 2;
+  while (true) {
+    const { data } = await supabase.from("businesses").select("id").eq("slug", slug).maybeSingle();
+    if (!data) return slug;
+    slug = `${base}-${i++}`;
+  }
+}
 import {
   BuildingStorefrontIcon,
   UserIcon,
@@ -85,72 +100,66 @@ export default function JoinPage() {
     let imagePath: string | null = null;
 
     try {
-      // 1. Upload image first (so we can clean up if DB insert fails)
-      if (form.image) {
-        const fileExt = form.image.name.split(".").pop();
-        const fileName = `${Date.now()}-${crypto.randomUUID()}.${fileExt}`;
-        imagePath = `business/${fileName}`;
-        const { error: uploadError } = await supabase.storage
-          .from("Olanchito-guide")
-          .upload(imagePath, form.image, { contentType: form.image.type, upsert: false });
-        if (uploadError) throw uploadError;
-      }
+      // 1. Upload image
+      const fileExt = form.image.name.split(".").pop();
+      const fileName = `${Date.now()}-${crypto.randomUUID()}.${fileExt}`;
+      imagePath = `business/${fileName}`;
+      const { error: uploadError } = await supabase.storage
+        .from("Olanchito-guide")
+        .upload(imagePath, form.image, { contentType: form.image.type, upsert: false });
+      if (uploadError) throw uploadError;
 
-      // 2. Save to DB
-      const { error: insertError } = await supabase.from("business_submissions").insert([{
-        business_name: form.business_name,
-        category_id: form.category || null,
-        contact_name: form.representative_name,
-        email: form.email,
-        phone: form.phone,
-        whatsapp: form.whatsapp,
-        address: form.address,
-        description: form.description,
-        hours: form.hours,
-        image: imagePath,
-        status: "new",
-      }]);
+      // 2. Generate unique slug
+      const slug = await generateUniqueSlug(form.business_name);
+
+      // 3. Insert directly into businesses (verified: false — admin reviews later)
+      const { data: newBiz, error: insertError } = await supabase
+        .from("businesses")
+        .insert([{
+          name:        form.business_name.trim(),
+          slug,
+          category_id: form.category || null,
+          description: form.description.trim() || null,
+          hours:       form.hours.trim() || null,
+          phone:       form.phone.trim() || null,
+          whatsapp:    form.whatsapp.trim() || null,
+          address:     form.address.trim() || null,
+          owner_email: form.email.toLowerCase().trim(),
+          image:       imagePath,
+          verified:    false,
+          featured:    false,
+          view_count:  0,
+          socials:     {},
+        }])
+        .select("id")
+        .single();
 
       if (insertError) {
-        // Clean up uploaded image if DB insert fails
-        if (imagePath) {
-          await supabase.storage.from("Olanchito-guide").remove([imagePath]);
-        }
+        await supabase.storage.from("Olanchito-guide").remove([imagePath]);
         throw insertError;
       }
 
-      // 3. Success — show toast and clear form immediately
-      setToast({ type: "success", msg: "¡Solicitud enviada! Revisaremos la información y publicaremos su negocio pronto." });
+      // 4. Send invite so owner can access their free portal immediately
+      if (newBiz) {
+        fetch("/api/owner/invite", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ business_id: newBiz.id }),
+        }).catch(() => {});
+      }
+
+      // 5. Show success with portal access message
+      setToast({
+        type: "success",
+        msg: "¡Tu negocio ya está en el directorio! Revisa tu correo para acceder a tu portal de administración.",
+      });
       clearForm();
 
-      // 4. Send email notification in background — non-blocking
-      const categoryName = selectedCategoryName || "Sin categoría";
-      const submissionDate = new Date().toLocaleString("es-HN", { dateStyle: "full", timeStyle: "short" });
-      emailjs.send(
-        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
-        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
-        {
-          business_name: form.business_name,
-          representative_name: form.representative_name,
-          category: categoryName,
-          phone: form.phone,
-          whatsapp: form.whatsapp,
-          address: form.address,
-          email: form.email,
-          description: form.description,
-          hours: form.hours,
-          date: submissionDate,
-        },
-        process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!
-      ).catch(() => {
-        // Email failed silently — data is already saved in DB
-      });
-
     } catch {
-      setToast({ type: "error", msg: "No se pudo enviar la solicitud. Revise los datos e inténtelo de nuevo." });
+      setToast({ type: "error", msg: "No se pudo registrar el negocio. Revisa los datos e intenta de nuevo." });
     } finally {
       setLoading(false);
-      setTimeout(() => setToast(null), 6000);
+      setTimeout(() => setToast(null), 8000);
     }
   };
 
@@ -356,7 +365,8 @@ export default function JoinPage() {
               <div className="space-y-3">
                 <ProcessStep n="1" title="Revisión" desc="Validamos que los datos estén completos y sean correctos." />
                 <ProcessStep n="2" title="Confirmación" desc="Le contactamos si necesitamos información adicional." />
-                <ProcessStep n="3" title="Publicación" desc="Su negocio aparece en el directorio." />
+                <ProcessStep n="3" title="Publicación" desc="Su negocio aparece en el directorio de Olanchito." />
+                <ProcessStep n="4" title="Acceso al portal" desc="Recibirá un correo para entrar a su portal gratuito y gestionar su información." />
               </div>
             </div>
 

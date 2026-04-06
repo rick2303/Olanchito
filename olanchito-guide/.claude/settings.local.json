@@ -2,7 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(npx tsc:*)",
-      "Bash(node -e \"const m = require\\('react-qr-code'\\); console.log\\(Object.keys\\(m\\)\\)\")"
+      "Bash(node -e \"const m = require\\('react-qr-code'\\); console.log\\(Object.keys\\(m\\)\\)\")",
+      "Bash(xargs grep:*)",
+      "Bash(npm install:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(del:*)",
+      "Bash(ls /c/Users/ricky/Portfolio/Olanchito/olanchito-guide/app/owner/[slug])"
     ]
   }
 }

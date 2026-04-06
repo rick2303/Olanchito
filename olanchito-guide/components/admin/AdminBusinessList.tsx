@@ -11,10 +11,15 @@ import {
   ArrowUpTrayIcon,
   SparklesIcon,
   ExclamationTriangleIcon,
+  EnvelopeIcon,
 } from "@heroicons/react/24/outline";
 import { StarIcon as StarSolid, CheckBadgeIcon } from "@heroicons/react/24/solid";
+import LocationPickerWrapper from "@/components/LocationPickerWrapper";
+import type { LatLng } from "@/components/LocationPicker";
 
 interface Category { id: string; name: string; }
+
+type SubscriptionTier = "free" | "premium" | "featured";
 
 interface Business {
   id: string;
@@ -31,9 +36,15 @@ interface Business {
   image: string | null;
   view_count: number;
   socials: Record<string, string | null> | null;
+  location: LatLng | null;
+  owner_email: string | null;
+  subscription_active: boolean;
+  subscription_tier: SubscriptionTier;
+  subscription_started_at: string | null;
+  stripe_subscription_id: string | null;
 }
 
-type EditState = Omit<Business, "id" | "view_count" | "socials"> & {
+type EditState = Omit<Business, "id" | "view_count" | "socials" | "location" | "subscription_active" | "subscription_tier" | "subscription_started_at" | "stripe_subscription_id"> & {
   newImage: File | null;
   instagram: string;
   facebook: string;
@@ -72,13 +83,17 @@ export default function AdminBusinessList() {
   const [deleteId, setDeleteId]     = useState<string | null>(null);
   const [deleting, setDeleting]     = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [togglingSubId, setTogglingSubId] = useState<string | null>(null);
+  const [editLocation, setEditLocation] = useState<LatLng | null>(null);
+  const [sendingInviteId, setSendingInviteId] = useState<string | null>(null);
+  const [inviteResult, setInviteResult] = useState<Record<string, "sent" | "exists" | "error">>({});
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
     const [{ data: biz }, { data: cats }] = await Promise.all([
       supabase
         .from("businesses")
-        .select("id, name, slug, category_id, description, hours, phone, whatsapp, address, featured, verified, image, view_count, socials")
+        .select("id, name, slug, category_id, description, hours, phone, whatsapp, address, featured, verified, image, view_count, socials, location, owner_email, subscription_active, subscription_tier, subscription_started_at, stripe_subscription_id")
         .order("name", { ascending: true }),
       supabase.from("categories").select("id, name").order("name", { ascending: true }),
     ]);
@@ -109,6 +124,7 @@ export default function AdminBusinessList() {
       featured: b.featured,
       verified: b.verified,
       image: b.image,
+      owner_email: b.owner_email,
       newImage: null,
       instagram: (b.socials?.instagram as string) ?? "",
       facebook:  (b.socials?.facebook  as string) ?? "",
@@ -117,12 +133,14 @@ export default function AdminBusinessList() {
       website:   (b.socials?.website   as string) ?? "",
     });
     setPreviewUrl(getPublicUrl(b.image));
+    setEditLocation((b.location as LatLng | null) ?? null);
   };
 
   const cancelEdit = () => {
     setEditId(null);
     setEditForm(null);
     setPreviewUrl(null);
+    setEditLocation(null);
   };
 
   const handleEditChange = (
@@ -146,6 +164,21 @@ export default function AdminBusinessList() {
     if (!editForm || !editId) return;
     setSaving(true);
     try {
+      // Warn if owner_email is already assigned to a different business
+      if (editForm.owner_email) {
+        const { data: existing } = await supabase
+          .from("businesses")
+          .select("id, name")
+          .eq("owner_email", editForm.owner_email.toLowerCase().trim())
+          .neq("id", editId)
+          .limit(1);
+        if (existing && existing.length > 0) {
+          const ok = window.confirm(
+            `⚠️ Este correo ya está asignado a "${existing[0].name}".\n\nSi continúas, ese negocio también podrá acceder al portal con el mismo correo.\n\n¿Deseas continuar?`
+          );
+          if (!ok) { setSaving(false); return; }
+        }
+      }
       let imagePath = editForm.image;
 
       if (editForm.newImage) {
@@ -172,9 +205,11 @@ export default function AdminBusinessList() {
         phone:       editForm.phone?.trim() || null,
         whatsapp:    editForm.whatsapp?.trim() || null,
         address:     editForm.address?.trim() || null,
-        featured:    editForm.featured,
-        verified:    editForm.verified,
-        image:       imagePath,
+        featured:     editForm.featured,
+        verified:     editForm.verified,
+        image:        imagePath,
+        location:     editLocation ?? null,
+        owner_email:  editForm.owner_email?.trim().toLowerCase() || null,
         socials: {
           instagram: editForm.instagram.trim() || null,
           facebook:  editForm.facebook.trim()  || null,
@@ -198,6 +233,94 @@ export default function AdminBusinessList() {
       alert(err instanceof Error ? err.message : "Error al guardar");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleSetTier = async (id: string, newTier: SubscriptionTier, currentTier: SubscriptionTier) => {
+    if (newTier === currentTier) return;
+    setTogglingSubId(id);
+    const newActive = newTier !== "free";
+    const biz = businesses.find(b => b.id === id);
+
+    // If the business has an active Stripe subscription, warn before overriding manually
+    if (biz?.stripe_subscription_id && newTier === "free") {
+      const ok = window.confirm(
+        "Este negocio tiene una suscripción activa en Stripe.\n\nCambiar el plan manualmente aquí NO cancela el cobro en Stripe. ¿Deseas continuar de todas formas?"
+      );
+      if (!ok) { setTogglingSubId(null); return; }
+    }
+
+    // Update DB directly — the admin has permission and doesn't need the owner's token
+    const { error } = await supabase
+      .from("businesses")
+      .update({
+        subscription_tier:       newTier,
+        subscription_active:     newActive,
+        featured:                newTier === "featured",
+        cancel_at_period_end:    false,
+        ...(newActive && currentTier === "free"
+          ? { subscription_started_at: new Date().toISOString() }
+          : {}),
+      })
+      .eq("id", id);
+
+    if (error) {
+      alert(`Error al cambiar el plan: ${error.message}`);
+      setTogglingSubId(null);
+      return;
+    }
+
+    setBusinesses((prev) =>
+      prev.map((b) => b.id === id
+        ? { ...b, subscription_tier: newTier, subscription_active: newActive, featured: newTier === "featured" }
+        : b
+      )
+    );
+
+    // Send invite only when upgrading from free → paid for the first time
+    if (currentTier === "free" && newActive) {
+      if (!biz?.owner_email) {
+        alert(`Plan ${newTier} activado. Recuerda asignar un email al dueño y guardar para enviarle el acceso.`);
+      } else {
+        const res = await fetch("/api/owner/invite", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ business_id: id }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          alert(`Plan activado, pero no se pudo enviar la invitación: ${data.error ?? "error desconocido"}`);
+        } else if (data.type === "existing_user") {
+          alert(`Plan ${newTier} activado. El dueño ya tiene cuenta — puede iniciar sesión en /owner/login.`);
+        } else if (data.sent) {
+          alert(`Plan ${newTier} activado. Se envió el correo de invitación al dueño.`);
+        }
+      }
+    } else if (currentTier !== "free" && newActive) {
+      alert(`Plan cambiado a ${newTier}.`);
+    } else if (!newActive) {
+      alert(`Plan desactivado.${biz?.stripe_subscription_id ? " Recuerda cancelar el cobro en el dashboard de Stripe si aplica." : ""}`);
+    }
+
+    setTogglingSubId(null);
+  };
+
+  const handleSendInvite = async (id: string) => {
+    setSendingInviteId(id);
+    try {
+      const res = await fetch("/api/owner/invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ business_id: id }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "error");
+      setInviteResult((prev) => ({ ...prev, [id]: data.type === "existing_user" ? "exists" : "sent" }));
+    } catch {
+      setInviteResult((prev) => ({ ...prev, [id]: "error" }));
+    } finally {
+      setSendingInviteId(null);
+      setTimeout(() => setInviteResult((prev) => { const next = { ...prev }; delete next[id]; return next; }), 4000);
     }
   };
 
@@ -301,29 +424,80 @@ export default function AdminBusinessList() {
                     {b.verified && (
                       <CheckBadgeIcon className="h-3.5 w-3.5 flex-shrink-0 text-blue-500" title="Verificado" />
                     )}
+                    {/* Subscription tier badge */}
+                    {b.owner_email && (
+                      <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ring-1 ${
+                        b.subscription_tier === "featured"
+                          ? "bg-amber-100 text-amber-700 ring-amber-200"
+                          : b.subscription_tier === "premium"
+                            ? "bg-green-100 text-green-700 ring-green-200"
+                            : "bg-jungle-100 text-jungle-400 ring-jungle-200"
+                      }`}>
+                        {b.subscription_tier === "featured" ? "★ Destacado" : b.subscription_tier === "premium" ? "● Premium" : "○ Gratis"}
+                      </span>
+                    )}
                   </div>
                   <p className="truncate text-[11px] text-jungle-400">
                     /{b.slug} · {categoryName(b.category_id)} · {b.view_count ?? 0} vistas
+                    {b.owner_email && <span className="ml-1 text-jungle-300">· {b.owner_email}</span>}
                   </p>
+                  {b.subscription_active && b.subscription_started_at && !b.stripe_subscription_id && (() => {
+                    const started = new Date(b.subscription_started_at);
+                    const next = new Date(started);
+                    const today = new Date();
+                    while (next <= today) next.setMonth(next.getMonth() + 1);
+                    const daysLeft = Math.ceil((next.getTime() - today.getTime()) / 86400000);
+                    return (
+                      <p className={`text-[10px] font-semibold ${daysLeft <= 5 ? "text-red-500" : "text-amber-500"}`}>
+                        💳 Pago manual · desde {started.toLocaleDateString("es-HN", { day: "numeric", month: "short", year: "numeric" })} · próximo cobro {next.toLocaleDateString("es-HN", { day: "numeric", month: "short" })} ({daysLeft}d)
+                      </p>
+                    );
+                  })()}
                 </div>
 
                 {/* Actions */}
                 {!isEditing && !isDeleting && (
-                  <div className="flex flex-shrink-0 gap-1.5">
-                    <button
-                      onClick={() => startEdit(b)}
-                      className="inline-flex items-center gap-1 rounded-xl bg-white px-2.5 py-1.5 text-xs font-semibold text-jungle-700 ring-1 ring-jungle-200 hover:bg-jungle-50"
-                    >
-                      <PencilSquareIcon className="h-3.5 w-3.5" />
-                      <span className="hidden sm:inline">Editar</span>
-                    </button>
-                    <button
-                      onClick={() => { cancelEdit(); setDeleteId(b.id); }}
-                      className="inline-flex items-center gap-1 rounded-xl bg-white px-2.5 py-1.5 text-xs font-semibold text-red-600 ring-1 ring-red-200 hover:bg-red-50"
-                    >
-                      <TrashIcon className="h-3.5 w-3.5" />
-                      <span className="hidden sm:inline">Eliminar</span>
-                    </button>
+                  <div className="flex flex-shrink-0 flex-col items-end gap-1.5">
+                    <div className="flex gap-1.5">
+                      {b.owner_email && (
+                        <button
+                          onClick={() => handleSendInvite(b.id)}
+                          disabled={sendingInviteId === b.id}
+                          className="inline-flex items-center gap-1 rounded-xl bg-white px-2.5 py-1.5 text-xs font-semibold text-jungle-700 ring-1 ring-jungle-200 hover:bg-jungle-50 disabled:opacity-50"
+                          title="Enviar acceso al portal"
+                        >
+                          <EnvelopeIcon className="h-3.5 w-3.5" />
+                          <span className="hidden sm:inline">
+                            {sendingInviteId === b.id ? "Enviando…" : "Enviar acceso"}
+                          </span>
+                        </button>
+                      )}
+                      <button
+                        onClick={() => startEdit(b)}
+                        className="inline-flex items-center gap-1 rounded-xl bg-white px-2.5 py-1.5 text-xs font-semibold text-jungle-700 ring-1 ring-jungle-200 hover:bg-jungle-50"
+                      >
+                        <PencilSquareIcon className="h-3.5 w-3.5" />
+                        <span className="hidden sm:inline">Editar</span>
+                      </button>
+                      <button
+                        onClick={() => { cancelEdit(); setDeleteId(b.id); }}
+                        className="inline-flex items-center gap-1 rounded-xl bg-white px-2.5 py-1.5 text-xs font-semibold text-red-600 ring-1 ring-red-200 hover:bg-red-50"
+                      >
+                        <TrashIcon className="h-3.5 w-3.5" />
+                        <span className="hidden sm:inline">Eliminar</span>
+                      </button>
+                    </div>
+                    {inviteResult[b.id] && (
+                      <p className={`text-[10px] font-semibold ${
+                        inviteResult[b.id] === "sent"   ? "text-green-600" :
+                        inviteResult[b.id] === "exists" ? "text-jungle-500" :
+                        "text-red-500"
+                      }`}>
+                        {inviteResult[b.id] === "sent"   ? "✓ Correo enviado" :
+                         inviteResult[b.id] === "exists" ? "Ya tiene cuenta" :
+                         "Error al enviar"}
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
@@ -468,6 +642,49 @@ export default function AdminBusinessList() {
                       </div>
                     </div>
 
+                    {/* Owner Portal */}
+                    <div className="rounded-xl border border-jungle-200 bg-jungle-50/30 p-3 space-y-2">
+                      <p className="text-[11px] font-semibold text-jungle-700">Owner Portal</p>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-jungle-700">
+                          Email del dueño
+                          <span className="ml-1 font-normal text-jungle-400">— necesario para acceder al portal</span>
+                        </label>
+                        <input
+                          name="owner_email"
+                          type="email"
+                          value={editForm.owner_email ?? ""}
+                          onChange={handleEditChange}
+                          className="admin-field text-xs"
+                          placeholder="dueno@correo.com"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[11px] font-semibold text-jungle-700">Plan de suscripción</label>
+                        <div className="flex gap-1.5">
+                          {(["free", "premium", "featured"] as SubscriptionTier[]).map((t) => (
+                            <button
+                              key={t}
+                              type="button"
+                              disabled={togglingSubId === b.id}
+                              onClick={() => handleSetTier(b.id, t, b.subscription_tier)}
+                              className={`flex-1 rounded-xl py-1.5 text-[11px] font-bold transition-colors disabled:opacity-50 ${
+                                b.subscription_tier === t
+                                  ? t === "featured"
+                                    ? "bg-amber-500 text-white"
+                                    : t === "premium"
+                                      ? "bg-green-600 text-white"
+                                      : "bg-jungle-600 text-white"
+                                  : "bg-white text-jungle-600 ring-1 ring-jungle-200 hover:bg-jungle-50"
+                              }`}
+                            >
+                              {togglingSubId === b.id ? "..." : t === "free" ? "Gratis" : t === "premium" ? "Premium" : "Destacado"}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
                     {/* Redes sociales */}
                     <div className="rounded-xl border border-jungle-200 bg-jungle-50/30 p-3 space-y-2">
                       <p className="text-[11px] font-semibold text-jungle-700">Redes sociales y web</p>
@@ -483,6 +700,12 @@ export default function AdminBusinessList() {
                         <label className="text-[11px] font-semibold text-jungle-700">Sitio web</label>
                         <input name="website" value={editForm.website} onChange={handleEditChange} className="admin-field text-xs" placeholder="https://www.negocio.com" />
                       </div>
+                    </div>
+
+                    {/* Location */}
+                    <div className="rounded-xl border border-jungle-200 bg-jungle-50/30 p-3 space-y-2">
+                      <p className="text-[11px] font-semibold text-jungle-700">Ubicación en el mapa</p>
+                      <LocationPickerWrapper value={editLocation} onChange={setEditLocation} />
                     </div>
 
                     {/* Image */}

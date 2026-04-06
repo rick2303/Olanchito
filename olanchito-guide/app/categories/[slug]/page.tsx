@@ -101,7 +101,7 @@ export default async function CategoryPage({
 
   const { data: raw } = await supabase
     .from("businesses")
-    .select("id, name, slug, address, image, description, featured, view_count, created_at")
+    .select("id, name, slug, address, image, description, featured, verified, view_count, created_at")
     .eq("category_id", category.id);
 
   const { data: allReviews } = await supabase
@@ -239,6 +239,7 @@ export default async function CategoryPage({
                     description: b.description ?? "",
                     category: category.name,
                     featured: b.featured ?? false,
+                    verified: b.verified ?? false,
                     isNew: b.isNew,
                     avgRating: b.avgRating ?? undefined,
                     reviewCount: b.reviewCount,

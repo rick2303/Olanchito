@@ -9,6 +9,12 @@ const navLinks = [
   { href: "/join", label: "Registrar negocio" },
 ];
 
+const businessLinks = [
+  { href: "/pricing", label: "Ver planes y precios" },
+  { href: "/join", label: "Registrar mi negocio" },
+  { href: "/owner/login", label: "Iniciar sesión" },
+];
+
 const companyLinks = [
   { href: "mailto:contact@qali-t.com", label: "Contacto", external: false },
   { href: "https://qali-t.com", label: "qali-t.com", external: true },
@@ -27,7 +33,7 @@ export default function Footer() {
     >
       <div className="section-container py-14">
         {/* Top grid */}
-        <div className="grid gap-10 lg:grid-cols-[1.6fr_1fr_1fr]">
+        <div className="grid gap-10 lg:grid-cols-[1.6fr_1fr_1fr_1fr]">
           {/* Brand column */}
           <div>
             <div className="flex items-center gap-3">
@@ -91,6 +97,29 @@ export default function Footer() {
             </p>
             <ul className="space-y-2.5">
               {navLinks.map(({ href, label }) => (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    className="text-sm transition-colors hover:text-white"
+                    style={{ color: "rgba(255,255,255,0.65)" }}
+                  >
+                    {label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Business links */}
+          <div>
+            <p
+              className="mb-4 text-[10px] font-bold uppercase tracking-[0.12em]"
+              style={{ color: "rgba(255,255,255,0.4)" }}
+            >
+              Para negocios
+            </p>
+            <ul className="space-y-2.5">
+              {businessLinks.map(({ href, label }) => (
                 <li key={href}>
                   <Link
                     href={href}

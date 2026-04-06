@@ -20,6 +20,7 @@ type Business = {
   image: string | null;
   category_id: string | null;
   featured: boolean;
+  verified: boolean;
   categoryName: string;
 };
 
@@ -44,7 +45,7 @@ export default function FavoritesPage() {
       const [{ data: biz }, { data: cats }] = await Promise.all([
         supabase
           .from("businesses")
-          .select("id, name, slug, address, description, image, category_id, featured")
+          .select("id, name, slug, address, description, image, category_id, featured, verified")
           .in("slug", slugs),
         supabase.from("categories").select("id, name"),
       ]);
@@ -130,6 +131,7 @@ export default function FavoritesPage() {
                   description: b.description ?? "",
                   category: b.categoryName,
                   featured: b.featured ?? false,
+                  verified: b.verified ?? false,
                 }}
               />
             ))}
