@@ -3,6 +3,7 @@ import BusinessCard from "@/components/BusinessCard";
 import BusinessFilters from "@/components/BusinessFilters";
 import BusinessMapWrapper from "@/components/BusinessMapWrapper";
 import Link from "next/link";
+import type { Metadata } from "next";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -13,32 +14,64 @@ import {
 } from "@heroicons/react/24/outline";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
 
-export const metadata = {
-  title: "Negocios | Directorio Olanchito",
-  description: "Explora todos los negocios registrados en el directorio de Olanchito, Honduras. Encuentra ferreterías, restaurantes, farmacias y más.",
-  alternates: { canonical: "https://olanchito.com/businesses" },
-  openGraph: {
-    title: "Negocios | Directorio Olanchito",
-    description: "Explora todos los negocios registrados en el directorio de Olanchito, Honduras.",
-    url: "https://olanchito.com/businesses",
-    siteName: "Directorio Olanchito",
-    images: [{ url: "/og-image.webp", width: 1200, height: 630, alt: "Directorio Olanchito" }],
-    locale: "es_HN",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Negocios | Directorio Olanchito",
-    description: "Explora todos los negocios registrados en el directorio de Olanchito, Honduras.",
-    images: ["/og-image.webp"],
-  },
-};
+const BASE_URL = "https://olanchito.com";
 
 type Props = {
   searchParams?: { category?: string; q?: string; page?: string; view?: string; nuevo?: string };
 };
+
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  const categorySlug = (searchParams?.category ?? "").toLowerCase().trim();
+
+  // When a category filter is active, point the canonical at the proper /categories/[slug] page.
+  // This prevents Google from treating the filter URL as a duplicate of the category page.
+  if (categorySlug) {
+    const { data: cat } = await supabase
+      .from("categories")
+      .select("name, slug")
+      .eq("slug", categorySlug)
+      .maybeSingle();
+
+    if (cat) {
+      const canonicalUrl = `${BASE_URL}/categories/${cat.slug}`;
+      return {
+        title: `${cat.name} en Olanchito | Directorio`,
+        description: `Encuentra los mejores negocios de ${cat.name} en Olanchito, Honduras.`,
+        alternates: { canonical: canonicalUrl },
+        openGraph: {
+          title: `${cat.name} en Olanchito | Directorio`,
+          url: canonicalUrl,
+          siteName: "Directorio Olanchito",
+          images: [{ url: "/og-image.webp", width: 1200, height: 630 }],
+          locale: "es_HN",
+          type: "website",
+        },
+      };
+    }
+  }
+
+  return {
+    title: "Negocios | Directorio Olanchito",
+    description: "Explora todos los negocios registrados en el directorio de Olanchito, Honduras. Encuentra ferreterías, restaurantes, farmacias y más.",
+    alternates: { canonical: `${BASE_URL}/businesses` },
+    openGraph: {
+      title: "Negocios | Directorio Olanchito",
+      description: "Explora todos los negocios registrados en el directorio de Olanchito, Honduras.",
+      url: `${BASE_URL}/businesses`,
+      siteName: "Directorio Olanchito",
+      images: [{ url: "/og-image.webp", width: 1200, height: 630, alt: "Directorio Olanchito" }],
+      locale: "es_HN",
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "Negocios | Directorio Olanchito",
+      description: "Explora todos los negocios registrados en el directorio de Olanchito, Honduras.",
+      images: ["/og-image.webp"],
+    },
+  };
+}
 
 const BUCKET_NAME = process.env.BUCKET_NAME ?? "Olanchito-guide";
 const FALLBACK_IMAGE =

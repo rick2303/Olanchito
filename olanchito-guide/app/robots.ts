@@ -11,7 +11,9 @@ export default function robots(): MetadataRoute.Robots {
           "/admin/",
           "/admin/login",
           "/api/",
-          "/*?*page=*&*view=map*",  // don't index map view URLs
+          "/owner/",
+          "/businesses?*",   // filter URLs — canonical content lives at /categories/[slug]
+          "/negocios?*",     // same for negocios if it accepts query params
         ],
       },
     ],

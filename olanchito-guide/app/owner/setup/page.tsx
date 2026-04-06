@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import {
@@ -14,6 +14,8 @@ import {
 
 export default function OwnerSetupPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isRecoveryMode = searchParams.get("mode") === "recovery";
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
@@ -69,11 +71,12 @@ export default function OwnerSetupPage() {
       await new Promise(r => setTimeout(r, 80));
       if (newAuthEvent) return; // already settled as "ready" by auth event
 
-      // Session exists but no fresh auth event. Two sub-cases:
-      // a) User has `has_password` flag → they've already set a password (came from Stripe payment redirect)
-      // b) User has NO flag → they clicked an invite link before but skipped the password step; force it now
-      if (!session.user.user_metadata?.has_password) {
-        settle("ready"); // force password creation
+      // Session exists but no fresh auth event. Possible sub-cases:
+      // a) Came from /owner/activate (recovery) — mode=recovery param forces password form
+      // b) User has no `has_password` flag → new invite user who skipped this step; force it now
+      // c) User has `has_password` flag → came from Stripe payment redirect
+      if (isRecoveryMode || !session.user.user_metadata?.has_password) {
+        settle("ready");
         return;
       }
 
