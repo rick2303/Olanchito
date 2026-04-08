@@ -641,7 +641,7 @@ export default async function BusinessDetail({ params }: Props) {
                             </p>
                           )}
                           {item.description && (
-                            <p className="mt-0.5 text-xs text-jungle-600 line-clamp-2">{item.description}</p>
+                            <p className="mt-0.5 text-xs text-jungle-600">{item.description}</p>
                           )}
                         </div>
                       </div>

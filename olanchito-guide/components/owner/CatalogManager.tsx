@@ -261,13 +261,19 @@ export default function CatalogManager({ businessId, slug, maxItems }: Props) {
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-jungle-900">Descripción (opcional)</label>
+              <label className="text-xs font-semibold text-jungle-900">
+                Descripción (opcional)
+                <span className={`ml-2 font-normal ${form.description.length > 255 ? "text-red-500" : "text-jungle-500"}`}>
+                  {form.description.length}/255
+                </span>
+              </label>
               <textarea
                 value={form.description}
-                onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
+                onChange={(e) => setForm(f => ({ ...f, description: e.target.value.slice(0, 255) }))}
                 rows={2}
                 placeholder="Breve descripción del producto o servicio"
                 className="field resize-none"
+                maxLength={255}
               />
             </div>
 
