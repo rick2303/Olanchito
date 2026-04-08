@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { supabase } from "@/lib/supabase";
 import ReviewSection from "@/components/reviews/ReviewSection";
 import GalleryLightbox from "@/components/GalleryLightbox";
+import CatalogGrid from "@/components/CatalogGrid";
 import ContactButtons from "@/components/ContactButtons";
 import TrackingLink from "@/components/TrackingLink";
 import OpenNowBadge from "@/components/OpenNowBadge";
@@ -621,33 +622,18 @@ export default async function BusinessDetail({ params }: Props) {
                   </div>
                   <h2 className="text-lg font-bold text-jungle-950">Catálogo</h2>
                 </div>
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  {catalogItems.map((item) => {
-                    const imgUrl = item.image_path
+                <CatalogGrid
+                  items={catalogItems.map((item) => ({
+                    id: item.id,
+                    name: item.name,
+                    description: item.description,
+                    price: item.price,
+                    currency: item.currency,
+                    imgUrl: item.image_path
                       ? supabase.storage.from(BUCKET_NAME).getPublicUrl(item.image_path).data.publicUrl
-                      : null;
-                    return (
-                      <div key={item.id} className="flex items-start gap-3 rounded-2xl bg-jungle-50 p-3 ring-1 ring-jungle-100">
-                        {imgUrl && (
-                          <div className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-xl">
-                            <Image src={imgUrl} alt={item.name} fill className="object-cover" />
-                          </div>
-                        )}
-                        <div className="min-w-0 flex-1">
-                          <p className="text-sm font-bold text-jungle-950">{item.name}</p>
-                          {item.price && (
-                            <p className="text-xs font-semibold text-jungle-600">
-                              {item.currency === "USD" ? `$${item.price}` : `L. ${item.price}`}
-                            </p>
-                          )}
-                          {item.description && (
-                            <p className="mt-0.5 text-xs text-jungle-600">{item.description}</p>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                      : null,
+                  }))}
+                />
               </div>
             )}
 
