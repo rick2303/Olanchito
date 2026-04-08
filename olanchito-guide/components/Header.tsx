@@ -61,21 +61,21 @@ export default function Header() {
       <div
         className="transition-all duration-300"
         style={{
-          background: scrolled
-            ? "rgba(255,255,255,0.92)"
-            : "rgba(255,255,255,0.97)",
+          background: scrolled ? "rgba(255,255,255,0.92)" : "rgba(255,255,255,0.97)",
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
           borderBottom: `1px solid ${scrolled ? "rgba(10,30,20,0.09)" : "rgba(10,30,20,0.06)"}`,
           boxShadow: scrolled ? "0 4px 20px rgba(10,30,20,0.07)" : "none",
         }}
       >
-        <div className="section-container grid h-[3.75rem] grid-cols-[auto_1fr_auto] items-center gap-4">
-          {/* Logo */}
+        {/* Contenedor Principal: justify-between asegura los extremos en móvil */}
+        <div className="section-container flex h-[3.75rem] items-center justify-between">
+
+          {/* 1. LOGO (Siempre a la izquierda) */}
           <Link
             href="/"
             onClick={close}
-            className="group flex items-center gap-2.5 outline-none"
+            className="group flex items-center gap-2.5 outline-none flex-shrink-0"
           >
             <span
               className="grid h-9 w-9 place-items-center rounded-xl border transition-transform duration-200 group-hover:scale-[1.04]"
@@ -100,8 +100,8 @@ export default function Header() {
             </span>
           </Link>
 
-          {/* Desktop nav */}
-          <nav className="hidden items-center justify-center gap-1 md:flex" aria-label="Navegación principal">
+          {/* 2. DESKTOP NAV (Centro - Solo visible en MD) */}
+          <nav className="hidden flex-1 items-center justify-center gap-1 md:flex" aria-label="Navegación principal">
             {navItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(pathname, item.href);
@@ -109,8 +109,6 @@ export default function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  onClick={close}
-                  aria-current={active ? "page" : undefined}
                   className={`nav-link ${active ? "active" : ""}`}
                 >
                   <Icon className="h-4 w-4" />
@@ -120,42 +118,44 @@ export default function Header() {
             })}
           </nav>
 
-          {/* Desktop actions */}
-          <div className="hidden items-center gap-2 md:flex">
-            <Link
-              href="/owner/login"
-              onClick={close}
-              className="inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition-colors"
+          {/* 3. ACCIONES / HAMBURGUESA (Derecha) */}
+          <div className="flex items-center justify-end gap-2">
+            {/* Botones Desktop */}
+            <div className="hidden items-center gap-2 md:flex">
+              <Link
+                href="/owner/login"
+                className="inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold"
+                style={{ background: "var(--surface-2)", color: "var(--ink-2)", border: "1px solid var(--line-strong)" }}
+              >
+                <BuildingStorefrontIcon className="h-3.5 w-3.5" />
+                Mi negocio
+              </Link>
+              <Link href="/join" className="btn-primary !py-2 !text-xs">
+                Registrar negocio
+                <ArrowRightIcon className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+
+            {/* Hamburguesa (Solo móvil - Alineada a la derecha) */}
+            <button
+              type="button"
+              onClick={() => setOpen((v) => !v)}
+              aria-expanded={open}
+              aria-label={open ? "Cerrar menú" : "Abrir menú"}
+              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border transition-all active:scale-95 md:hidden"
               style={{
-                background: "var(--surface-2)",
-                color: "var(--ink-2)",
-                border: "1px solid var(--line-strong)",
+                background: open ? "var(--surface-2)" : "white",
+                borderColor: "rgba(10,30,20,0.1)",
+                color: "var(--ink)",
               }}
             >
-              <BuildingStorefrontIcon className="h-3.5 w-3.5" />
-              Mi negocio
-            </Link>
-            <Link href="/join" onClick={close} className="btn-primary !py-2 !text-xs">
-              Registrar negocio
-              <ArrowRightIcon className="h-3.5 w-3.5" />
-            </Link>
+              {open ? (
+                <XMarkIcon className="h-6 w-6" />
+              ) : (
+                <Bars3Icon className="h-6 w-6" />
+              )}
+            </button>
           </div>
-
-          {/* Mobile burger */}
-          <button
-            type="button"
-            onClick={() => setOpen((v) => !v)}
-            aria-expanded={open}
-            aria-label={open ? "Cerrar menú" : "Abrir menú"}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-xl transition-colors duration-150 md:hidden"
-            style={{
-              background: open ? "var(--surface-2)" : "transparent",
-              border: "1px solid var(--line-strong)",
-              color: "var(--ink)",
-            }}
-          >
-            {open ? <XMarkIcon className="h-5 w-5" /> : <Bars3Icon className="h-5 w-5" />}
-          </button>
         </div>
       </div>
 
