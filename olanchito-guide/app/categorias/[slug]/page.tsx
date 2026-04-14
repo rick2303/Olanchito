@@ -21,7 +21,7 @@ const categoryDescriptions: Record<string, string> = {
   restaurantes:
     "Descubre los mejores restaurantes, comedores y cafeterías de Olanchito, Honduras. Consulta menús, horarios y contacta directamente.",
   ferreterias:
-    "Encuentra ferreterías y proveedores de materiales de construcción en Olanchito. Compara precios y ubícalos en el mapa.",
+    "Encuentra ferreterías en Olanchito, Honduras con materiales de construcción, herramientas y productos para el hogar. Horarios, teléfonos y ubicaciones actualizadas.",
   farmacias:
     "Localiza farmacias y servicios de salud en Olanchito, Honduras. Horarios, teléfonos y ubicaciones actualizadas.",
   "servicios-tecnicos":
@@ -36,6 +36,26 @@ const categoryDescriptions: Record<string, string> = {
     "Salones de belleza, barberías y spas en Olanchito. Cortes, tratamientos y más.",
   talleres:
     "Talleres mecánicos, vulcanizadoras y servicios automotrices en Olanchito, Honduras.",
+  "repuestos-talleres":
+    "Talleres mecánicos y repuestos en Olanchito, Yoro, Honduras. Encuentra talleres de confianza con horarios, direcciones y contacto por WhatsApp.",
+  "hoteles-hospedaje":
+    "Hoteles y hospedajes en Olanchito, Honduras para viajeros y visitantes del Valle del Aguán. Información de precios, ubicación y contacto directo.",
+};
+
+// Longer body text shown on the category page (150–200 words) for priority categories
+const categoryLongDescriptions: Record<string, string> = {
+  restaurantes:
+    "Descubre los restaurantes, comedores y cafeterías de Olanchito, Honduras en el directorio local más completo de la Ciudad Cívica. Aquí encontrarás opciones para todos los gustos: desde platos típicos hondureños hasta comedores económicos para el almuerzo diario. Consulta los horarios de atención, números de teléfono y contacta directamente por WhatsApp a cada establecimiento. El directorio incluye restaurantes en el centro de Olanchito y sus alrededores, con reseñas reales de clientes y ubicaciones en el mapa interactivo. Ya sea que estés buscando dónde comer en familia, con amigos o durante una visita de negocios, encontrarás todas las opciones de gastronomía local de Olanchito, Yoro en un solo lugar. Actualizado regularmente para reflejar horarios reales y nueva información de contacto.",
+  ferreterias:
+    "Ferreterías en Olanchito, Honduras con materiales de construcción, herramientas y productos para el hogar. Consulta horarios, ubicación y contacta directamente a las ferreterías de Olanchito, Yoro. Todo el directorio ferretero de la Ciudad Cívica en un solo lugar. Aquí encontrarás distribuidores de cemento, varillas, blocks, pintura, plomería y electricidad. Ya sea que estés construyendo, remodelando o haciendo reparaciones menores en tu hogar o negocio, las ferreterías de Olanchito cuentan con todo lo que necesitas. El directorio te permite comparar opciones, ver ubicaciones en el mapa y contactar directamente por teléfono o WhatsApp. Información actualizada con horarios reales de atención.",
+  farmacias:
+    "Farmacias en Olanchito, Yoro, Honduras con medicamentos, productos de salud y artículos de cuidado personal. El directorio local reúne todas las farmacias activas de Olanchito para que encuentres la más cercana o la que mejor se adapte a tus necesidades. Consulta horarios de atención, números de teléfono y ubicaciones actualizadas de cada farmacia. Algunas farmacias en Olanchito ofrecen servicio a domicilio o turno nocturno — revisa los detalles de cada establecimiento. También encontrarás farmacias con laboratorio clínico, venta de insumos médicos y productos veterinarios. Todo el directorio farmacéutico de la Ciudad Cívica de Honduras en un solo lugar, con información verificada y reseñas de clientes reales.",
+  "hoteles-hospedaje":
+    "Hoteles y hospedajes en Olanchito, Honduras para viajeros y visitantes del Valle del Aguán. El directorio incluye opciones de alojamiento en Olanchito, Yoro, con información de precios, ubicación y contacto directo. Si buscás dónde quedarte en Olanchito durante tu visita o estadía laboral, encontrá aquí las opciones de alojamiento con contacto directo, precios y ubicaciones en el Valle del Aguán. Desde hoteles con todas las comodidades hasta hospedajes económicos, el directorio de Olanchito reúne las mejores alternativas de alojamiento de la Ciudad Cívica. Consulta disponibilidad, tarifa y contacta directamente por teléfono o WhatsApp a cada establecimiento.",
+  talleres:
+    "Talleres mecánicos y repuestos en Olanchito, Yoro, Honduras. Encuentra talleres de confianza para tu vehículo en la Ciudad Cívica con horarios, direcciones y contacto por WhatsApp. El directorio local reúne los principales talleres mecánicos y distribuidores de repuestos de Olanchito y sus alrededores. Ya sea que necesites mantenimiento preventivo, reparación de motor, frenos, suspensión o electricidad automotriz, aquí encontrarás el taller indicado. También incluye vulcanizadoras, alineación y balanceo, y tiendas de repuestos originales y alternativos. Contacta directamente a los talleres de Olanchito con información actualizada.",
+  "repuestos-talleres":
+    "Talleres mecánicos y repuestos en Olanchito, Yoro, Honduras. Encuentra talleres de confianza para tu vehículo en la Ciudad Cívica con horarios, direcciones y contacto por WhatsApp. El directorio local reúne los principales talleres mecánicos y distribuidores de repuestos de Olanchito y sus alrededores. Ya sea que necesites mantenimiento preventivo, reparación de motor, frenos, suspensión o electricidad automotriz, aquí encontrarás el taller indicado. También incluye vulcanizadoras, alineación y balanceo, y tiendas de repuestos originales y alternativos. Contacta directamente a los talleres de Olanchito con información actualizada.",
 };
 
 function getCategoryDescription(slug: string, name: string): string {
@@ -43,6 +63,10 @@ function getCategoryDescription(slug: string, name: string): string {
     categoryDescriptions[slug] ??
     `Encuentra los mejores negocios de ${name} en Olanchito, Honduras. Información de contacto, horarios, ubicación y reseñas de clientes reales.`
   );
+}
+
+function getCategoryLongDescription(slug: string): string | null {
+  return categoryLongDescriptions[slug] ?? null;
 }
 
 export async function generateStaticParams() {
@@ -147,6 +171,7 @@ export default async function CategoriaPage({
     });
 
   const description = getCategoryDescription(category.slug, category.name);
+  const longDescription = getCategoryLongDescription(category.slug);
 
   const breadcrumbSchema = {
     "@context": "https://schema.org",
@@ -202,6 +227,11 @@ export default async function CategoriaPage({
         <p className="mt-2 max-w-2xl text-sm leading-relaxed" style={{ color: "var(--ink-2)" }}>
           {description}
         </p>
+        {longDescription && (
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed" style={{ color: "var(--ink-2)" }}>
+            {longDescription}
+          </p>
+        )}
         <p className="mt-2 text-xs" style={{ color: "var(--ink-3)" }}>
           {businesses.length} negocio{businesses.length !== 1 ? "s" : ""} encontrado{businesses.length !== 1 ? "s" : ""}
         </p>

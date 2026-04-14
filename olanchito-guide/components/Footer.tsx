@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { MapPinIcon, EnvelopeIcon } from "@heroicons/react/24/outline";
+import { FooterSupport } from "@/components/FooterSupport";
 
 const navLinks = [
   { href: "/", label: "Inicio" },
@@ -157,10 +158,17 @@ export default function Footer() {
               ))}
             </ul>
           </div>
+
         </div>
 
         {/* Divider */}
         <div className="my-10" style={{ height: 1, background: "rgba(255,255,255,0.08)" }} />
+
+        {/* Support row */}
+        <FooterSupport />
+
+        {/* Divider */}
+        <div className="my-8" style={{ height: 1, background: "rgba(255,255,255,0.08)" }} />
 
         {/* Bottom row */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

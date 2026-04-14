@@ -35,7 +35,7 @@ const faqs = [
   },
   {
     q: "¿Dónde está ubicado Olanchito, Honduras?",
-    a: "Olanchito es un municipio del departamento de Yoro, en el norte de Honduras. Está ubicado a aproximadamente 200 km de San Pedro Sula y es conocido como \"La Ciudad Señorial del Norte\". Es uno de los municipios más importantes del departamento de Yoro.",
+    a: "Olanchito es un municipio del departamento de Yoro, en el norte de Honduras. Está ubicado a aproximadamente 200 km de San Pedro Sula y es conocido como \"La Ciudad Cívica de Honduras\". Es uno de los municipios más importantes del departamento de Yoro.",
   },
   {
     q: "¿Qué tipos de negocios y servicios hay en Olanchito?",

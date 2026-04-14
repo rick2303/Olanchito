@@ -11,12 +11,12 @@ import { ArrowRightIcon, Squares2X2Icon } from "@heroicons/react/24/outline";
 import CategoryCard from "@/components/CategoryCard";
 
 export const metadata = {
-  title: "Categorías | Directorio Olanchito",
-  description: "Explora todas las categorías de negocios en Olanchito: ferreterías, restaurantes, farmacias y más.",
+  title: { absolute: "Categorías de negocios en Olanchito, Honduras | Directorio Olanchito" },
+  description: "Explora todas las categorías de negocios en Olanchito, Honduras: ferreterías, restaurantes, farmacias, clínicas y más. Directorio local actualizado.",
   alternates: { canonical: "https://olanchito.com/categorias" },
   openGraph: {
-    title: "Categorías | Directorio Olanchito",
-    description: "Explora todas las categorías de negocios en Olanchito: ferreterías, restaurantes, farmacias y más.",
+    title: "Categorías de negocios en Olanchito, Honduras | Directorio Olanchito",
+    description: "Explora todas las categorías de negocios en Olanchito, Honduras: ferreterías, restaurantes, farmacias, clínicas y más. Directorio local actualizado.",
     url: "https://olanchito.com/categorias",
     siteName: "Directorio Olanchito",
     images: [{ url: "/og-image.webp", width: 1200, height: 630, alt: "Directorio Olanchito" }],
@@ -25,8 +25,8 @@ export const metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Categorías | Directorio Olanchito",
-    description: "Explora todas las categorías de negocios en Olanchito.",
+    title: "Categorías de negocios en Olanchito, Honduras | Directorio Olanchito",
+    description: "Explora todas las categorías de negocios en Olanchito, Honduras: ferreterías, restaurantes, farmacias y más.",
     images: ["/og-image.webp"],
   },
 };

@@ -11,6 +11,7 @@ import OpenNowBadge from "@/components/OpenNowBadge";
 import ViewTracker from "@/components/ViewTracker";
 import RelatedBusinesses from "@/components/RelatedBusinesses";
 import SuggestCorrection from "@/components/SuggestCorrection";
+import { SupportBanner } from "@/components/SupportBanner";
 import ShareButtons from "@/components/ShareButtons";
 import BusinessQR from "@/components/BusinessQR";
 import {
@@ -832,6 +833,9 @@ export default async function BusinessDetail({ params }: Props) {
 
             {/* Sugerir corrección */}
             <SuggestCorrection businessSlug={data.slug} businessName={data.name} />
+
+            {/* Apoyar el directorio */}
+            <SupportBanner />
           </aside>
         </div>
       </section>

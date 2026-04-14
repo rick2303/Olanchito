@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     "farmacias Olanchito",
     "empresas Olanchito",
     "directorio empresarial Olanchito",
-    "ciudad señorial del norte Honduras",
+    "ciudad cívica de Honduras",
   ],
   alternates: { canonical: "https://olanchito.com/" },
   icons: { icon: "/colibri.webp", shortcut: "/colibri.webp", apple: "/colibri.webp" },

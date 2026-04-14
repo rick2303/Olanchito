@@ -135,9 +135,9 @@ export default async function HomePage() {
                 color: "var(--ink)",
               }}
             >
-              Encuentre negocios locales
+              Directorio de negocios en Olanchito, Honduras
               <span className="hero-home-highlight block">
-                con datos reales y contacto directo
+                contacto directo y horarios reales
               </span>
             </h1>
 
