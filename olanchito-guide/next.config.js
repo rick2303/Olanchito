@@ -17,19 +17,6 @@ const nextConfig = {
       },
     ],
   },
-  async redirects() {
-    return [
-      // www → non-www (301 permanente). Sin esto Google ve dos versiones del
-      // sitio y trata la www como "página alternativa con canonical adecuado"
-      // en lugar de indexar la versión canónica sin www.
-      {
-        source: '/:path*',
-        has: [{ type: 'host', value: 'www.olanchito.com' }],
-        destination: 'https://olanchito.com/:path*',
-        permanent: true,
-      },
-    ]
-  },
   async headers() {
     return [
       {
