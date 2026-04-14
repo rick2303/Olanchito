@@ -154,7 +154,7 @@ export default async function BusinessDetail({ params }: Props) {
               Negocio no encontrado
             </p>
             <Link
-              href="/businesses"
+              href="/negocios"
               className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-jungle-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-jungle-700"
             >
               <ArrowLeftIcon className="h-5 w-5" />
@@ -299,10 +299,10 @@ export default async function BusinessDetail({ params }: Props) {
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Inicio",   item: "https://olanchito.com" },
-      { "@type": "ListItem", position: 2, name: "Negocios", item: "https://olanchito.com/businesses" },
+      { "@type": "ListItem", position: 2, name: "Negocios", item: "https://olanchito.com/negocios" },
       ...(category
         ? [
-            { "@type": "ListItem", position: 3, name: category.name, item: `https://olanchito.com/categories/${category.slug}` },
+            { "@type": "ListItem", position: 3, name: category.name, item: `https://olanchito.com/categorias/${category.slug}` },
             { "@type": "ListItem", position: 4, name: data.name,     item: `https://olanchito.com/negocios/${data.slug}` },
           ]
         : [{ "@type": "ListItem", position: 3, name: data.name, item: `https://olanchito.com/negocios/${data.slug}` }]),
@@ -361,12 +361,12 @@ export default async function BusinessDetail({ params }: Props) {
         <ol className="flex items-center gap-1.5 text-xs" style={{ color: "var(--ink-3)" }}>
           <li><Link href="/" style={{ color: "var(--ink-3)" }} className="hover:underline">Inicio</Link></li>
           <li aria-hidden>/</li>
-          <li><Link href="/businesses" style={{ color: "var(--ink-3)" }} className="hover:underline">Negocios</Link></li>
+          <li><Link href="/negocios" style={{ color: "var(--ink-3)" }} className="hover:underline">Negocios</Link></li>
           {category && (
             <>
               <li aria-hidden>/</li>
               <li>
-                <Link href={`/categories/${category.slug}`} style={{ color: "var(--ink-3)" }} className="hover:underline">
+                <Link href={`/categorias/${category.slug}`} style={{ color: "var(--ink-3)" }} className="hover:underline">
                   {category.name}
                 </Link>
               </li>
@@ -419,7 +419,7 @@ export default async function BusinessDetail({ params }: Props) {
           <div className="mx-auto max-w-5xl px-4 py-3 sm:px-6">
             <div className="flex items-center justify-between gap-3">
               <Link
-                href="/businesses"
+                href="/negocios"
                 className="inline-flex items-center gap-1.5 rounded-2xl bg-white px-3 py-2 text-xs font-semibold text-jungle-900 ring-1 ring-black/10 hover:bg-jungle-50"
               >
                 <ArrowLeftIcon className="h-4 w-4" />
@@ -462,7 +462,7 @@ export default async function BusinessDetail({ params }: Props) {
           <div className="mx-auto max-w-5xl px-4 pb-6 pt-5 sm:px-6 lg:pt-0 lg:pb-6">
             <div className="hidden lg:block">
               <Link
-                href="/businesses"
+                href="/negocios"
                 className="inline-flex items-center gap-2 rounded-2xl bg-black/45 px-3 py-2 text-sm font-semibold text-white ring-1 ring-white/20 backdrop-blur hover:bg-black/55"
               >
                 <ArrowLeftIcon className="h-5 w-5" />
@@ -475,7 +475,7 @@ export default async function BusinessDetail({ params }: Props) {
               <div className="flex flex-wrap items-center gap-2">
                 {category?.name ? (
                   <Link
-                    href={`/businesses?category=${category.slug}&page=1`}
+                    href={`/negocios?category=${category.slug}&page=1`}
                     className={[pillBase, pillMobile, pillDesktop].join(" ")}
                   >
                     <TagIcon className="h-4 w-4" />
@@ -862,7 +862,7 @@ export default async function BusinessDetail({ params }: Props) {
               Acceder al portal
             </Link>
             <Link
-              href="/pricing"
+              href="/precios"
               className="inline-flex items-center gap-1.5 rounded-xl bg-white px-4 py-2.5 text-xs font-semibold text-jungle-700 ring-1 ring-jungle-200 transition-colors hover:bg-jungle-50"
             >
               Ver planes

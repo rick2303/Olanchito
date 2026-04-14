@@ -12,8 +12,8 @@ export default function robots(): MetadataRoute.Robots {
           "/admin/login",
           "/api/",
           "/owner/",
-          "/businesses?*",   // filter URLs — canonical content lives at /categories/[slug]
-          "/negocios?*",     // same for negocios if it accepts query params
+          "/negocios?*",    // filtros y paginación — el contenido canónico vive en /categorias/[slug]
+          "/businesses?*",  // ruta legacy (redirect a /negocios), también bloqueada por si acaso
         ],
       },
     ],

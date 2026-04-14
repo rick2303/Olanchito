@@ -17,7 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   const categoryUrls: MetadataRoute.Sitemap = (categories ?? []).map((c) => ({
-    url: `${BASE_URL}/categories/${c.slug}`,
+    url: `${BASE_URL}/categorias/${c.slug}`,
     lastModified: new Date(),
     changeFrequency: "weekly",
     priority: 0.7,
@@ -25,10 +25,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const staticUrls: MetadataRoute.Sitemap = [
     { url: BASE_URL,                       lastModified: new Date(), changeFrequency: "daily",   priority: 1.0 },
-    { url: `${BASE_URL}/businesses`,        lastModified: new Date(), changeFrequency: "daily",   priority: 0.9 },
-    { url: `${BASE_URL}/categories`,        lastModified: new Date(), changeFrequency: "weekly",  priority: 0.7 },
-    { url: `${BASE_URL}/join`,              lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
-    { url: `${BASE_URL}/pricing`,           lastModified: new Date(), changeFrequency: "monthly", priority: 0.4 },
+    { url: `${BASE_URL}/negocios`,          lastModified: new Date(), changeFrequency: "daily",   priority: 0.9 },
+    { url: `${BASE_URL}/categorias`,        lastModified: new Date(), changeFrequency: "weekly",  priority: 0.7 },
+    { url: `${BASE_URL}/registrar`,         lastModified: new Date(), changeFrequency: "monthly", priority: 0.6 },
+    { url: `${BASE_URL}/precios`,           lastModified: new Date(), changeFrequency: "monthly", priority: 0.4 },
   ];
 
   return [...staticUrls, ...categoryUrls, ...businessUrls];

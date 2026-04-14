@@ -67,7 +67,7 @@ export default async function NovedadesSection() {
             <div className="mb-4 flex items-center justify-between">
               <h2 className="heading-xl text-lg">Negocios nuevos esta semana</h2>
               <Link
-                href="/businesses?nuevo=1"
+                href="/negocios?nuevo=1"
                 className="inline-flex items-center gap-1 text-xs font-semibold transition-colors"
                 style={{ color: "var(--primary-mid)" }}
               >
@@ -137,7 +137,7 @@ export default async function NovedadesSection() {
             <div className="mb-4 flex items-center justify-between">
               <h2 className="heading-xl text-lg">Últimas reseñas</h2>
               <Link
-                href="/businesses"
+                href="/negocios"
                 className="inline-flex items-center gap-1 text-xs font-semibold"
                 style={{ color: "var(--primary-mid)" }}
               >

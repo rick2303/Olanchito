@@ -39,7 +39,7 @@ export default async function RelatedBusinesses({
           Más negocios en {categoryName}
         </h2>
         <Link
-          href={`/businesses?category=${categoryId}`}
+          href={`/negocios?category=${categoryId}`}
           className="flex items-center gap-1 text-xs font-semibold text-jungle-600 hover:text-jungle-800"
         >
           Ver todos

@@ -68,7 +68,7 @@ export default async function HomePage() {
     description: "Directorio comunitario de negocios y servicios locales en Olanchito, Honduras.",
     potentialAction: {
       "@type": "SearchAction",
-      target: "https://olanchito.com/businesses?q={search_term_string}",
+      target: "https://olanchito.com/negocios?q={search_term_string}",
       "query-input": "required name=search_term_string",
     },
   };
@@ -151,7 +151,7 @@ export default async function HomePage() {
 
             {/* Search bar */}
             <form
-              action="/businesses"
+              action="/negocios"
               method="GET"
               className="mx-auto mt-8 flex w-full max-w-xl items-center gap-2 rounded-2xl p-1.5"
               style={{
@@ -177,11 +177,11 @@ export default async function HomePage() {
             </form>
 
             <div className="mt-4 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Link href="/categories" className="btn-secondary !text-xs !py-2">
+              <Link href="/categorias" className="btn-secondary !text-xs !py-2">
                 <Squares2X2Icon className="h-3.5 w-3.5" />
                 Ver categorías
               </Link>
-              <Link href="/businesses" className="btn-secondary !text-xs !py-2">
+              <Link href="/negocios" className="btn-secondary !text-xs !py-2">
                 <BuildingStorefrontIcon className="h-3.5 w-3.5" />
                 Ver todos los negocios
               </Link>
@@ -276,7 +276,7 @@ export default async function HomePage() {
             <h2 className="heading-xl">Explore por tipo de negocio</h2>
           </div>
           <Link
-            href="/categories"
+            href="/categorias"
             className="btn-secondary !py-2 !text-xs mt-2 sm:mt-0"
           >
             Ver todas
@@ -288,7 +288,7 @@ export default async function HomePage() {
           {featured.map(({ title, slug, hint, Icon, color }, i) => (
             <Link
               key={slug}
-              href={`/categories/${slug}`}
+              href={`/categorias/${slug}`}
               className={`panel group p-5 transition-all duration-300 hover:-translate-y-1 animate-fade-up anim-delay-${i + 1}`}
               style={{ "--tw-shadow": "var(--shadow-md)" } as React.CSSProperties}
             >
@@ -360,11 +360,11 @@ export default async function HomePage() {
             </div>
 
             <div className="flex flex-col gap-2.5 sm:flex-row">
-              <Link href="/join" className="btn-primary">
+              <Link href="/registrar" className="btn-primary">
                 Registrar negocio
                 <ArrowRightIcon className="h-4 w-4" />
               </Link>
-              <Link href="/businesses" className="btn-secondary">
+              <Link href="/negocios" className="btn-secondary">
                 Ver directorio
               </Link>
             </div>

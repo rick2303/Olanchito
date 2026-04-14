@@ -217,11 +217,11 @@ export default function OwnerLoginPage() {
             <div className="border-t border-jungle-100 px-7 py-4">
               <p className="mb-2.5 text-[11px] font-semibold text-jungle-400 uppercase tracking-widest">¿Nuevo aquí?</p>
               <div className="flex flex-col gap-1.5">
-                <Link href="/pricing" className="flex items-center gap-2 text-xs font-semibold text-jungle-700 hover:text-jungle-950 transition-colors">
+                <Link href="/precios" className="flex items-center gap-2 text-xs font-semibold text-jungle-700 hover:text-jungle-950 transition-colors">
                   <ArrowRightIcon className="h-3.5 w-3.5 text-jungle-400" />
                   Tengo negocio y quiero activar el portal
                 </Link>
-                <Link href="/join" className="flex items-center gap-2 text-xs font-semibold text-jungle-700 hover:text-jungle-950 transition-colors">
+                <Link href="/registrar" className="flex items-center gap-2 text-xs font-semibold text-jungle-700 hover:text-jungle-950 transition-colors">
                   <BuildingStorefrontIcon className="h-3.5 w-3.5 text-jungle-400" />
                   Mi negocio no está en el directorio
                 </Link>

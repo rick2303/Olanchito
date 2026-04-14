@@ -4,14 +4,14 @@ import { MapPinIcon, EnvelopeIcon } from "@heroicons/react/24/outline";
 
 const navLinks = [
   { href: "/", label: "Inicio" },
-  { href: "/categories", label: "Categorías" },
-  { href: "/businesses", label: "Negocios" },
-  { href: "/join", label: "Registrar negocio" },
+  { href: "/categorias", label: "Categorías" },
+  { href: "/negocios", label: "Negocios" },
+  { href: "/registrar", label: "Registrar negocio" },
 ];
 
 const businessLinks = [
-  { href: "/pricing", label: "Ver planes y precios" },
-  { href: "/join", label: "Registrar mi negocio" },
+  { href: "/precios", label: "Ver planes y precios" },
+  { href: "/registrar", label: "Registrar mi negocio" },
   { href: "/owner/login", label: "Iniciar sesión" },
 ];
 

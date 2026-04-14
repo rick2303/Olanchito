@@ -113,7 +113,7 @@ export default function FavoritesPage() {
             <p className="mt-1 text-xs" style={{ color: "var(--ink-3)" }}>
               Toca el corazón en cualquier negocio para guardarlo aquí.
             </p>
-            <Link href="/businesses" className="btn-primary mt-6 inline-flex !text-xs !py-2">
+            <Link href="/negocios" className="btn-primary mt-6 inline-flex !text-xs !py-2">
               <BuildingStorefrontIcon className="h-3.5 w-3.5" />
               Explorar negocios
             </Link>

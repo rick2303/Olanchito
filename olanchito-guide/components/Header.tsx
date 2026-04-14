@@ -16,8 +16,8 @@ import {
 
 const navItems = [
   { href: "/", label: "Inicio", icon: HomeIcon },
-  { href: "/categories", label: "Categorías", icon: Squares2X2Icon },
-  { href: "/businesses", label: "Negocios", icon: BuildingStorefrontIcon },
+  { href: "/categorias", label: "Categorías", icon: Squares2X2Icon },
+  { href: "/negocios", label: "Negocios", icon: BuildingStorefrontIcon },
   { href: "/favoritos", label: "Favoritos", icon: HeartIcon },
 ];
 
@@ -130,7 +130,7 @@ export default function Header() {
                 <BuildingStorefrontIcon className="h-3.5 w-3.5" />
                 Mi negocio
               </Link>
-              <Link href="/join" className="btn-primary !py-2 !text-xs">
+              <Link href="/registrar" className="btn-primary !py-2 !text-xs">
                 Registrar negocio
                 <ArrowRightIcon className="h-3.5 w-3.5" />
               </Link>
@@ -255,7 +255,7 @@ export default function Header() {
                 <BuildingStorefrontIcon className="h-4 w-4" />
                 Mi negocio
               </Link>
-              <Link href="/join" onClick={close} className="btn-primary w-full">
+              <Link href="/registrar" onClick={close} className="btn-primary w-full">
                 Registrar negocio
                 <ArrowRightIcon className="h-4 w-4" />
               </Link>

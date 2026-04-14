@@ -13,7 +13,7 @@ type CategoryCardProps = {
 export default function CategoryCard({ cat, iconDef }: CategoryCardProps) {
   return (
     <Link
-      href={`/categories/${cat.slug}`}
+      href={`/categorias/${cat.slug}`}
       className="group flex flex-col gap-3 rounded-2xl p-4 transition-all duration-200"
       style={{
         background: "var(--surface)",
