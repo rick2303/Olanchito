@@ -6,6 +6,7 @@ const SUGGESTIONS = [25, 50, 100, 200]
 
 export default function DonateForm() {
   const [lempiras, setLempiras] = useState('')
+  const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -24,7 +25,7 @@ export default function DonateForm() {
       const res = await fetch('/api/donate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount }),
+        body: JSON.stringify({ amount, email: email.trim() || undefined }),
       })
       const data = await res.json()
       if (!res.ok || !data.url) {
@@ -58,6 +59,26 @@ export default function DonateForm() {
             L.{n}
           </button>
         ))}
+      </div>
+
+      {/* Email input (optional) */}
+      <div
+        className="flex items-center gap-2 rounded-2xl px-4 py-3"
+        style={{
+          background: "var(--surface)",
+          border: "1px solid var(--line-strong)",
+          boxShadow: "0 2px 8px rgba(10,30,20,0.05)",
+        }}
+      >
+        <input
+          type="email"
+          inputMode="email"
+          placeholder="Tu correo (opcional, para recibir un agradecimiento)"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="flex-1 bg-transparent text-sm outline-none placeholder:text-[var(--ink-3)]"
+          style={{ color: "var(--ink)" }}
+        />
       </div>
 
       {/* Amount input */}

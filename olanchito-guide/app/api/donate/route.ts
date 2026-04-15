@@ -7,7 +7,7 @@ const MIN_AMOUNT = 100    // L.1 minimum
 const MAX_AMOUNT = 500000 // L.5000 maximum
 
 export async function POST(req: NextRequest) {
-  const { amount } = await req.json()
+  const { amount, email } = await req.json()
 
   if (!Number.isInteger(amount) || amount < MIN_AMOUNT || amount > MAX_AMOUNT) {
     return NextResponse.json({ error: 'Monto no válido' }, { status: 400 })
@@ -16,6 +16,8 @@ export async function POST(req: NextRequest) {
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
     mode: 'payment',
+    ...(email ? { customer_email: email } : {}),
+    metadata: { donation: 'true', ...(email ? { donor_email: email } : {}) },
     line_items: [
       {
         price_data: {

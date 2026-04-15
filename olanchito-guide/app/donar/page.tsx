@@ -42,8 +42,8 @@ export default function DonarPage() {
             Apoyar el directorio
           </h1>
           <p className="mt-2 text-center text-sm leading-relaxed" style={{ color: "var(--ink-2)" }}>
-            Olanchito.com es gratuito para toda la comunidad. Si les fue útil,
-            pueden apoyar con cualquier monto en lempiras — desde L.1.
+            Olanchito.com es gratuito para toda la comunidad. Si te fue útil,
+            puedes apoyar con cualquier monto en lempiras — desde L.1.
           </p>
 
           {/* Form */}
