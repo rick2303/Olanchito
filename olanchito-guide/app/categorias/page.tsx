@@ -19,7 +19,7 @@ export const metadata = {
     description: "Explora todas las categorías de negocios en Olanchito, Honduras: ferreterías, restaurantes, farmacias, clínicas y más. Directorio local actualizado.",
     url: "https://olanchito.com/categorias",
     siteName: "Directorio Olanchito",
-    images: [{ url: "/og-image.webp", width: 1200, height: 630, alt: "Directorio Olanchito" }],
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Directorio Olanchito" }],
     locale: "es_HN",
     type: "website",
   },
@@ -27,7 +27,7 @@ export const metadata = {
     card: "summary_large_image",
     title: "Categorías de negocios en Olanchito, Honduras | Directorio Olanchito",
     description: "Explora todas las categorías de negocios en Olanchito, Honduras: ferreterías, restaurantes, farmacias y más.",
-    images: ["/og-image.webp"],
+    images: ["/og-image.png"],
   },
 };
 

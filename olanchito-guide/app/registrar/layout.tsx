@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     description: 'Registra tu negocio gratis en el directorio de Olanchito, Honduras.',
     url: 'https://olanchito.com/registrar',
     siteName: 'Directorio Olanchito',
-    images: [{ url: '/og-image.webp', width: 1200, height: 630, alt: 'Directorio Olanchito' }],
+    images: [{ url: '/og-image.png', width: 1200, height: 630, alt: 'Directorio Olanchito' }],
     locale: 'es_HN',
     type: 'website',
   },
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Registra tu negocio | Directorio Olanchito',
     description: 'Registra tu negocio gratis en el directorio de Olanchito, Honduras.',
-    images: ['/og-image.webp'],
+    images: ['/og-image.png'],
   },
 }
 

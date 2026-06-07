@@ -46,14 +46,14 @@ export const metadata: Metadata = {
     "ciudad cívica de Honduras",
   ],
   alternates: { canonical: "https://olanchito.com/" },
-  icons: { icon: "/colibri.webp", shortcut: "/colibri.webp", apple: "/colibri.webp" },
+  icons: { icon: "/colibri.webp", shortcut: "/colibri.webp", apple: "/logo.png" },
   openGraph: {
     title: "Olanchito Honduras | Directorio de Negocios Locales",
     description:
       "Encuentra negocios, servicios y comercios en Olanchito, Yoro, Honduras. Directorio comunitario con contacto directo y reseñas reales.",
     url: "https://olanchito.com/",
     siteName: "Directorio Olanchito",
-    images: [{ url: "/og-image.webp", width: 1200, height: 630, alt: "Directorio de Negocios en Olanchito, Honduras" }],
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Directorio de Negocios en Olanchito, Honduras" }],
     locale: "es_HN",
     type: "website",
   },
@@ -61,7 +61,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Olanchito Honduras | Directorio Local",
     description: "Negocios, servicios y emprendimientos locales en Olanchito, Honduras.",
-    images: ["/og-image.webp"],
+    images: ["/og-image.png"],
   },
   other: {
     "geo.region": "HN-YO",

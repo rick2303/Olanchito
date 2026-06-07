@@ -17,6 +17,19 @@ const nextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      // Consolida el dominio: www → no-www (301 permanente).
+      // Evita contenido duplicado y libera crawl budget para las páginas reales.
+      // (Vercel ya fuerza http → https automáticamente.)
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'www.olanchito.com' }],
+        destination: 'https://olanchito.com/:path*',
+        permanent: true,
+      },
+    ]
+  },
   async headers() {
     return [
       {

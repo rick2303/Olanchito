@@ -99,7 +99,7 @@ export async function generateMetadata({
       description,
       url: `${BASE_URL}/categorias/${cat.slug}`,
       siteName: "Directorio Olanchito",
-      images: [{ url: "/og-image.webp", width: 1200, height: 630 }],
+      images: [{ url: "/og-image.png", width: 1200, height: 630 }],
       locale: "es_HN",
       type: "website",
     },

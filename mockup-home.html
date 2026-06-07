@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Directorio Olanchito — Mockup Home</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary: #1a4a2e;
+      --primary-mid: #2d6a4f;
+      --primary-light: #40916c;
+      --accent: #74c69d;
+      --surface: #fafaf8;
+      --surface-2: #f2f4f0;
+      --ink: #0f1f14;
+      --ink-2: #3d5245;
+      --ink-3: #7a9480;
+      --line: #e4ebe6;
+      --line-strong: #c8d9cc;
+    }
+    body { font-family: 'Inter', sans-serif; background: var(--surface); color: var(--ink); }
+    .font-syne { font-family: 'Syne', sans-serif; }
+
+    /* Hero grid */
+    .hero-grid {
+      background-image:
+        linear-gradient(rgba(26,74,46,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(26,74,46,0.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+    .hero-glow-left {
+      background: radial-gradient(circle, rgba(116,198,157,0.35) 0%, transparent 70%);
+      filter: blur(48px);
+    }
+    .hero-glow-right {
+      background: radial-gradient(circle, rgba(45,106,79,0.22) 0%, transparent 70%);
+      filter: blur(64px);
+    }
+    .panel {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 1.25rem;
+      box-shadow: 0 4px 16px rgba(10,30,20,0.05);
+    }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--primary); color: #fff; font-weight: 600; font-size: 13px;
+      padding: 9px 18px; border-radius: 999px; cursor: pointer;
+      transition: background 150ms;
+    }
+    .btn-primary:hover { background: var(--primary-mid); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #fff; color: var(--ink); font-weight: 600; font-size: 13px;
+      padding: 8px 16px; border-radius: 999px; cursor: pointer;
+      border: 1px solid var(--line-strong);
+      transition: background 150ms;
+    }
+    .btn-secondary:hover { background: var(--surface-2); }
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 600; letter-spacing: 0.02em;
+      padding: 4px 12px; border-radius: 999px;
+      background: rgba(116,198,157,0.15); color: var(--primary-mid);
+      border: 1px solid rgba(116,198,157,0.4);
+    }
+    .section-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--primary-light);
+    }
+    .icon-box {
+      width: 40px; height: 40px; border-radius: 12px;
+      display: grid; place-items: center;
+      background: #f0f7f3; border: 1px solid var(--line);
+      color: var(--primary-mid);
+    }
+    /* Category card color variants */
+    .cat-orange { background: #fff7ed; border-color: #fed7aa; }
+    .cat-orange .cat-icon { background: #fff7ed; color: #ea580c; border-color: #fed7aa; }
+    .cat-yellow { background: #fefce8; border-color: #fde68a; }
+    .cat-yellow .cat-icon { background: #fefce8; color: #ca8a04; border-color: #fde68a; }
+    .cat-blue { background: #eff6ff; border-color: #bfdbfe; }
+    .cat-blue .cat-icon { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+    .cat-purple { background: #faf5ff; border-color: #e9d5ff; }
+    .cat-purple .cat-icon { background: #faf5ff; color: #9333ea; border-color: #e9d5ff; }
+
+    /* Star rating */
+    .stars { color: #f59e0b; font-size: 12px; }
+
+    /* Announcement banner */
+    .announcement-banner {
+      background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+      border: 1px solid #bbf7d0;
+      border-radius: 16px;
+      padding: 12px 20px;
+    }
+
+    /* Novedades card */
+    .novedad-card {
+      display: flex; gap: 14px; padding: 14px;
+      background: #fff; border: 1px solid var(--line);
+      border-radius: 16px; cursor: pointer;
+      transition: box-shadow 150ms, transform 150ms;
+    }
+    .novedad-card:hover { box-shadow: 0 8px 24px rgba(10,30,20,0.09); transform: translateY(-1px); }
+    .novedad-img {
+      width: 64px; height: 64px; border-radius: 12px;
+      object-fit: cover; flex-shrink: 0;
+      background: linear-gradient(135deg, #d1fae5, #6ee7b7);
+      display: grid; place-items: center; font-size: 24px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── HEADER ─────────────────────────────────────── -->
+<header style="background: rgba(250,250,248,0.92); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 50;">
+  <div style="max-width: 1200px; margin: 0 auto; padding: 0 24px; height: 60px; display: flex; align-items: center; justify-content: space-between;">
+    <!-- Logo -->
+    <a href="#" style="display: flex; align-items: center; gap: 8px; text-decoration: none;">
+      <div style="width: 32px; height: 32px; border-radius: 10px; background: var(--primary); display: grid; place-items: center;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#74c69d" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+      </div>
+      <span class="font-syne" style="font-weight: 700; font-size: 15px; color: var(--ink); letter-spacing: -0.02em;">Directorio Olanchito</span>
+    </a>
+
+    <!-- Nav -->
+    <nav style="display: flex; align-items: center; gap: 4px;">
+      <a href="#" style="padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; color: var(--ink-2); text-decoration: none; transition: background 150ms;" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='transparent'">Negocios</a>
+      <a href="#" style="padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; color: var(--ink-2); text-decoration: none; transition: background 150ms;" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='transparent'">Categorías</a>
+      <a href="#" style="padding: 6px 14px; border-radius: 999px; font-size: 13px; font-weight: 500; color: var(--ink-2); text-decoration: none; transition: background 150ms;" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='transparent'">Mapa</a>
+      <a href="#" class="btn-primary" style="margin-left: 8px; text-decoration: none;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Registrar negocio
+      </a>
+    </nav>
+  </div>
+</header>
+
+<!-- ─── HERO ──────────────────────────────────────── -->
+<section class="hero-grid" style="position: relative; overflow: hidden; padding: 80px 24px 72px;">
+  <!-- Glows -->
+  <div class="hero-glow-left" style="position: absolute; left: -64px; top: 40px; width: 280px; height: 280px; border-radius: 50%; pointer-events: none;"></div>
+  <div class="hero-glow-right" style="position: absolute; right: -80px; bottom: 32px; width: 360px; height: 360px; border-radius: 50%; pointer-events: none;"></div>
+
+  <div style="max-width: 900px; margin: 0 auto; text-align: center; position: relative;">
+    <!-- Badge -->
+    <div class="badge" style="margin: 0 auto 20px;">
+      <svg width="10" height="10" viewBox="0 0 10 10"><circle cx="5" cy="5" r="5" fill="var(--primary-light)"/></svg>
+      Directorio local de Olanchito, Honduras
+    </div>
+
+    <!-- Headline -->
+    <h1 class="font-syne" style="font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1.06; color: var(--ink); margin-bottom: 20px;">
+      Directorio de negocios<br />en Olanchito, Honduras
+      <span style="display: block; background: linear-gradient(135deg, var(--primary-light) 0%, var(--accent) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+        contacto directo y horarios reales
+      </span>
+    </h1>
+
+    <!-- Subtitle -->
+    <p style="color: var(--ink-2); font-size: 16px; line-height: 1.65; max-width: 560px; margin: 0 auto 36px;">
+      Busque por categoría, compare opciones y contacte por teléfono o WhatsApp en segundos.
+    </p>
+
+    <!-- Search bar -->
+    <form style="display: flex; align-items: center; gap: 8px; max-width: 560px; margin: 0 auto 20px; background: #fff; border: 1px solid var(--line-strong); border-radius: 20px; padding: 6px; box-shadow: 0 8px 24px rgba(10,30,20,0.08);">
+      <svg style="margin-left: 12px; flex-shrink: 0; color: var(--ink-3);" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="search" placeholder="Buscar restaurantes, ferreterías, farmacias..." style="flex: 1; background: transparent; border: none; outline: none; font-size: 13px; color: var(--ink); padding: 6px 4px;" />
+      <button class="btn-primary" style="border: none; flex-shrink: 0;">
+        Buscar
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </form>
+
+    <!-- Secondary actions -->
+    <div style="display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 48px;">
+      <a href="#" class="btn-secondary" style="text-decoration: none;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Ver categorías
+      </a>
+      <a href="#" class="btn-secondary" style="text-decoration: none;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+        Ver todos los negocios
+      </a>
+    </div>
+
+    <!-- Stats -->
+    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; max-width: 640px; margin: 0 auto; padding-top: 28px; border-top: 1px solid var(--line);">
+      <div class="panel" style="padding: 16px; text-align: center; border-radius: 18px;">
+        <p class="font-syne" style="font-size: 26px; font-weight: 700; color: var(--ink);">127</p>
+        <p style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">Negocios activos</p>
+      </div>
+      <div class="panel" style="padding: 16px; text-align: center; border-radius: 18px;">
+        <p class="font-syne" style="font-size: 26px; font-weight: 700; color: var(--ink);">18</p>
+        <p style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">Categorías disponibles</p>
+      </div>
+      <div class="panel" style="padding: 16px; text-align: center; border-radius: 18px;">
+        <p class="font-syne" style="font-size: 26px; font-weight: 700; color: var(--ink);">7.1</p>
+        <p style="font-size: 11px; color: var(--ink-3); margin-top: 2px;">Promedio por categoría</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PILLARS ────────────────────────────────────── -->
+<section style="max-width: 1100px; margin: 0 auto; padding: 48px 24px;">
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+
+    <div class="panel" style="padding: 22px; display: flex; align-items: flex-start; gap: 16px;">
+      <div class="icon-box" style="flex-shrink: 0;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><path d="M20.618 5.984A11.955 11.955 0 0 1 12 2.944a11.955 11.955 0 0 1-8.618 3.04A12.02 12.02 0 0 0 3 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+      </div>
+      <div>
+        <p class="font-syne" style="font-size: 13px; font-weight: 700; color: var(--ink);">Negocios verificados</p>
+        <p style="font-size: 12px; color: var(--ink-2); margin-top: 4px; line-height: 1.55;">Información validada para encontrar servicios confiables.</p>
+      </div>
+    </div>
+
+    <div class="panel" style="padding: 22px; display: flex; align-items: flex-start; gap: 16px;">
+      <div class="icon-box" style="flex-shrink: 0;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.54 1h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9A16 16 0 0 0 15 15.91l1.36-1.35a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 23 16.92z"/></svg>
+      </div>
+      <div>
+        <p class="font-syne" style="font-size: 13px; font-weight: 700; color: var(--ink);">Contacto directo</p>
+        <p style="font-size: 12px; color: var(--ink-2); margin-top: 4px; line-height: 1.55;">Llamada, WhatsApp y redes sociales en un solo lugar.</p>
+      </div>
+    </div>
+
+    <div class="panel" style="padding: 22px; display: flex; align-items: flex-start; gap: 16px;">
+      <div class="icon-box" style="flex-shrink: 0;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      </div>
+      <div>
+        <p class="font-syne" style="font-size: 13px; font-weight: 700; color: var(--ink);">Ubicación precisa</p>
+        <p style="font-size: 12px; color: var(--ink-2); margin-top: 4px; line-height: 1.55;">Direcciones y mapas integrados para llegar rápido.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─── FEATURED CATEGORIES ───────────────────────── -->
+<section style="max-width: 1100px; margin: 0 auto; padding: 0 24px 60px;">
+  <div style="display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 28px;">
+    <div>
+      <p class="section-label">Categorías destacadas</p>
+      <h2 class="font-syne" style="font-size: 22px; font-weight: 700; color: var(--ink); margin-top: 6px; letter-spacing: -0.02em;">Explore por tipo de negocio</h2>
+    </div>
+    <a href="#" class="btn-secondary" style="text-decoration: none;">
+      Ver todas
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+    </a>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+
+    <!-- Restaurantes -->
+    <a href="#" class="panel cat-orange" style="padding: 22px; text-decoration: none; display: block; transition: transform 200ms, box-shadow 200ms; cursor: pointer;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 12px 32px rgba(10,30,20,0.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+      <div class="cat-icon" style="width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; border: 1px solid;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/></svg>
+      </div>
+      <div style="margin-top: 14px;">
+        <h3 class="font-syne" style="font-size: 13px; font-weight: 700; color: var(--ink);">Restaurantes</h3>
+        <p style="font-size: 11px; color: #92400e; margin-top: 2px;">Comida, cafés y más</p>
+      </div>
+      <p style="margin-top: 14px; font-size: 11px; font-weight: 700; color: #ea580c; display: flex; align-items: center; gap: 4px;">
+        Ver negocios
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </p>
+    </a>
+
+    <!-- Ferreterías -->
+    <a href="#" class="panel cat-yellow" style="padding: 22px; text-decoration: none; display: block; transition: transform 200ms, box-shadow 200ms;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 12px 32px rgba(10,30,20,0.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+      <div class="cat-icon" style="width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; border: 1px solid;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+      </div>
+      <div style="margin-top: 14px;">
+        <h3 class="font-syne" style="font-size: 13px; font-weight: 700; color: var(--ink);">Ferreterías</h3>
+        <p style="font-size: 11px; color: #92400e; margin-top: 2px;">Materiales y herramientas</p>
+      </div>
+      <p style="margin-top: 14px; font-size: 11px; font-weight: 700; color: #ca8a04; display: flex; align-items: center; gap: 4px;">
+        Ver negocios
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </p>
+    </a>
+
+    <!-- Farmacias -->
+    <a href="#" class="panel cat-blue" style="padding: 22px; text-decoration: none; display: block; transition: transform 200ms, box-shadow 200ms;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 12px 32px rgba(10,30,20,0.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+      <div class="cat-icon" style="width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; border: 1px solid;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+      </div>
+      <div style="margin-top: 14px;">
+        <h3 class="font-syne" style="font-size: 13px; font-weight: 700; color: var(--ink);">Farmacias</h3>
+        <p style="font-size: 11px; color: #1d4ed8; margin-top: 2px;">Salud y bienestar</p>
+      </div>
+      <p style="margin-top: 14px; font-size: 11px; font-weight: 700; color: #2563eb; display: flex; align-items: center; gap: 4px;">
+        Ver negocios
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </p>
+    </a>
+
+    <!-- Servicios técnicos -->
+    <a href="#" class="panel cat-purple" style="padding: 22px; text-decoration: none; display: block; transition: transform 200ms, box-shadow 200ms;" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 12px 32px rgba(10,30,20,0.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+      <div class="cat-icon" style="width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; border: 1px solid;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93A10 10 0 1 0 21 12"/></svg>
+      </div>
+      <div style="margin-top: 14px;">
+        <h3 class="font-syne" style="font-size: 13px; font-weight: 700; color: var(--ink);">Servicios técnicos</h3>
+        <p style="font-size: 11px; color: #7e22ce; margin-top: 2px;">Reparación y soporte</p>
+      </div>
+      <p style="margin-top: 14px; font-size: 11px; font-weight: 700; color: #9333ea; display: flex; align-items: center; gap: 4px;">
+        Ver negocios
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+      </p>
+    </a>
+
+  </div>
+</section>
+
+<!-- ─── CTA BANNER ────────────────────────────────── -->
+<section style="max-width: 1100px; margin: 0 auto; padding: 0 24px 64px;">
+  <div style="position: relative; overflow: hidden; border-radius: 20px; padding: 40px 48px; background: linear-gradient(135deg, #f0f7f3 0%, #e8f5ed 100%); border: 1px solid var(--line);">
+    <!-- Decorative blob -->
+    <div style="position: absolute; right: -48px; top: -48px; width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, rgba(116,198,157,0.3) 0%, transparent 70%); filter: blur(40px); pointer-events: none;"></div>
+
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 32px; position: relative;">
+      <div style="max-width: 560px;">
+        <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(45,106,79,0.1); color: var(--primary-mid); font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 999px; border: 1px solid rgba(45,106,79,0.2); margin-bottom: 12px;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          Para propietarios
+        </div>
+        <h3 class="font-syne" style="font-size: 26px; font-weight: 800; color: var(--ink); letter-spacing: -0.025em;">¿Tiene un negocio en Olanchito?</h3>
+        <p style="margin-top: 8px; font-size: 14px; color: var(--ink-2); line-height: 1.6;">Aparezca en el directorio gratis y mejore su visibilidad local. Miles de vecinos buscan aquí.</p>
+      </div>
+      <div style="display: flex; gap: 10px; flex-shrink: 0;">
+        <a href="#" class="btn-primary" style="text-decoration: none; padding: 12px 24px; font-size: 14px;">
+          Registrar negocio
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+        <a href="#" class="btn-secondary" style="text-decoration: none; padding: 11px 22px; font-size: 14px;">Ver directorio</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── NOVEDADES ─────────────────────────────────── -->
+<section style="max-width: 1100px; margin: 0 auto; padding: 0 24px 72px;">
+  <div style="display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 24px;">
+    <div>
+      <p class="section-label">Recién agregados</p>
+      <h2 class="font-syne" style="font-size: 22px; font-weight: 700; color: var(--ink); margin-top: 6px; letter-spacing: -0.02em;">Novedades del directorio</h2>
+    </div>
+    <a href="#" class="btn-secondary" style="text-decoration: none;">
+      Ver todos
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+    </a>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+
+    <!-- Card 1 -->
+    <div class="novedad-card" style="display: flex; flex-direction: column; padding: 20px;">
+      <div style="display: flex; gap: 14px; margin-bottom: 16px;">
+        <div style="width: 64px; height: 64px; border-radius: 14px; flex-shrink: 0; background: linear-gradient(135deg, #d1fae5, #6ee7b7); display: grid; place-items: center; font-size: 26px;">🍽</div>
+        <div style="min-width: 0;">
+          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+            <span style="font-size: 10px; font-weight: 700; color: var(--primary-mid); background: rgba(116,198,157,0.15); padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(116,198,157,0.35);">Restaurantes</span>
+            <span style="font-size: 10px; font-weight: 700; color: #16a34a; background: #dcfce7; padding: 2px 8px; border-radius: 999px;">Nuevo</span>
+          </div>
+          <p class="font-syne" style="font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 2px;">Qali-T</p>
+          <p style="font-size: 11px; color: var(--ink-3); display: flex; align-items: center; gap: 4px;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Col. Palmira, Olanchito
+          </p>
+        </div>
+      </div>
+      <p style="font-size: 12px; color: var(--ink-2); line-height: 1.55; flex: 1;">Desayunos, almuerzos y cenas con sabores hondureños auténticos. Para llevar y entrega disponible.</p>
+      <div style="margin-top: 14px; display: flex; align-items: center; justify-content: space-between;">
+        <div class="stars">★★★★★ <span style="color: var(--ink-3); font-size: 11px;">(24)</span></div>
+        <a href="#" style="font-size: 11px; font-weight: 700; color: var(--primary-mid); text-decoration: none; display: flex; align-items: center; gap: 3px;">
+          Ver negocio
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="novedad-card" style="display: flex; flex-direction: column; padding: 20px;">
+      <div style="display: flex; gap: 14px; margin-bottom: 16px;">
+        <div style="width: 64px; height: 64px; border-radius: 14px; flex-shrink: 0; background: linear-gradient(135deg, #dbeafe, #93c5fd); display: grid; place-items: center; font-size: 26px;">💊</div>
+        <div style="min-width: 0;">
+          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+            <span style="font-size: 10px; font-weight: 700; color: #2563eb; background: #eff6ff; padding: 2px 8px; border-radius: 999px; border: 1px solid #bfdbfe;">Farmacias</span>
+            <span style="font-size: 10px; font-weight: 700; color: #16a34a; background: #dcfce7; padding: 2px 8px; border-radius: 999px;">Nuevo</span>
+          </div>
+          <p class="font-syne" style="font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 2px;">Farmacia Santa Cruz</p>
+          <p style="font-size: 11px; color: var(--ink-3); display: flex; align-items: center; gap: 4px;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Barrio El Centro, Olanchito
+          </p>
+        </div>
+      </div>
+      <p style="font-size: 12px; color: var(--ink-2); line-height: 1.55; flex: 1;">Medicamentos, vitaminas y productos de salud. Servicio rápido y asesoría farmacéutica profesional.</p>
+      <div style="margin-top: 14px; display: flex; align-items: center; justify-content: space-between;">
+        <div class="stars">★★★★☆ <span style="color: var(--ink-3); font-size: 11px;">(11)</span></div>
+        <a href="#" style="font-size: 11px; font-weight: 700; color: var(--primary-mid); text-decoration: none; display: flex; align-items: center; gap: 3px;">
+          Ver negocio
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="novedad-card" style="display: flex; flex-direction: column; padding: 20px;">
+      <div style="display: flex; gap: 14px; margin-bottom: 16px;">
+        <div style="width: 64px; height: 64px; border-radius: 14px; flex-shrink: 0; background: linear-gradient(135deg, #fef9c3, #fde68a); display: grid; place-items: center; font-size: 26px;">🔨</div>
+        <div style="min-width: 0;">
+          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+            <span style="font-size: 10px; font-weight: 700; color: #ca8a04; background: #fefce8; padding: 2px 8px; border-radius: 999px; border: 1px solid #fde68a;">Ferreterías</span>
+          </div>
+          <p class="font-syne" style="font-size: 15px; font-weight: 700; color: var(--ink); margin-bottom: 2px;">Ferretería El Maestro</p>
+          <p style="font-size: 11px; color: var(--ink-3); display: flex; align-items: center; gap: 4px;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Av. Principal, Olanchito
+          </p>
+        </div>
+      </div>
+      <p style="font-size: 12px; color: var(--ink-2); line-height: 1.55; flex: 1;">Todo en materiales de construcción, herramientas eléctricas y plomería. Entrega a domicilio en Olanchito.</p>
+      <div style="margin-top: 14px; display: flex; align-items: center; justify-content: space-between;">
+        <div class="stars">★★★★★ <span style="color: var(--ink-3); font-size: 11px;">(8)</span></div>
+        <a href="#" style="font-size: 11px; font-weight: 700; color: var(--primary-mid); text-decoration: none; display: flex; align-items: center; gap: 3px;">
+          Ver negocio
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ─── FOOTER ────────────────────────────────────── -->
+<footer style="background: var(--primary); color: rgba(255,255,255,0.8); padding: 48px 24px 32px;">
+  <div style="max-width: 1100px; margin: 0 auto;">
+    <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 40px; margin-bottom: 40px;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+          <div style="width: 32px; height: 32px; border-radius: 10px; background: rgba(255,255,255,0.15); display: grid; place-items: center;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          </div>
+          <span class="font-syne" style="font-size: 14px; font-weight: 700; color: #fff;">Directorio Olanchito</span>
+        </div>
+        <p style="font-size: 13px; line-height: 1.65; max-width: 280px;">Directorio comunitario de negocios y servicios locales en Olanchito, Yoro, Honduras.</p>
+      </div>
+      <div>
+        <p class="font-syne" style="font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.5); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 14px;">Explorar</p>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <a href="#" style="font-size: 13px; color: rgba(255,255,255,0.7); text-decoration: none;">Negocios</a>
+          <a href="#" style="font-size: 13px; color: rgba(255,255,255,0.7); text-decoration: none;">Categorías</a>
+          <a href="#" style="font-size: 13px; color: rgba(255,255,255,0.7); text-decoration: none;">Mapa interactivo</a>
+          <a href="#" style="font-size: 13px; color: rgba(255,255,255,0.7); text-decoration: none;">Novedades</a>
+        </div>
+      </div>
+      <div>
+        <p class="font-syne" style="font-size: 12px; font-weight: 700; color: rgba(255,255,255,0.5); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 14px;">Negocio</p>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+          <a href="#" style="font-size: 13px; color: rgba(255,255,255,0.7); text-decoration: none;">Registrar negocio</a>
+          <a href="#" style="font-size: 13px; color: rgba(255,255,255,0.7); text-decoration: none;">Portal del dueño</a>
+          <a href="#" style="font-size: 13px; color: rgba(255,255,255,0.7); text-decoration: none;">Planes y precios</a>
+        </div>
+      </div>
+    </div>
+    <div style="border-top: 1px solid rgba(255,255,255,0.12); padding-top: 24px; display: flex; align-items: center; justify-content: space-between;">
+      <p style="font-size: 12px; color: rgba(255,255,255,0.4);">© 2025 Directorio Olanchito. Todos los derechos reservados.</p>
+      <p style="font-size: 12px; color: rgba(255,255,255,0.4);">Olanchito, Yoro, Honduras 🇭🇳</p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

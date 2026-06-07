@@ -41,7 +41,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
           title: `${cat.name} en Olanchito | Directorio`,
           url: canonicalUrl,
           siteName: "Directorio Olanchito",
-          images: [{ url: "/og-image.webp", width: 1200, height: 630 }],
+          images: [{ url: "/og-image.png", width: 1200, height: 630 }],
           locale: "es_HN",
           type: "website",
         },
@@ -58,7 +58,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
       description: "Explora todos los negocios registrados en el directorio de Olanchito, Honduras.",
       url: `${BASE_URL}/negocios`,
       siteName: "Directorio Olanchito",
-      images: [{ url: "/og-image.webp", width: 1200, height: 630, alt: "Directorio Olanchito" }],
+      images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Directorio Olanchito" }],
       locale: "es_HN",
       type: "website",
     },
@@ -66,7 +66,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
       card: "summary_large_image",
       title: "Negocios | Directorio Olanchito",
       description: "Explora todos los negocios registrados en el directorio de Olanchito, Honduras.",
-      images: ["/og-image.webp"],
+      images: ["/og-image.png"],
     },
   };
 }
