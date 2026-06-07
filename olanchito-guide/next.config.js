@@ -17,19 +17,9 @@ const nextConfig = {
       },
     ],
   },
-  async redirects() {
-    return [
-      // Consolida el dominio: www → no-www (301 permanente).
-      // Evita contenido duplicado y libera crawl budget para las páginas reales.
-      // (Vercel ya fuerza http → https automáticamente.)
-      {
-        source: '/:path*',
-        has: [{ type: 'host', value: 'www.olanchito.com' }],
-        destination: 'https://olanchito.com/:path*',
-        permanent: true,
-      },
-    ]
-  },
+  // NOTA: la consolidación de dominio (www ↔ no-www) se gestiona en Vercel
+  // (Settings → Domains → marcar el dominio principal), NO en el código.
+  // Hacerlo aquí choca con el redirect de Vercel y causa un bucle infinito.
   async headers() {
     return [
       {
