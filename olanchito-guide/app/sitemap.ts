@@ -5,13 +5,13 @@ const BASE_URL = "https://olanchito.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [{ data: businesses }, { data: categories }] = await Promise.all([
-    supabase.from("businesses").select("slug, updated_at"),
+    supabase.from("businesses").select("slug, created_at"),
     supabase.from("categories").select("slug"),
   ]);
 
   const businessUrls: MetadataRoute.Sitemap = (businesses ?? []).map((b) => ({
     url: `${BASE_URL}/negocios/${b.slug}`,
-    lastModified: b.updated_at ? new Date(b.updated_at) : new Date(),
+    lastModified: b.created_at ? new Date(b.created_at) : new Date(),
     changeFrequency: "weekly",
     priority: 0.8,
   }));
