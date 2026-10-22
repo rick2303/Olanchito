@@ -30,7 +30,8 @@ const nextConfig = {
           { key: 'Referrer-Policy',              value: 'strict-origin-when-cross-origin' },
           { key: 'Strict-Transport-Security',    value: 'max-age=63072000; includeSubDomains; preload' },
           { key: 'Cross-Origin-Opener-Policy',   value: 'same-origin' },
-          { key: 'Permissions-Policy',           value: 'camera=(), microphone=(), geolocation=()' },
+          // geolocation=(self): el filtro "Cerca de mí" pide la ubicación desde este mismo dominio
+          { key: 'Permissions-Policy',           value: 'camera=(), microphone=(), geolocation=(self)' },
         ],
       },
     ]

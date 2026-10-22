@@ -1,5 +1,6 @@
 "use client";
 
+import { trackEvent } from "@/lib/analytics";
 import { useState } from "react";
 import {
   FlagIcon,
@@ -46,7 +47,10 @@ export default function SuggestCorrection({
       }),
     });
     setLoading(false);
-    if (res.ok) setDone(true);
+    if (res.ok) {
+      setDone(true);
+      trackEvent("suggestion_submit", { business_slug: businessSlug, field });
+    }
   };
 
   if (done) {

@@ -10,7 +10,8 @@ export default function BusinessQR({ slug, name }: Props) {
   const [open, setOpen] = useState(false);
   const qrRef = useRef<HTMLDivElement>(null);
 
-  const url = `https://olanchito.com/negocios/${slug}`;
+  // Lleva directo al formulario de reseñas y marca la visita como "qr" en Analytics (si no, cuenta como directa)
+  const url = `https://olanchito.com/negocios/${slug}?utm_source=qr&utm_medium=print#resenas`;
 
   const handlePrint = () => {
     const svg = qrRef.current?.querySelector("svg");

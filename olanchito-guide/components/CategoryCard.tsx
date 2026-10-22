@@ -8,9 +8,10 @@ type IconDef = { el: React.ReactNode; accent: string; bg: string };
 type CategoryCardProps = {
   cat: { id: string; name: string; slug: string };
   iconDef: IconDef;
+  count?: number;
 };
 
-export default function CategoryCard({ cat, iconDef }: CategoryCardProps) {
+export default function CategoryCard({ cat, iconDef, count }: CategoryCardProps) {
   return (
     <Link
       href={`/categorias/${cat.slug}`}
@@ -48,7 +49,11 @@ export default function CategoryCard({ cat, iconDef }: CategoryCardProps) {
           {cat.name}
         </h2>
         <p className="mt-0.5 text-xs" style={{ color: "var(--ink-3)" }}>
-          Ver negocios disponibles
+          {count === undefined
+            ? "Ver negocios disponibles"
+            : count === 0
+              ? "Próximamente"
+              : `${count} negocio${count !== 1 ? "s" : ""}`}
         </p>
       </div>
 

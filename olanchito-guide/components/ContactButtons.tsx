@@ -1,19 +1,10 @@
 "use client";
 
 import { PhoneIcon, ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
-
-declare global {
-  interface Window {
-    gtag?: (...args: unknown[]) => void;
-  }
-}
+import { trackEvent } from "@/lib/analytics";
 
 function track(method: "phone" | "whatsapp", businessName: string, businessId?: string) {
-  window.gtag?.("event", "contact_click", {
-    event_category: "engagement",
-    event_label: method,
-    business_name: businessName,
-  });
+  trackEvent("contact_click", { method, business_name: businessName });
   if (businessId) {
     fetch("/api/track", {
       method: "POST",

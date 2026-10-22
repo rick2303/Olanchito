@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { LinkIcon, CheckIcon } from "@heroicons/react/24/outline";
+import { trackEvent } from "@/lib/analytics";
 
 type ShareButtonsProps = {
   slug: string;
@@ -16,7 +17,10 @@ export default function ShareButtons({ slug, name }: ShareButtonsProps) {
   const url = `${BASE_URL}/negocios/${slug}`;
   const text = `Mirá este negocio en Olanchito: ${name} 👉 ${url}`;
 
+  const share = (method: string) => trackEvent("share", { method, content_type: "business", item_id: slug });
+
   const handleCopy = async () => {
+    share("copy_link");
     try {
       await navigator.clipboard.writeText(url);
       setCopied(true);
@@ -36,6 +40,7 @@ export default function ShareButtons({ slug, name }: ShareButtonsProps) {
 
   const handleInstagram = async () => {
     if (typeof navigator !== "undefined" && navigator.share) {
+      share("native");
       try {
         await navigator.share({ title: name, text, url });
       } catch {
@@ -52,6 +57,7 @@ export default function ShareButtons({ slug, name }: ShareButtonsProps) {
       {/* WhatsApp */}
       <a
         href={`https://wa.me/?text=${encodeURIComponent(text)}`}
+        onClick={() => share("whatsapp")}
         target="_blank"
         rel="noreferrer"
         className="inline-flex w-full items-center gap-3 rounded-2xl px-4 py-2.5 text-sm font-semibold text-white transition-colors"
@@ -66,6 +72,7 @@ export default function ShareButtons({ slug, name }: ShareButtonsProps) {
       {/* Facebook */}
       <a
         href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`}
+        onClick={() => share("facebook")}
         target="_blank"
         rel="noreferrer"
         className="inline-flex w-full items-center gap-3 rounded-2xl px-4 py-2.5 text-sm font-semibold text-white transition-colors"

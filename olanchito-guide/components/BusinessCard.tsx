@@ -10,6 +10,8 @@ import {
 } from "@heroicons/react/24/outline";
 import { StarIcon, CheckBadgeIcon } from "@heroicons/react/24/solid";
 import FavoriteButton from "@/components/FavoriteButton";
+import OpenNowBadge from "@/components/OpenNowBadge";
+import { formatDistance } from "@/lib/geo";
 
 type BusinessCardProps = {
   business: {
@@ -24,6 +26,8 @@ type BusinessCardProps = {
     isNew?: boolean;
     avgRating?: number;
     reviewCount?: number;
+    hours?: string | null;
+    distanceKm?: number;
   };
   className?: string;
 };
@@ -119,7 +123,18 @@ export default function BusinessCard({ business, className = "" }: BusinessCardP
         <p className="flex items-start gap-1.5 text-xs" style={{ color: "var(--ink-3)" }}>
           <MapPinIcon className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" style={{ color: "var(--accent)" }} />
           <span className="line-clamp-1">{business.address || "Dirección no especificada"}</span>
+          {business.distanceKm != null && (
+            <span className="ml-auto flex-shrink-0 font-semibold" style={{ color: "var(--primary-mid)" }}>
+              {formatDistance(business.distanceKm)}
+            </span>
+          )}
         </p>
+
+        {business.hours ? (
+          <div className="-mt-1">
+            <OpenNowBadge hours={business.hours} size="sm" />
+          </div>
+        ) : null}
 
         {/* Description */}
         <p

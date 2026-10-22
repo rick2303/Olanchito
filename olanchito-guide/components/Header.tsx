@@ -12,12 +12,14 @@ import {
   Squares2X2Icon,
   BuildingStorefrontIcon,
   HeartIcon,
+  BookOpenIcon,
 } from "@heroicons/react/24/outline";
 
 const navItems = [
   { href: "/", label: "Inicio", icon: HomeIcon },
   { href: "/categorias", label: "Categorías", icon: Squares2X2Icon },
   { href: "/negocios", label: "Negocios", icon: BuildingStorefrontIcon },
+  { href: "/visitar-olanchito", label: "Visitar", icon: BookOpenIcon },
   { href: "/favoritos", label: "Favoritos", icon: HeartIcon },
 ];
 

@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabase";
 import CatalogManager from "@/components/owner/CatalogManager";
 import OffersManager from "@/components/owner/OffersManager";
 import PhotoGallery from "@/components/owner/PhotoGallery";
+import ReviewRequest from "@/components/owner/ReviewRequest";
 import InactivityGuard from "@/components/InactivityGuard";
 import LocationPickerWrapper from "@/components/LocationPickerWrapper";
 import type { LatLng } from "@/components/LocationPicker";
@@ -935,6 +936,8 @@ export default function OwnerDashboard() {
                 })() : null}
               </div>
             )}
+
+            <ReviewRequest slug={business.slug} name={business.name} reviewCount={reviews.length} />
 
             {/* Reviews list */}
             <div className="rounded-3xl bg-white p-6 ring-1 ring-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.06)]">

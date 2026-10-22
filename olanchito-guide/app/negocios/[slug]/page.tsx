@@ -7,6 +7,7 @@ import GalleryLightbox from "@/components/GalleryLightbox";
 import CatalogGrid from "@/components/CatalogGrid";
 import ContactButtons from "@/components/ContactButtons";
 import TrackingLink from "@/components/TrackingLink";
+import TrackedAnchor from "@/components/TrackedAnchor";
 import OpenNowBadge from "@/components/OpenNowBadge";
 import ViewTracker from "@/components/ViewTracker";
 import RelatedBusinesses from "@/components/RelatedBusinesses";
@@ -60,10 +61,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .single();
 
   if (!data) {
-    return { title: "Negocio no encontrado | Directorio Olanchito" };
+    return { title: "Negocio no encontrado", robots: { index: false } };
   }
 
-  const title = `${data.name} en Olanchito | Directorio Olanchito`;
+  const title = `${data.name} en Olanchito`;
+  const socialTitle = `${title} | Directorio Olanchito`;
   const rawDesc = data.description?.trim();
   const description = rawDesc
     ? rawDesc.length > 155 ? `${rawDesc.slice(0, 152)}…` : rawDesc
@@ -77,7 +79,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description,
     alternates: { canonical },
     openGraph: {
-      title,
+      title: socialTitle,
       description,
       url: canonical,
       siteName: "Directorio Olanchito",
@@ -87,7 +89,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title,
+      title: socialTitle,
       description,
       images: [imageUrl],
     },
@@ -233,6 +235,9 @@ export default async function BusinessDetail({ params }: Props) {
 
   const phone = normalizePhone(data.phone ?? "");
   const waLink = buildWhatsAppLink(data.whatsapp ?? "");
+  const waLinkWithMessage = waLink
+    ? `${waLink}?text=${encodeURIComponent(`Hola, encontré *${data.name}* en el directorio de Olanchito (olanchito.com) y me gustaría obtener más información.`)}`
+    : "";
   const web = normalizeUrl(socials?.website);
   const ig  = normalizeUrl(socials?.instagram);
   const fb  = normalizeUrl(socials?.facebook);
@@ -432,6 +437,8 @@ export default async function BusinessDetail({ params }: Props) {
                   <TrackingLink
                     href={`tel:${phone}`}
                     businessId={data.id}
+                    businessName={data.name}
+                    businessSlug={data.slug}
                     eventType="phone_click"
                     className="inline-flex items-center gap-2 rounded-2xl bg-white px-3 py-2 text-xs font-semibold text-jungle-900 ring-1 ring-black/10 hover:bg-jungle-50"
                   >
@@ -442,8 +449,10 @@ export default async function BusinessDetail({ params }: Props) {
 
                 {waLink ? (
                   <TrackingLink
-                    href={waLink}
+                    href={waLinkWithMessage}
                     businessId={data.id}
+                    businessName={data.name}
+                    businessSlug={data.slug}
                     eventType="whatsapp_click"
                     target="_blank"
                     rel="noreferrer"
@@ -521,6 +530,8 @@ export default async function BusinessDetail({ params }: Props) {
                   <TrackingLink
                     href={`tel:${phone}`}
                     businessId={data.id}
+                    businessName={data.name}
+                    businessSlug={data.slug}
                     eventType="phone_click"
                     className="inline-flex items-center gap-2 rounded-2xl bg-black/45 px-4 py-2 text-sm font-semibold text-white ring-1 ring-white/20 backdrop-blur hover:bg-black/55"
                   >
@@ -531,8 +542,10 @@ export default async function BusinessDetail({ params }: Props) {
 
                 {waLink ? (
                   <TrackingLink
-                    href={waLink}
+                    href={waLinkWithMessage}
                     businessId={data.id}
+                    businessName={data.name}
+                    businessSlug={data.slug}
                     eventType="whatsapp_click"
                     target="_blank"
                     rel="noreferrer"
@@ -559,7 +572,7 @@ export default async function BusinessDetail({ params }: Props) {
                 <div className="grid h-10 w-10 place-items-center rounded-2xl bg-jungle-50 ring-1 ring-jungle-200">
                   <ChatBubbleLeftRightIcon className="h-5 w-5 text-jungle-700" />
                 </div>
-                <h2 className="text-lg font-bold text-jungle-950">Descripcion</h2>
+                <h2 className="text-lg font-bold text-jungle-950">Descripción</h2>
               </div>
 
               {data.description ? (
@@ -568,7 +581,7 @@ export default async function BusinessDetail({ params }: Props) {
                 </p>
               ) : (
                 <p className="mt-4 text-sm text-jungle-700/70 italic">
-                  Sin descripcion disponible.
+                  Sin descripción disponible.
                 </p>
               )}
             </div>
@@ -693,7 +706,7 @@ export default async function BusinessDetail({ params }: Props) {
                   <div className="grid h-10 w-10 place-items-center rounded-2xl bg-jungle-50 ring-1 ring-jungle-200">
                     <MapPinIcon className="h-5 w-5 text-jungle-700" />
                   </div>
-                  <h2 className="text-lg font-bold text-jungle-950">Ubicacion</h2>
+                  <h2 className="text-lg font-bold text-jungle-950">Ubicación</h2>
                 </div>
 
                 {/* Direccion ANTES del mapa */}
@@ -701,7 +714,7 @@ export default async function BusinessDetail({ params }: Props) {
                   <div className="mt-4 flex items-start gap-3 rounded-2xl bg-jungle-50 px-4 py-3 ring-1 ring-jungle-200">
                     <MapPinIcon className="h-5 w-5 text-jungle-700 mt-0.5" />
                     <div className="min-w-0">
-                      <p className="text-xs font-semibold text-jungle-900">Direccion</p>
+                      <p className="text-xs font-semibold text-jungle-900">Dirección</p>
                       <p className="text-sm font-semibold text-jungle-800 line-clamp-3">
                         {data.address}
                       </p>
@@ -721,16 +734,29 @@ export default async function BusinessDetail({ params }: Props) {
                   </div>
                 </div>
 
-                <div className="mt-4">
-                  <a
-                    href={`https://www.google.com/maps?q=${location!.lat},${location!.lng}`}
+                <div className="mt-4 grid gap-2 sm:flex">
+                  <TrackedAnchor
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${location!.lat},${location!.lng}`}
                     target="_blank"
                     rel="noreferrer"
+                    event="directions_click"
+                    params={{ business_slug: data.slug, app: "google_maps" }}
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-jungle-700 px-4 py-2.5 text-xs font-semibold text-white hover:bg-jungle-800 sm:w-auto"
+                  >
+                    <MapPinIcon className="h-4 w-4" />
+                    Cómo llegar
+                  </TrackedAnchor>
+                  <TrackedAnchor
+                    href={`https://waze.com/ul?ll=${location!.lat},${location!.lng}&navigate=yes`}
+                    target="_blank"
+                    rel="noreferrer"
+                    event="directions_click"
+                    params={{ business_slug: data.slug, app: "waze" }}
                     className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-white px-4 py-2.5 text-xs font-semibold text-jungle-950 ring-1 ring-black/10 hover:bg-jungle-50 sm:w-auto"
                   >
-                    Abrir en Maps
+                    Abrir en Waze
                     <ArrowTopRightOnSquareIcon className="h-4 w-4" />
-                  </a>
+                  </TrackedAnchor>
                 </div>
               </div>
             ) : null}
@@ -763,10 +789,12 @@ export default async function BusinessDetail({ params }: Props) {
                 />
 
                 {bookingUrl && (
-                  <a
+                  <TrackedAnchor
                     href={bookingUrl}
                     target="_blank"
                     rel="noreferrer"
+                    event="booking_click"
+                    params={{ business_slug: data.slug }}
                     className="flex w-full items-center justify-center gap-2 rounded-2xl bg-jungle-700 px-4 py-3 text-sm font-bold text-white hover:bg-jungle-800 transition-colors"
                   >
                     <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} aria-hidden>
@@ -776,7 +804,7 @@ export default async function BusinessDetail({ params }: Props) {
                     </svg>
                     Agendar cita
                     <ArrowTopRightOnSquareIcon className="h-3.5 w-3.5 opacity-80" />
-                  </a>
+                  </TrackedAnchor>
                 )}
               </div>
             </div>

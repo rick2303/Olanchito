@@ -7,8 +7,12 @@ import {
   XMarkIcon,
   ArrowRightIcon,
   BuildingStorefrontIcon,
+  MapPinIcon,
+  ClockIcon,
 } from "@heroicons/react/24/outline";
-import { supabase } from "@/lib/supabase";
+import { trackEvent } from "@/lib/analytics";
+
+type FilterUpdate = { category?: string; q?: string; nuevo?: boolean; abierto?: boolean; cerca?: string };
 
 type Category = { id: string; name: string; slug: string };
 type Suggestion = { name: string; slug: string; category: string };
@@ -20,11 +24,15 @@ export default function BusinessFilters({ categories }: { categories: Category[]
   const category = sp.get("category") ?? "";
   const q = sp.get("q") ?? "";
   const nuevo = sp.get("nuevo") === "1";
+  const abierto = sp.get("abierto") === "1";
+  const cerca = sp.get("cerca") ?? "";
 
   const [term, setTerm] = useState(q);
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+  const [locating, setLocating] = useState(false);
+  const [locationError, setLocationError] = useState("");
   const wrapperRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -54,21 +62,16 @@ export default function BusinessFilters({ categories }: { categories: Category[]
 
     debounceRef.current = setTimeout(async () => {
       setLoadingSuggestions(true);
-      const { data } = await supabase
-        .from("businesses")
-        .select("name, slug, categories(name)")
-        .ilike("name", `%${trimmed}%`)
-        .limit(6);
-
-      const results: Suggestion[] = (data ?? []).map((b: any) => ({
-        name: b.name,
-        slug: b.slug,
-        category: b.categories?.name ?? "",
-      }));
-
-      setSuggestions(results);
-      setShowSuggestions(results.length > 0);
-      setLoadingSuggestions(false);
+      try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(trimmed)}`);
+        const { results } = (await res.json()) as { results: Suggestion[] };
+        setSuggestions(results ?? []);
+        setShowSuggestions((results ?? []).length > 0);
+      } catch {
+        setSuggestions([]);
+      } finally {
+        setLoadingSuggestions(false);
+      }
     }, 280);
 
     return () => {
@@ -77,8 +80,18 @@ export default function BusinessFilters({ categories }: { categories: Category[]
   }, [term]);
 
   const buildUrl = useMemo(() => {
-    return (next: { category?: string; q?: string; nuevo?: boolean }) => {
+    return (next: FilterUpdate) => {
       const params = new URLSearchParams(sp.toString());
+      if (next.abierto !== undefined) {
+        if (next.abierto) params.set("abierto", "1");
+        else params.delete("abierto");
+        params.set("page", "1");
+      }
+      if (next.cerca !== undefined) {
+        if (next.cerca) params.set("cerca", next.cerca);
+        else params.delete("cerca");
+        params.set("page", "1");
+      }
       if (next.category !== undefined) {
         if (next.category) params.set("category", next.category);
         else params.delete("category");
@@ -95,12 +108,39 @@ export default function BusinessFilters({ categories }: { categories: Category[]
         params.set("page", "1");
       }
       if (!params.get("page")) params.set("page", "1");
-      return `/businesses?${params.toString()}`;
+      return `/negocios?${params.toString()}`;
     };
   }, [sp]);
 
-  const pushWith = (next: { category?: string; q?: string; nuevo?: boolean }) =>
-    router.push(buildUrl(next));
+  const pushWith = (next: FilterUpdate) => router.push(buildUrl(next));
+
+  const toggleNearMe = () => {
+    setLocationError("");
+    if (cerca) return pushWith({ cerca: "" });
+    if (!("geolocation" in navigator)) {
+      setLocationError("Su navegador no permite compartir la ubicación.");
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        setLocating(false);
+        trackEvent("near_me");
+        // 3 decimales ≈ 100 m: suficiente para ordenar y no deja la ubicación exacta en la URL
+        pushWith({ cerca: `${coords.latitude.toFixed(3)},${coords.longitude.toFixed(3)}` });
+      },
+      () => {
+        setLocating(false);
+        setLocationError("No pudimos obtener su ubicación. Revise el permiso de ubicación del navegador.");
+      },
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 },
+    );
+  };
+
+  const toggleOpen = () => {
+    if (!abierto) trackEvent("filter_open_now");
+    pushWith({ abierto: !abierto });
+  };
 
   const doSearch = () => {
     setShowSuggestions(false);
@@ -114,7 +154,7 @@ export default function BusinessFilters({ categories }: { categories: Category[]
     pushWith({ q: "" });
   };
 
-  const clearAll = () => router.push("/businesses?page=1");
+  const clearAll = () => router.push("/negocios");
 
   const pickSuggestion = (s: Suggestion) => {
     setShowSuggestions(false);
@@ -122,7 +162,7 @@ export default function BusinessFilters({ categories }: { categories: Category[]
     router.push(`/negocios/${s.slug}`);
   };
 
-  const hasActive = Boolean(category || q || nuevo);
+  const hasActive = Boolean(category || q || nuevo || abierto || cerca);
 
   return (
     <div className="w-full space-y-3">
@@ -145,7 +185,7 @@ export default function BusinessFilters({ categories }: { categories: Category[]
             onChange={(e) => setTerm(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && doSearch()}
             onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
-            placeholder="Buscar negocios por nombre..."
+            placeholder="Buscar por nombre, producto o servicio..."
             className="min-w-0 flex-1 bg-transparent text-sm font-medium outline-none placeholder:font-normal"
             style={{ color: "var(--ink)" }}
             autoComplete="off"
@@ -216,7 +256,7 @@ export default function BusinessFilters({ categories }: { categories: Category[]
                 style={{ color: "var(--primary-mid)" }}
               >
                 <MagnifyingGlassIcon className="h-3.5 w-3.5" />
-                Ver todos los resultados de "{term}"
+                Ver todos los resultados de &quot;{term}&quot;
               </button>
             </div>
           </div>
@@ -228,14 +268,35 @@ export default function BusinessFilters({ categories }: { categories: Category[]
         <button
           type="button"
           onClick={() => pushWith({ category: "" })}
-          className={`filter-pill ${!category && !nuevo ? "active" : ""}`}
+          className={`filter-pill ${!category && !nuevo && !abierto && !cerca ? "active" : ""}`}
         >
           Todos
         </button>
 
         <button
           type="button"
-          onClick={() => pushWith({ nuevo: !nuevo, category: "" })}
+          onClick={toggleOpen}
+          aria-pressed={abierto}
+          className={`filter-pill inline-flex items-center gap-1.5 ${abierto ? "active" : ""}`}
+        >
+          <ClockIcon className="h-3.5 w-3.5" />
+          Abierto ahora
+        </button>
+
+        <button
+          type="button"
+          onClick={toggleNearMe}
+          aria-pressed={Boolean(cerca)}
+          disabled={locating}
+          className={`filter-pill inline-flex items-center gap-1.5 ${cerca ? "active" : ""}`}
+        >
+          <MapPinIcon className="h-3.5 w-3.5" />
+          {locating ? "Ubicando..." : "Cerca de mí"}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => pushWith({ nuevo: !nuevo })}
           className={`filter-pill ${nuevo ? "active" : ""}`}
         >
           ✨ Nuevo
@@ -268,6 +329,12 @@ export default function BusinessFilters({ categories }: { categories: Category[]
           </button>
         ) : null}
       </div>
+
+      {locationError && (
+        <p className="text-xs" role="alert" style={{ color: "rgb(220,38,38)" }}>
+          {locationError}
+        </p>
+      )}
     </div>
   );
 }

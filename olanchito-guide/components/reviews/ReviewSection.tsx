@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { StarIcon } from "@heroicons/react/24/solid";
+import { trackEvent } from "@/lib/analytics";
 import {
   StarIcon as StarOutlineIcon,
   UserIcon,
@@ -86,6 +87,7 @@ export default function ReviewSection({ businessSlug, initialReviews }: Props) {
         .single();
       if (error || !data) throw error;
       setReviews((prev) => [data as Review, ...prev]);
+      trackEvent("review_submit", { business_slug: businessSlug, rating: form.rating });
       setForm({ author_name: "", rating: 0, comment: "" });
       localStorage.setItem(storageKey, "1");
       setAlreadyReviewed(true);
@@ -106,7 +108,7 @@ export default function ReviewSection({ businessSlug, initialReviews }: Props) {
     });
 
   return (
-    <div className="rounded-3xl bg-white p-6 ring-1 ring-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.06)] sm:p-7">
+    <div id="resenas" className="scroll-mt-28 rounded-3xl bg-white p-6 ring-1 ring-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.06)] sm:p-7">
 
       {/* ── Header ── */}
       <div className="mb-6 flex items-start justify-between gap-4">

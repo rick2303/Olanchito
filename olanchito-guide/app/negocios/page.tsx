@@ -2,8 +2,12 @@ import { supabase } from "@/lib/supabase";
 import BusinessCard from "@/components/BusinessCard";
 import BusinessFilters from "@/components/BusinessFilters";
 import BusinessMapWrapper from "@/components/BusinessMapWrapper";
+import SearchTracker from "@/components/SearchTracker";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { expandQuery, normalizeText, scoreMatch } from "@/lib/search";
+import { getOpenStatus } from "@/lib/hours";
+import { distanceKm, OLANCHITO_CENTER, parseLatLng } from "@/lib/geo";
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -11,18 +15,31 @@ import {
   BuildingStorefrontIcon,
   ListBulletIcon,
   MapIcon,
+  PlusCircleIcon,
 } from "@heroicons/react/24/outline";
 
 export const dynamic = "force-dynamic";
 
 const BASE_URL = "https://olanchito.com";
 
+type SearchParams = {
+  category?: string;
+  q?: string;
+  page?: string;
+  view?: string;
+  nuevo?: string;
+  abierto?: string;
+  cerca?: string;
+};
+
 type Props = {
-  searchParams?: { category?: string; q?: string; page?: string; view?: string; nuevo?: string };
+  searchParams?: SearchParams;
 };
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const categorySlug = (searchParams?.category ?? "").toLowerCase().trim();
+  // Las variantes filtradas (búsqueda, abiertos, cerca) no se indexan: el contenido cambia por usuario y hora
+  const isFiltered = Boolean(searchParams?.q || searchParams?.abierto || searchParams?.cerca || searchParams?.nuevo);
 
   if (categorySlug) {
     const { data: cat } = await supabase
@@ -34,11 +51,12 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     if (cat) {
       const canonicalUrl = `${BASE_URL}/categorias/${cat.slug}`;
       return {
-        title: `${cat.name} en Olanchito | Directorio`,
+        title: `${cat.name} en Olanchito`,
         description: `Encuentra los mejores negocios de ${cat.name} en Olanchito, Honduras.`,
         alternates: { canonical: canonicalUrl },
+        robots: isFiltered ? { index: false, follow: true } : undefined,
         openGraph: {
-          title: `${cat.name} en Olanchito | Directorio`,
+          title: `${cat.name} en Olanchito | Directorio Olanchito`,
           url: canonicalUrl,
           siteName: "Directorio Olanchito",
           images: [{ url: "/og-image.png", width: 1200, height: 630 }],
@@ -50,11 +68,12 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   }
 
   return {
-    title: "Negocios | Directorio Olanchito",
+    title: "Negocios en Olanchito",
     description: "Explora todos los negocios registrados en el directorio de Olanchito, Honduras. Encuentra ferreterías, restaurantes, farmacias y más.",
     alternates: { canonical: `${BASE_URL}/negocios` },
+    robots: isFiltered ? { index: false, follow: true } : undefined,
     openGraph: {
-      title: "Negocios | Directorio Olanchito",
+      title: "Negocios en Olanchito | Directorio Olanchito",
       description: "Explora todos los negocios registrados en el directorio de Olanchito, Honduras.",
       url: `${BASE_URL}/negocios`,
       siteName: "Directorio Olanchito",
@@ -64,7 +83,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     },
     twitter: {
       card: "summary_large_image",
-      title: "Negocios | Directorio Olanchito",
+      title: "Negocios en Olanchito | Directorio Olanchito",
       description: "Explora todos los negocios registrados en el directorio de Olanchito, Honduras.",
       images: ["/og-image.png"],
     },
@@ -76,33 +95,34 @@ const FALLBACK_IMAGE =
   process.env.FALLBACK_BUCKET_IMG ??
   "https://lvvciuhvhpjgfzediulv.supabase.co/storage/v1/object/public/Olanchito-guide/default-business.png";
 const PAGE_SIZE = 12;
+// Más allá de esto el usuario no está en Olanchito: se ordena desde el centro de la ciudad
+const MAX_NEAR_ME_KM = 40;
 
 export default async function NegociosPage({ searchParams }: Props) {
   const categorySlug = (searchParams?.category ?? "").toLowerCase().trim();
-  const q = (searchParams?.q ?? "").trim();
+  const q = (searchParams?.q ?? "").trim().slice(0, 80);
   const page = Math.max(parseInt(searchParams?.page ?? "1", 10) || 1, 1);
   const view = searchParams?.view === "map" ? "map" : "list";
   const filterNew = searchParams?.nuevo === "1";
+  const filterOpen = searchParams?.abierto === "1";
+  const userLocation = parseLatLng(searchParams?.cerca);
+  const userIsFar = userLocation ? distanceKm(userLocation, OLANCHITO_CENTER) > MAX_NEAR_ME_KM : false;
+  const origin = userLocation ? (userIsFar ? OLANCHITO_CENTER : userLocation) : null;
 
   const { data: categories } = await supabase
     .from("categories")
     .select("id, name, slug")
     .order("name", { ascending: true });
 
-  let categoryId: string | null = null;
-  let categoryName: string | null = null;
-  if (categorySlug) {
-    const { data: cat } = await supabase.from("categories").select("id, name").eq("slug", categorySlug).maybeSingle();
-    categoryId = cat?.id ?? null;
-    categoryName = cat?.name ?? null;
-  }
+  const category = categorySlug ? (categories ?? []).find((c) => c.slug === categorySlug) ?? null : null;
+  const categoryId = category?.id ?? null;
+  const categoryName = category?.name ?? null;
 
   let query = supabase
     .from("businesses")
-    .select("id, name, slug, category_id, address, image, description, featured, verified, subscription_tier, view_count, created_at, location");
+    .select("id, name, slug, category_id, address, image, description, services, hours, featured, verified, subscription_tier, view_count, created_at, location");
 
   if (categoryId) query = query.eq("category_id", categoryId);
-  if (q) query = query.ilike("name", `%${q}%`);
 
   const [{ data: rawData, error }, { data: allReviews }] = await Promise.all([
     query,
@@ -135,27 +155,44 @@ export default async function NegociosPage({ searchParams }: Props) {
     reviewStats[r.business_slug] = s;
   }
 
-  const positiveReviewCounts: Record<string, number> = Object.fromEntries(
-    Object.entries(reviewStats).map(([slug, s]) => [slug, s.positive])
+  const categoryMap = Object.fromEntries(
+    (categories ?? []).map((c) => [c.id, c.name])
   );
 
   const now = Date.now();
   const THREE_DAYS_MS = 3 * 24 * 60 * 60 * 1000;
+  const queryGroups = q ? expandQuery(q) : [];
 
   const scored = (rawData ?? [])
     .map((b) => {
       const isNew = b.created_at
         ? now - new Date(b.created_at).getTime() <= THREE_DAYS_MS
         : false;
-      const isDestacado = (b as { subscription_tier?: string }).subscription_tier === "featured" || b.featured;
+      const isDestacado = b.subscription_tier === "featured" || b.featured;
+      const loc = b.location as { lat?: number; lng?: number } | null;
+      const distance =
+        origin && loc?.lat && loc?.lng ? distanceKm(origin, { lat: loc.lat, lng: loc.lng }) : null;
       return {
         ...b,
         isNew,
         isDestacado,
-        _score: (b.view_count ?? 0) + (positiveReviewCounts[b.slug] ?? 0) * 3,
+        distance,
+        isOpen: getOpenStatus(b.hours) === "open",
+        relevance: q ? scoreMatch({ ...b, categoryName: categoryMap[b.category_id ?? ""] }, queryGroups) : 0,
+        _score: (b.view_count ?? 0) + (reviewStats[b.slug]?.positive ?? 0) * 3,
       };
     })
+    .filter((b) => !q || b.relevance > 0)
+    .filter((b) => !filterNew || b.isNew)
+    .filter((b) => !filterOpen || b.isOpen)
     .sort((a, b) => {
+      if (origin) {
+        // Cerca de mí: los que tienen ubicación primero, del más cercano al más lejano
+        if (a.distance !== null && b.distance === null) return -1;
+        if (a.distance === null && b.distance !== null) return 1;
+        if (a.distance !== null && b.distance !== null) return a.distance - b.distance;
+      }
+      if (q && b.relevance !== a.relevance) return b.relevance - a.relevance;
       if (a.isDestacado && !b.isDestacado) return -1;
       if (!a.isDestacado && b.isDestacado) return 1;
       if (a.isNew && !b.isNew) return -1;
@@ -164,17 +201,11 @@ export default async function NegociosPage({ searchParams }: Props) {
       return a.name.localeCompare(b.name, "es");
     });
 
-  const filtered = filterNew ? scored.filter((b) => b.isNew) : scored;
-
-  const total = filtered.length;
+  const total = scored.length;
   const totalPages = Math.max(Math.ceil(total / PAGE_SIZE), 1);
   const pageStart = (page - 1) * PAGE_SIZE;
 
-  const categoryMap = Object.fromEntries(
-    (categories ?? []).map((c) => [c.id, c.name])
-  );
-
-  const businesses = filtered.slice(pageStart, pageStart + PAGE_SIZE).map((b) => {
+  const businesses = scored.slice(pageStart, pageStart + PAGE_SIZE).map((b) => {
     let imageUrl = FALLBACK_IMAGE;
     if (b.image && typeof b.image === "string") {
       const cleanPath = b.image.startsWith("business/") ? b.image : `business/${b.image}`;
@@ -192,7 +223,7 @@ export default async function NegociosPage({ searchParams }: Props) {
     };
   });
 
-  const mapBusinesses = filtered
+  const mapBusinesses = scored
     .filter((b) => {
       const loc = b.location as { lat?: number; lng?: number } | null;
       return loc?.lat && loc?.lng;
@@ -211,30 +242,50 @@ export default async function NegociosPage({ searchParams }: Props) {
       };
     });
 
-  const buildPageHref = (p: number) => {
+  // Sin resultados: categorías cuyo nombre se parece a lo buscado, para no dejar al usuario en blanco
+  const suggestedCategories =
+    total === 0 && q
+      ? (categories ?? [])
+          .filter((c) => {
+            const name = normalizeText(c.name);
+            return queryGroups.some((variants) => variants.some(({ term }) => name.includes(term.slice(0, 5))));
+          })
+          .slice(0, 4)
+      : [];
+
+  const buildHref = (overrides: Partial<Record<keyof SearchParams, string | null>>) => {
+    const current: Record<string, string | undefined> = {
+      category: categorySlug || undefined,
+      q: q || undefined,
+      nuevo: filterNew ? "1" : undefined,
+      abierto: filterOpen ? "1" : undefined,
+      cerca: searchParams?.cerca || undefined,
+      view: view === "map" ? "map" : undefined,
+      page: String(page),
+    };
     const params = new URLSearchParams();
-    if (categorySlug) params.set("category", categorySlug);
-    if (q) params.set("q", q);
-    params.set("page", String(p));
+    for (const [key, value] of Object.entries({ ...current, ...overrides })) {
+      if (value) params.set(key, value);
+    }
     return `/negocios?${params.toString()}`;
   };
 
-  const buildViewHref = (v: "list" | "map") => {
-    const params = new URLSearchParams();
-    if (categorySlug) params.set("category", categorySlug);
-    if (q) params.set("q", q);
-    if (v === "map") params.set("view", "map");
-    return `/negocios?${params.toString()}`;
-  };
+  const buildPageHref = (p: number) => buildHref({ page: String(p) });
+  const buildViewHref = (v: "list" | "map") => buildHref({ view: v === "map" ? "map" : null, page: null });
 
   const pageTitle = categoryName
     ? categoryName
     : q
     ? `"${q}"`
+    : origin
+    ? "Cerca de ti"
+    : filterOpen
+    ? "Abiertos ahora"
     : "Todos los negocios";
 
   return (
     <main className="page-shell">
+      <SearchTracker term={q} results={total} />
 
       {/* ─── PAGE HEADER ─────────────────────────────── */}
       <section className="section-container pt-8 pb-6 sm:pt-10 sm:pb-7">
@@ -252,8 +303,14 @@ export default async function NegociosPage({ searchParams }: Props) {
             </h1>
             <p className="mt-1.5 text-sm" style={{ color: "var(--ink-3)" }}>
               {total} resultado{total !== 1 ? "s" : ""}
-              {view === "list" && ` · Página ${page} de ${totalPages}`}
+              {view === "list" && totalPages > 1 && ` · Página ${page} de ${totalPages}`}
+              {filterOpen && " · según el horario publicado"}
             </p>
+            {userIsFar && (
+              <p className="mt-2 max-w-md rounded-xl px-3 py-2 text-xs" style={{ background: "var(--surface-2)", color: "var(--ink-2)" }}>
+                Parece que no estás en Olanchito, así que ordenamos por distancia desde el centro de la ciudad.
+              </p>
+            )}
           </div>
 
           <div className="w-full lg:max-w-2xl xl:max-w-3xl flex flex-col gap-3">
@@ -314,15 +371,41 @@ export default async function NegociosPage({ searchParams }: Props) {
             <div className="panel p-8 text-center">
               <BuildingStorefrontIcon className="mx-auto h-10 w-10 mb-3" style={{ color: "var(--ink-3)" }} />
               <p className="text-sm font-semibold" style={{ color: "var(--ink)" }}>
-                No se encontraron negocios
+                {q ? `No encontramos negocios para "${q}"` : "No se encontraron negocios"}
               </p>
-              <p className="mt-1 text-xs" style={{ color: "var(--ink-3)" }}>
-                Intente con otros filtros o busque en todas las categorías.
+              <p className="mx-auto mt-1 max-w-md text-xs" style={{ color: "var(--ink-3)" }}>
+                {filterOpen
+                  ? "Ninguno de estos negocios está abierto en este momento según su horario publicado."
+                  : "Pruebe con otra palabra (por ejemplo, lo que vende o el servicio que ofrece) o explore por categoría."}
               </p>
-              <Link href="/negocios" className="btn-primary mt-5 inline-flex !text-xs !py-2">
-                <ArrowPathIcon className="h-3.5 w-3.5" />
-                Ver todos
-              </Link>
+
+              {suggestedCategories.length > 0 && (
+                <div className="mt-5 flex flex-wrap justify-center gap-2">
+                  {suggestedCategories.map((c) => (
+                    <Link key={c.id} href={`/categorias/${c.slug}`} className="filter-pill">
+                      {c.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
+
+              <div className="mt-5 flex flex-col items-center justify-center gap-2 sm:flex-row">
+                <Link href="/negocios" className="btn-primary inline-flex !text-xs !py-2">
+                  <ArrowPathIcon className="h-3.5 w-3.5" />
+                  Ver todos
+                </Link>
+                <Link href="/categorias" className="btn-secondary inline-flex !text-xs !py-2">
+                  Ver categorías
+                </Link>
+              </div>
+
+              <p className="mx-auto mt-6 max-w-md text-xs" style={{ color: "var(--ink-3)" }}>
+                ¿Conoce un negocio que debería estar aquí?{" "}
+                <Link href="/registrar" className="inline-flex items-center gap-1 font-semibold underline" style={{ color: "var(--primary-mid)" }}>
+                  <PlusCircleIcon className="h-3.5 w-3.5" />
+                  Regístrelo gratis
+                </Link>
+              </p>
             </div>
           ) : (
             <>
@@ -343,6 +426,8 @@ export default async function NegociosPage({ searchParams }: Props) {
                       isNew: business.isNew,
                       avgRating: business.avgRating ?? undefined,
                       reviewCount: business.reviewCount,
+                      hours: business.hours,
+                      distanceKm: business.distance ?? undefined,
                     }}
                   />
                 ))}
@@ -357,6 +442,7 @@ export default async function NegociosPage({ searchParams }: Props) {
     </main>
   );
 }
+
 
 function PaginationBar({
   page,

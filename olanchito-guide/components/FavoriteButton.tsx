@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { HeartIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as HeartSolid } from "@heroicons/react/24/solid";
+import { trackEvent } from "@/lib/analytics";
 
 const STORAGE_KEY = "olanchito_favorites";
 
@@ -36,6 +37,7 @@ export default function FavoriteButton({
       : [...favs, slug];
     localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
     setSaved(next.includes(slug));
+    if (next.includes(slug)) trackEvent("favorite_add", { business_slug: slug });
   };
 
   return (

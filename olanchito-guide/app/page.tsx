@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
-import { FaUtensils, FaHammer, FaPills, FaTools } from "react-icons/fa";
 import {
   ArrowRightIcon,
   Squares2X2Icon,
@@ -16,16 +15,12 @@ import DeviceMacbookMockup from "@/components/DeviceMacbookMockup";
 import FaqSection from "@/components/FaqSection";
 import NovedadesSection from "@/components/NovedadesSection";
 import AnnouncementsSection from "@/components/AnnouncementsSection";
+import QuickFilters from "@/components/QuickFilters";
+import { categoryIcon } from "@/lib/categoryIcons";
+import { getOpenStatus } from "@/lib/hours";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
-
-const featured = [
-  { title: "Restaurantes", slug: "restaurantes", Icon: FaUtensils, hint: "Comida, cafés y más", color: "bg-orange-50 text-orange-600 ring-orange-200" },
-  { title: "Ferreterías", slug: "ferreterias", Icon: FaHammer, hint: "Materiales y herramientas", color: "bg-yellow-50 text-yellow-700 ring-yellow-200" },
-  { title: "Farmacias", slug: "farmacias", Icon: FaPills, hint: "Salud y bienestar", color: "bg-blue-50 text-blue-600 ring-blue-200" },
-  { title: "Servicios técnicos", slug: "servicios-tecnicos", Icon: FaTools, hint: "Reparación y soporte", color: "bg-purple-50 text-purple-600 ring-purple-200" },
-];
 
 const pillars = [
   {
@@ -46,19 +41,27 @@ const pillars = [
 ];
 
 export default async function HomePage() {
-  const [{ count: businessCount, error: businessError }, { count: categoryCount, error: categoryError }] =
+  const [{ data: businessRows, error: businessError }, { data: categoryRows, error: categoryError }] =
     await Promise.all([
-      supabase.from("businesses").select("id", { count: "exact", head: true }),
-      supabase.from("categories").select("id", { count: "exact", head: true }),
+      supabase.from("businesses").select("hours"),
+      supabase.from("categories").select("id, name, slug, icon, businesses(count)"),
     ]);
 
-  const totalBusinesses = businessError ? 0 : businessCount ?? 0;
-  const totalCategories = categoryError ? 0 : categoryCount ?? 0;
-  const avgPerCategory = totalCategories > 0 ? (totalBusinesses / totalCategories).toFixed(1) : "0.0";
+  const totalBusinesses = businessError ? 0 : businessRows?.length ?? 0;
+  const openNow = (businessRows ?? []).filter((b) => getOpenStatus(b.hours) === "open").length;
+
+  // Categorías con negocios, de la más poblada a la menos ("Otros" no dice nada como destacada)
+  const categoriesWithCount = (categoryError ? [] : categoryRows ?? [])
+    .map((c) => ({ ...c, count: (c.businesses as { count: number }[] | null)?.[0]?.count ?? 0 }))
+    .filter((c) => c.count > 0);
+  const featured = categoriesWithCount
+    .filter((c) => c.slug !== "otros")
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, "es"))
+    .slice(0, 8);
 
   const numberFormatter = new Intl.NumberFormat("es-HN");
   const businessesLabel = numberFormatter.format(totalBusinesses);
-  const categoriesLabel = numberFormatter.format(totalCategories);
+  const categoriesLabel = numberFormatter.format(categoriesWithCount.length);
 
   const websiteJsonLd = {
     "@context": "https://schema.org",
@@ -163,7 +166,8 @@ export default async function HomePage() {
               <input
                 name="q"
                 type="search"
-                placeholder="Buscar restaurantes, ferreterías, farmacias..."
+                aria-label="Buscar negocios"
+                placeholder="Farmacia, hotel, mecánico..."
                 className="flex-1 bg-transparent px-3 py-1.5 text-sm outline-none placeholder:text-[var(--ink-3)]"
                 style={{ color: "var(--ink)" }}
               />
@@ -176,7 +180,9 @@ export default async function HomePage() {
               </button>
             </form>
 
-            <div className="mt-4 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <QuickFilters openNowCount={openNow} />
+
+            <div className="mt-3 flex flex-wrap items-center justify-center gap-2">
               <Link href="/categorias" className="btn-secondary !text-xs !py-2">
                 <Squares2X2Icon className="h-3.5 w-3.5" />
                 Ver categorías
@@ -219,11 +225,12 @@ export default async function HomePage() {
                   {categoriesLabel}
                 </p>
                 <p className="text-xs" style={{ color: "var(--ink-3)" }}>
-                  Categorías disponibles
+                  Categorías con negocios
                 </p>
               </article>
 
-              <article
+              <Link
+                href="/negocios?abierto=1"
                 className="rounded-2xl px-4 py-3 text-center backdrop-blur-[2px] transition-transform duration-300 hover:-translate-y-0.5"
                 style={{
                   background: "rgba(255,255,255,0.78)",
@@ -232,12 +239,12 @@ export default async function HomePage() {
                 }}
               >
                 <p className="text-xl font-semibold sm:text-2xl" style={{ fontFamily: "var(--font-syne)", color: "var(--ink)" }}>
-                  {avgPerCategory}
+                  {numberFormatter.format(openNow)}
                 </p>
                 <p className="text-xs" style={{ color: "var(--ink-3)" }}>
-                  Promedio por categoría
+                  Abiertos en este momento
                 </p>
-              </article>
+              </Link>
             </div>
           </div>
         </div>
@@ -285,17 +292,20 @@ export default async function HomePage() {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {featured.map(({ title, slug, hint, Icon, color }, i) => (
+          {featured.map(({ name, slug, icon, count }, i) => {
+            const def = categoryIcon(icon);
+            return (
             <Link
               key={slug}
               href={`/categorias/${slug}`}
-              className={`panel group p-5 transition-all duration-300 hover:-translate-y-1 animate-fade-up anim-delay-${i + 1}`}
+              className={`panel group p-5 transition-all duration-300 hover:-translate-y-1 animate-fade-up anim-delay-${(i % 4) + 1}`}
               style={{ "--tw-shadow": "var(--shadow-md)" } as React.CSSProperties}
             >
               <span
-                className={`grid h-10 w-10 place-items-center rounded-xl ring-1 ${color}`}
+                className="grid h-10 w-10 place-items-center rounded-xl"
+                style={{ background: def.bg, color: def.accent }}
               >
-                <Icon size={18} />
+                {def.el}
               </span>
 
               <div className="mt-3">
@@ -303,9 +313,11 @@ export default async function HomePage() {
                   className="text-sm font-semibold"
                   style={{ fontFamily: "var(--font-syne)", color: "var(--ink)" }}
                 >
-                  {title}
+                  {name}
                 </h3>
-                <p className="mt-0.5 text-xs" style={{ color: "var(--ink-3)" }}>{hint}</p>
+                <p className="mt-0.5 text-xs" style={{ color: "var(--ink-3)" }}>
+                  {count} negocio{count !== 1 ? "s" : ""}
+                </p>
               </div>
 
               <div
@@ -316,8 +328,36 @@ export default async function HomePage() {
                 <ArrowRightIcon className="h-3.5 w-3.5" />
               </div>
             </Link>
-          ))}
+            );
+          })}
         </div>
+      </section>
+
+      {/* ─── GUÍA PARA VISITANTES ────────────────────────── */}
+      <section className="section-container pb-14 sm:pb-16">
+        <Link
+          href="/visitar-olanchito"
+          className="panel group flex flex-col gap-4 p-6 transition-all duration-300 hover:-translate-y-0.5 sm:flex-row sm:items-center sm:justify-between sm:p-8"
+        >
+          <div className="flex items-start gap-4">
+            <div className="icon-box flex-shrink-0">
+              <MapPinIcon className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="section-label mb-1">¿Viene de visita?</p>
+              <h2 className="text-xl font-semibold sm:text-2xl" style={{ fontFamily: "var(--font-syne)", color: "var(--ink)", letterSpacing: "-0.02em" }}>
+                Guía para visitar Olanchito
+              </h2>
+              <p className="mt-1 text-sm" style={{ color: "var(--ink-2)" }}>
+                Dónde dormir, dónde comer, cómo moverse y a quién llamar si necesita un médico.
+              </p>
+            </div>
+          </div>
+          <span className="btn-primary w-fit !text-xs">
+            Ver la guía
+            <ArrowRightIcon className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+          </span>
+        </Link>
       </section>
 
       {/* ─── ANUNCIOS ────────────────────────────────────── */}

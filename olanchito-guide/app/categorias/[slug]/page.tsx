@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import BusinessCard from "@/components/BusinessCard";
+import { getOpenStatus } from "@/lib/hours";
 import {
   ArrowLeftIcon,
   ArrowRightIcon,
@@ -81,21 +82,24 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { data: cat } = await supabase
     .from("categories")
-    .select("name, slug")
+    .select("name, slug, businesses(count)")
     .eq("slug", params.slug)
     .maybeSingle();
 
   if (!cat) return {};
 
-  const title = `${cat.name} en Olanchito | Directorio`;
+  const title = `${cat.name} en Olanchito`;
   const description = getCategoryDescription(cat.slug, cat.name);
+  const count = (cat.businesses as { count: number }[] | null)?.[0]?.count ?? 0;
 
   return {
     title,
     description,
     alternates: { canonical: `${BASE_URL}/categorias/${cat.slug}` },
+    // Una categoría vacía es contenido "delgado" para Google: se indexa cuando tenga negocios
+    robots: count === 0 ? { index: false, follow: true } : undefined,
     openGraph: {
-      title,
+      title: `${title} | Directorio Olanchito`,
       description,
       url: `${BASE_URL}/categorias/${cat.slug}`,
       siteName: "Directorio Olanchito",
@@ -124,7 +128,7 @@ export default async function CategoriaPage({
 
   const { data: raw } = await supabase
     .from("businesses")
-    .select("id, name, slug, address, image, description, featured, verified, view_count, created_at")
+    .select("id, name, slug, address, image, description, hours, featured, verified, view_count, created_at")
     .eq("category_id", category.id);
 
   const { data: allReviews } = await supabase
@@ -169,6 +173,8 @@ export default async function CategoriaPage({
       if (!a.isNew && b.isNew) return 1;
       return b.score - a.score;
     });
+
+  const openNowCount = businesses.filter((b) => getOpenStatus(b.hours) === "open").length;
 
   const description = getCategoryDescription(category.slug, category.name);
   const longDescription = getCategoryLongDescription(category.slug);
@@ -232,9 +238,20 @@ export default async function CategoriaPage({
             {longDescription}
           </p>
         )}
-        <p className="mt-2 text-xs" style={{ color: "var(--ink-3)" }}>
-          {businesses.length} negocio{businesses.length !== 1 ? "s" : ""} encontrado{businesses.length !== 1 ? "s" : ""}
-        </p>
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs" style={{ color: "var(--ink-3)" }}>
+          <span>
+            {businesses.length} negocio{businesses.length !== 1 ? "s" : ""} encontrado{businesses.length !== 1 ? "s" : ""}
+          </span>
+          {openNowCount > 0 && (
+            <Link
+              href={`/negocios?category=${category.slug}&abierto=1`}
+              className="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-2.5 py-1 font-semibold text-green-700 ring-1 ring-green-200"
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-green-500" />
+              {openNowCount} abierto{openNowCount !== 1 ? "s" : ""} ahora
+            </Link>
+          )}
+        </div>
       </section>
 
       {/* ─── GRID ───────────────────────────────── */}
@@ -271,6 +288,7 @@ export default async function CategoriaPage({
                     isNew: b.isNew,
                     avgRating: b.avgRating ?? undefined,
                     reviewCount: b.reviewCount,
+                    hours: b.hours,
                   }}
                 />
               ))}

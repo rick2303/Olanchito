@@ -2,7 +2,7 @@ import { ReactNode } from 'react'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Registra tu negocio en Olanchito | Directorio Olanchito',
+  title: 'Registra tu negocio en Olanchito',
   description: 'Registra tu negocio en el directorio de Olanchito, Honduras. Llega a más clientes con tu información de contacto, horario y ubicación.',
   alternates: { canonical: 'https://olanchito.com/registrar' },
   openGraph: {
