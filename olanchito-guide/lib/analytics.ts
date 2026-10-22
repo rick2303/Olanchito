@@ -19,7 +19,8 @@ export type AnalyticsEvent =
   | "suggestion_submit"
   | "filter_open_now"
   | "near_me"
-  | "business_suggest";
+  | "business_suggest"
+  | "business_claim";
 
 export function trackEvent(name: AnalyticsEvent, params: Record<string, string | number | boolean | undefined> = {}) {
   if (typeof window === "undefined") return;

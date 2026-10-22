@@ -93,3 +93,18 @@ export type NewBusinessProposal = {
   submitter_name: string | null;
   submitter_contact: string | null;
 };
+
+// Reclamo de un negocio sin dueño (pendiente de aprobación del admin)
+export const CLAIM_FIELD = "reclamo";
+// El dueño pidió no recibir más el reporte mensual
+export const REPORT_OPTOUT_FIELD = "reporte_baja";
+
+export type ClaimRequest = {
+  name: string;
+  email: string;
+  whatsapp: string;
+  role: string;
+  message: string | null;
+  // El WhatsApp que dio coincide con el de la ficha: señal fuerte de que es el dueño
+  phone_matches: boolean;
+};

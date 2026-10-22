@@ -1,9 +1,12 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 
-// Enlace firmado para que el dueño complete su ficha sin crear cuenta.
-// Formato del token: "<expira_en_segundos>.<firma>". No necesita tabla: la firma prueba que lo generó el admin.
+// Enlaces firmados: prueban que los generó el sitio sin necesitar una tabla.
+// Formato del token: "<expira_en_segundos>.<firma>". "purpose" separa usos para que
+// un enlace de baja del reporte no sirva para editar la ficha (y al revés).
 
-const VALID_DAYS = 30;
+type Purpose = "update" | "report-unsubscribe";
+
+const VALID_DAYS: Record<Purpose, number> = { update: 30, "report-unsubscribe": 400 };
 
 function secret(): string {
   const s = process.env.UPDATE_LINK_SECRET ?? process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -11,26 +14,37 @@ function secret(): string {
   return s;
 }
 
-function sign(slug: string, exp: number): string {
-  return createHmac("sha256", secret()).update(`${slug}.${exp}`).digest("base64url");
+function sign(purpose: Purpose, slug: string, exp: number): string {
+  const payload = purpose === "update" ? `${slug}.${exp}` : `${purpose}:${slug}.${exp}`;
+  return createHmac("sha256", secret()).update(payload).digest("base64url");
 }
 
-export function createUpdateToken(slug: string, now = Date.now()): string {
-  const exp = Math.floor(now / 1000) + VALID_DAYS * 24 * 60 * 60;
-  return `${exp}.${sign(slug, exp)}`;
+export function createToken(purpose: Purpose, slug: string, now = Date.now()): string {
+  const exp = Math.floor(now / 1000) + VALID_DAYS[purpose] * 24 * 60 * 60;
+  return `${exp}.${sign(purpose, slug, exp)}`;
 }
 
-export function verifyUpdateToken(slug: string, token: string | null | undefined): boolean {
+export function verifyToken(purpose: Purpose, slug: string, token: string | null | undefined): boolean {
   if (!token) return false;
   const [expRaw, sig] = token.split(".");
   const exp = Number(expRaw);
   if (!Number.isFinite(exp) || !sig || exp * 1000 < Date.now()) return false;
-  const expected = Buffer.from(sign(slug, exp));
+  const expected = Buffer.from(sign(purpose, slug, exp));
   const given = Buffer.from(sig);
   return expected.length === given.length && timingSafeEqual(expected, given);
 }
 
+export const createUpdateToken = (slug: string, now = Date.now()) => createToken("update", slug, now);
+export const verifyUpdateToken = (slug: string, token: string | null | undefined) => verifyToken("update", slug, token);
+
+export function baseUrl(): string {
+  return process.env.NEXT_PUBLIC_BASE_URL ?? "https://olanchito.com";
+}
+
 export function updateUrl(slug: string): string {
-  const base = process.env.NEXT_PUBLIC_BASE_URL ?? "https://olanchito.com";
-  return `${base}/actualizar/${slug}?t=${createUpdateToken(slug)}`;
+  return `${baseUrl()}/actualizar/${slug}?t=${createUpdateToken(slug)}`;
+}
+
+export function unsubscribeUrl(slug: string): string {
+  return `${baseUrl()}/reporte/baja/${slug}?t=${createToken("report-unsubscribe", slug)}`;
 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase-server'
+import { inviteOwner } from '@/lib/ownerInvite'
 
 export async function POST(req: NextRequest) {
   const { business_id } = await req.json()
@@ -23,31 +24,10 @@ export async function POST(req: NextRequest) {
     )
   }
 
-  // Check if user already has an account — if so, no email needed, they just log in
-  const { data: users } = await supabase.auth.admin.listUsers()
-  const existingUser = users?.users?.find(
-    (u) => u.email?.toLowerCase() === business.owner_email!.toLowerCase()
-  )
-
-  if (existingUser) {
-    return NextResponse.json({ sent: false, type: 'existing_user' })
+  try {
+    return NextResponse.json(await inviteOwner(business.id, business.owner_email))
+  } catch (err) {
+    console.error('[invite] inviteUserByEmail failed:', err)
+    return NextResponse.json({ error: err instanceof Error ? err.message : 'Error' }, { status: 500 })
   }
-
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
-    ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000')
-
-  const { error: inviteError } = await supabase.auth.admin.inviteUserByEmail(
-    business.owner_email,
-    {
-      data: { business_id: business.id, role: 'owner' },
-      redirectTo: `${baseUrl}/owner/setup`,
-    }
-  )
-
-  if (inviteError) {
-    console.error('[invite] inviteUserByEmail failed:', inviteError)
-    return NextResponse.json({ error: inviteError.message }, { status: 500 })
-  }
-
-  return NextResponse.json({ sent: true, type: 'invite' })
 }

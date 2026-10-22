@@ -141,6 +141,7 @@ export default async function BusinessDetail({ params }: Props) {
       subscription_active,
       subscription_tier,
       booking_url,
+      owner_email,
       announcement,
       announcement_expires_at
     `
@@ -255,6 +256,9 @@ export default async function BusinessDetail({ params }: Props) {
     if (exp && new Date(exp) < new Date()) return null;
     return raw;
   })();
+
+  // Solo se usa para saber si alguien administra la ficha; el correo no se muestra
+  const hasOwner = Boolean((data as { owner_email?: string | null }).owner_email);
 
   const bookingUrl = normalizeUrl((data as { booking_url?: string | null }).booking_url);
   const services = Array.isArray(data.services)
@@ -861,6 +865,19 @@ export default async function BusinessDetail({ params }: Props) {
               <BusinessQR slug={data.slug} name={data.name} />
             )}
 
+            {!hasOwner && (
+              <Link
+                href={`/reclamar/${data.slug}`}
+                className="flex items-center justify-between gap-3 rounded-3xl bg-white p-5 ring-1 ring-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.06)] hover:bg-jungle-50"
+              >
+                <span>
+                  <span className="block text-sm font-bold text-jungle-950">¿Es su negocio?</span>
+                  <span className="mt-0.5 block text-xs text-jungle-600">Reclámelo gratis y adminístrelo usted mismo.</span>
+                </span>
+                <ArrowTopRightOnSquareIcon className="h-4 w-4 flex-shrink-0 text-jungle-600" aria-hidden />
+              </Link>
+            )}
+
             {/* Sugerir corrección */}
             <SuggestCorrection businessSlug={data.slug} businessName={data.name} />
 
@@ -885,15 +902,17 @@ export default async function BusinessDetail({ params }: Props) {
           <div>
             <p className="text-sm font-bold text-jungle-950">¿Eres el dueño de {data.name}?</p>
             <p className="mt-0.5 text-xs text-jungle-600">
-              Activa tu portal y gestiona fotos, catálogo, horarios y más — sin depender de nadie.
+              {hasOwner
+                ? "Activa tu portal y gestiona fotos, catálogo, horarios y más — sin depender de nadie."
+                : "Nadie administra esta ficha todavía. Reclámala gratis y gestiona horarios, fotos y reseñas."}
             </p>
           </div>
           <div className="flex flex-shrink-0 items-center gap-2">
             <Link
-              href="/owner/login"
+              href={hasOwner ? "/owner/login" : `/reclamar/${data.slug}`}
               className="inline-flex items-center gap-1.5 rounded-xl bg-jungle-900 px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-jungle-800"
             >
-              Acceder al portal
+              {hasOwner ? "Acceder al portal" : "Reclamar mi negocio"}
             </Link>
             <Link
               href="/precios"
