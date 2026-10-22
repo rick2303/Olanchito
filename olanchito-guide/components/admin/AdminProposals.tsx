@@ -123,9 +123,9 @@ export default function AdminProposals({
                 </p>
               )}
               {p.hours && <p className="text-jungle-700">Horario: {p.hours}</p>}
-              {(p.website || p.instagram) && (
+              {(p.website || p.instagram || p.facebook) && (
                 <p className="text-jungle-700">
-                  {[p.website && `Web: ${p.website}`, p.instagram && `Instagram: ${p.instagram}`].filter(Boolean).join(" · ")}
+                  {[p.website && `Web: ${p.website}`, p.instagram && `Instagram: ${p.instagram}`, p.facebook && `Facebook: ${p.facebook}`].filter(Boolean).join(" · ")}
                 </p>
               )}
               {p.admin_note && (

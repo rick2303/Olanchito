@@ -51,6 +51,8 @@ const categoryDescriptions: Record<string, string> = {
     "Lavanderías y servicios de limpieza en Olanchito, Honduras para hogares, negocios, hoteles e iglesias.",
   "muebles-hogar":
     "Muebles, electrodomésticos y artículos para el hogar en Olanchito, Honduras. Fabricación de muebles, roperos, cocinas y más.",
+  "tramites-oficinas-publicas":
+    "Oficinas públicas en Olanchito, Honduras para trámites de identidad, registro civil y otros servicios del Estado, con horario y ubicación.",
   "carnicerias-pollerias":
     "Carnicerías y pollerías en Olanchito, Honduras: pollo fresco, cortes de carne y embutidos para su hogar o negocio.",
 };

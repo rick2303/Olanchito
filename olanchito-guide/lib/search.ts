@@ -40,6 +40,9 @@ const SYNONYMS: [string[], string[]][] = [
   [["muebles", "mueble", "electrodomesticos", "refrigeradora", "lavadora", "cocina", "ropero"], ["mueble", "electrodomestico", "hogar", "ropero", "cocina"]],
   [["carne", "carnes", "pollo", "carniceria", "polleria", "embutidos"], ["carne", "pollo", "carniceria", "polleria", "embutido"]],
   [["panaderia", "pan", "pasteles", "pastel", "reposteria"], ["panaderia", "reposteria", "pastel", "postre"]],
+  [["rnp", "identidad", "dni", "partida", "nacimiento", "tramite", "tramites", "registro", "gobierno"], ["rnp", "registro nacional", "identidad", "tramite", "oficina publica"]],
+  [["pintura", "pinturas", "pintar"], ["pintura"]],
+  [["china", "chino", "oriental", "arroz frito", "chop suey"], ["china", "oriental"]],
 ];
 
 // wholeWord: la forma en singular solo cuenta como palabra completa ("flor"/"flores"),

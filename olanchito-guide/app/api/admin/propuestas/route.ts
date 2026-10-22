@@ -60,6 +60,7 @@ export async function POST(req: NextRequest) {
     socials: {
       ...(proposal.website && { website: proposal.website }),
       ...(proposal.instagram && { instagram: proposal.instagram }),
+      ...(proposal.facebook && { facebook: proposal.facebook }),
     },
   });
   if (error) return NextResponse.json({ error: "No se pudo crear el negocio" }, { status: 500 });

@@ -102,6 +102,7 @@ export type NewBusinessProposal = {
   // Opcionales: sitio web e Instagram que publica el negocio
   website?: string | null;
   instagram?: string | null;
+  facebook?: string | null;
 };
 
 // Reclamo de un negocio sin dueño (pendiente de aprobación del admin)
