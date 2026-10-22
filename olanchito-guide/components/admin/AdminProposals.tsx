@@ -123,6 +123,11 @@ export default function AdminProposals({
                 </p>
               )}
               {p.hours && <p className="text-jungle-700">Horario: {p.hours}</p>}
+              {(p.website || p.instagram) && (
+                <p className="text-jungle-700">
+                  {[p.website && `Web: ${p.website}`, p.instagram && `Instagram: ${p.instagram}`].filter(Boolean).join(" · ")}
+                </p>
+              )}
               {p.admin_note && (
                 <p className="rounded-lg bg-amber-50 px-2.5 py-1.5 text-amber-900 ring-1 ring-amber-200">
                   <span className="font-semibold">Nota interna (no se publica):</span> {p.admin_note}

@@ -57,7 +57,10 @@ export async function POST(req: NextRequest) {
     verified: false,
     featured: false,
     view_count: 0,
-    socials: {},
+    socials: {
+      ...(proposal.website && { website: proposal.website }),
+      ...(proposal.instagram && { instagram: proposal.instagram }),
+    },
   });
   if (error) return NextResponse.json({ error: "No se pudo crear el negocio" }, { status: 500 });
 

@@ -99,6 +99,9 @@ export type NewBusinessProposal = {
   hours?: string | null;
   // Fuente y pendientes para el admin. NUNCA se publica: la ficha usa solo `description`
   admin_note?: string | null;
+  // Opcionales: sitio web e Instagram que publica el negocio
+  website?: string | null;
+  instagram?: string | null;
 };
 
 // Reclamo de un negocio sin dueño (pendiente de aprobación del admin)
