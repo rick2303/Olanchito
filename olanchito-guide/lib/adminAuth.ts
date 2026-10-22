@@ -1,19 +1,20 @@
 import type { NextRequest } from "next/server";
 import { createServerClient } from "@/lib/supabase-server";
 
-// Valida que la petición venga del admin. Los dueños también tienen sesión de Supabase
-// (role "owner" en user_metadata), así que tener sesión no basta.
-// ADMIN_EMAILS (separados por coma) restringe aún más; si no está, basta con no ser dueño.
+// Correos con acceso al panel admin. Debe coincidir con la tabla public.admins de la base.
+// No se usa user_metadata: cada usuario puede editar el suyo desde el navegador.
+export function adminEmails(): string[] {
+  return (process.env.ADMIN_EMAILS ?? "admin@olanchito.com")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+}
+
 export async function isAdminRequest(req: NextRequest): Promise<boolean> {
   const token = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
   if (!token) return false;
   const { data, error } = await createServerClient().auth.getUser(token);
-  const user = data?.user;
-  if (error || !user) return false;
-  if (user.user_metadata?.role === "owner") return false;
-  const allowed = (process.env.ADMIN_EMAILS ?? "")
-    .split(",")
-    .map((e) => e.trim().toLowerCase())
-    .filter(Boolean);
-  return allowed.length === 0 || allowed.includes((user.email ?? "").toLowerCase());
+  const email = data?.user?.email?.toLowerCase();
+  if (error || !email) return false;
+  return adminEmails().includes(email);
 }

@@ -138,8 +138,12 @@ export default function AdminDashboard() {
   }, []);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) { router.replace("/admin/login"); return; }
+      // Los dueños también tienen sesión: la base decide quién es admin (tabla public.admins).
+      // Si la función aún no existe (SQL sin aplicar) se mantiene el comportamiento anterior.
+      const { data: isAdmin, error } = await supabase.rpc("is_admin");
+      if (!error && isAdmin === false) { router.replace("/owner/login"); return; }
       setAuthChecked(true);
       fetchData();
     });
