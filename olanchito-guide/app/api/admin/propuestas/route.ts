@@ -52,6 +52,7 @@ export async function POST(req: NextRequest) {
     phone: proposal.phone ?? proposal.whatsapp,
     address: proposal.address,
     location: proposal.location,
+    hours: proposal.hours ?? null,
     // Lo propuso un vecino: queda sin verificar hasta que el dueño confirme sus datos
     verified: false,
     featured: false,

@@ -92,6 +92,8 @@ export type NewBusinessProposal = {
   location: LatLng | null;
   submitter_name: string | null;
   submitter_contact: string | null;
+  // Opcional: lo traen las propuestas cargadas desde Google Maps
+  hours?: string | null;
 };
 
 // Reclamo de un negocio sin dueño (pendiente de aprobación del admin)

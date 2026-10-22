@@ -122,6 +122,7 @@ export default function AdminProposals({
                   )}
                 </p>
               )}
+              {p.hours && <p className="text-jungle-700">Horario: {p.hours}</p>}
               {p.description && <p className="text-jungle-600">{p.description}</p>}
               {(p.submitter_name || p.submitter_contact) && (
                 <p className="flex items-center gap-1.5 text-jungle-600">
