@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import QRCode from "react-qr-code";
 import { PrinterIcon, QrCodeIcon } from "@heroicons/react/24/outline";
+import { StarIcon } from "@heroicons/react/24/solid";
 
 type Props = { slug: string; name: string };
 
@@ -236,7 +237,7 @@ export default function BusinessQR({ slug, name }: Props) {
                 >
                   Directorio Olanchito
                 </p>
-                <p className="text-[10px]" style={{ color: "#6b8f78" }}>olanchito.com</p>
+                <p className="text-[11px]" style={{ color: "#6b8f78" }}>olanchito.com</p>
               </div>
             </div>
 
@@ -283,17 +284,19 @@ export default function BusinessQR({ slug, name }: Props) {
             />
 
             <p className="mb-1 text-[11px] font-semibold" style={{ color: "#1a6b3c" }}>
-              ⭐⭐⭐⭐⭐
+              <span className="inline-flex gap-0.5" aria-label="5 estrellas">
+                {[1, 2, 3, 4, 5].map((n) => <StarIcon key={n} className="h-3.5 w-3.5 text-amber-400" />)}
+              </span>
             </p>
             <p className="text-xs font-semibold" style={{ color: "#1a6b3c" }}>
               ¿Ya nos visitaste? ¡Déjanos tu reseña!
             </p>
-            <p className="mt-1 text-[10px]" style={{ color: "#7a8f84" }}>
+            <p className="mt-1 text-[11px]" style={{ color: "#7a8f84" }}>
               Escanea el QR y cuéntanos tu experiencia.
             </p>
 
             <p
-              className="mt-3 border-t pt-2.5 text-[9px]"
+              className="mt-3 border-t pt-2.5 text-[11px]"
               style={{ borderColor: "#dde8e3", color: "#a0b8ac", borderStyle: "dashed" }}
             >
               Directorio comunitario de negocios en Olanchito, Honduras
@@ -314,7 +317,7 @@ export default function BusinessQR({ slug, name }: Props) {
             Imprimir / Guardar como PDF
           </button>
 
-          <p className="text-center text-[10px]" style={{ color: "var(--ink-3)" }}>
+          <p className="text-center text-[11px]" style={{ color: "var(--ink-3)" }}>
             Se abrirá el diálogo de impresión. Elige "Guardar como PDF" para tener el archivo.
           </p>
         </div>

@@ -75,7 +75,7 @@ export default function SuggestCorrection({
           ¿Datos incorrectos? Sugerir corrección
         </span>
         <ChevronDownIcon
-          className={`h-4 w-4 text-jungle-400 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          className={`h-4 w-4 text-jungle-600 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
         />
       </button>
 
@@ -83,7 +83,7 @@ export default function SuggestCorrection({
         <form onSubmit={handleSubmit} className="border-t border-jungle-100 px-5 pb-5 pt-4 space-y-3">
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-jungle-800">
-              ¿Qué dato está incorrecto? <span className="text-red-500">*</span>
+              ¿Qué dato está incorrecto? <span className="text-red-600">*</span>
             </label>
             <select
               value={field}
@@ -100,7 +100,7 @@ export default function SuggestCorrection({
 
           <div className="space-y-1.5">
             <label className="text-xs font-semibold text-jungle-800">
-              Descripción <span className="text-red-500">*</span>
+              Descripción <span className="text-red-600">*</span>
             </label>
             <textarea
               value={description}

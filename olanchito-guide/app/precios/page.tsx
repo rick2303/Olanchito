@@ -69,7 +69,7 @@ export default function PreciosPage() {
       <section className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
         {/* Header */}
         <div className="mb-12 text-center">
-          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-jungle-500">Planes</p>
+          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-jungle-600">Planes</p>
           <h1 className="text-3xl font-bold text-jungle-950 sm:text-4xl" style={{ fontFamily: "var(--font-syne)" }}>
             Más visibilidad para tu negocio
           </h1>
@@ -166,11 +166,11 @@ export default function PreciosPage() {
                   { text: "Prioridad e insignia de negocio destacado", tier: "featured" },
                 ].map((f) => (
                   <li key={f.text} className="flex items-start gap-2.5 text-sm text-jungle-200">
-                    <CheckBadgeIcon className={`h-4 w-4 flex-shrink-0 mt-0.5 ${f.tier === "featured" ? "text-amber-400" : "text-jungle-400"}`} />
+                    <CheckBadgeIcon className={`h-4 w-4 flex-shrink-0 mt-0.5 ${f.tier === "featured" ? "text-amber-400" : "text-jungle-300"}`} />
                     <span>
                       {f.text}
                       {f.tier === "featured" && (
-                        <span className="ml-1.5 inline-flex items-center rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-amber-300">Destacado</span>
+                        <span className="ml-1.5 inline-flex items-center rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-amber-300">Destacado</span>
                       )}
                     </span>
                   </li>
@@ -181,15 +181,15 @@ export default function PreciosPage() {
             {/* Checkout form */}
             <div className="rounded-2xl bg-jungle-800/70 p-6 ring-1 ring-jungle-700 backdrop-blur">
               <p className="mb-1 text-base font-bold text-white">Activa el Owner Portal</p>
-              <p className="mb-5 text-xs text-jungle-400">
+              <p className="mb-5 text-xs text-jungle-200">
                 Ingresa el correo con el que registraste tu negocio. Si aún no está en el directorio,{" "}
-                <Link href="/registrar" className="text-jungle-300 hover:underline">regístralo aquí primero</Link>.
+                <Link href="/registrar" className="font-semibold text-white underline underline-offset-2">regístralo aquí primero</Link>.
               </p>
 
               {pickerBusinesses.length > 0 && (
                 <div className="mb-5 space-y-3">
                   <p className="text-sm font-bold text-white">¿Para cuál negocio?</p>
-                  <p className="text-xs text-jungle-400">Tu correo está asociado a varios negocios. Selecciona el que quieres activar.</p>
+                  <p className="text-xs text-jungle-300">Tu correo está asociado a varios negocios. Selecciona el que quieres activar.</p>
                   <div className="space-y-2">
                     {pickerBusinesses.map((b) => {
                       const alreadyActive = b.subscription_active;
@@ -201,7 +201,7 @@ export default function PreciosPage() {
                           disabled={alreadyActive}
                           onClick={() => setSelectedBusinessId(b.id)}
                           className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm transition-colors ring-1 ${alreadyActive
-                              ? "opacity-50 cursor-not-allowed bg-jungle-900/30 ring-jungle-700 text-jungle-500"
+                              ? "opacity-50 cursor-not-allowed bg-jungle-900/30 ring-jungle-700 text-jungle-300"
                               : isSelected
                                 ? "bg-white text-jungle-950 ring-white font-semibold"
                                 : "bg-jungle-900/50 text-jungle-300 ring-jungle-700 hover:bg-jungle-800/60"
@@ -210,10 +210,10 @@ export default function PreciosPage() {
                           <BuildingStorefrontIcon className="h-4 w-4 flex-shrink-0" />
                           <span className="flex-1">{b.name}</span>
                           {alreadyActive && (
-                            <span className="text-[10px] font-bold uppercase tracking-wide text-jungle-500">Ya activo</span>
+                            <span className="text-[11px] font-bold uppercase tracking-wide text-jungle-300">Ya activo</span>
                           )}
                           {isSelected && !alreadyActive && (
-                            <CheckIcon className="h-4 w-4 text-jungle-600" />
+                            <CheckIcon className="h-4 w-4 text-jungle-300" />
                           )}
                         </button>
                       );
@@ -224,7 +224,7 @@ export default function PreciosPage() {
                     disabled={!selectedBusinessId || loading}
                     onClick={handlePickBusiness}
                     className={`flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${selectedTier === "featured"
-                        ? "bg-amber-500 text-white hover:bg-amber-400"
+                        ? "bg-amber-700 text-white hover:bg-amber-600"
                         : "bg-white text-jungle-950 hover:bg-jungle-100"
                       }`}
                   >
@@ -238,7 +238,7 @@ export default function PreciosPage() {
                   <button
                     type="button"
                     onClick={() => { setPickerBusinesses([]); setSelectedBusinessId(""); }}
-                    className="w-full text-center text-xs text-jungle-500 hover:text-jungle-300"
+                    className="w-full text-center text-xs text-jungle-300 hover:text-jungle-300"
                   >
                     ← Volver
                   </button>
@@ -257,19 +257,21 @@ export default function PreciosPage() {
                       onClick={() => setSelectedTier(t.id)}
                       className={`flex flex-1 flex-col items-center rounded-xl px-3 py-2.5 text-xs font-bold transition-colors ring-1 ${selectedTier === t.id
                           ? t.id === "featured"
-                            ? "bg-amber-500 text-white ring-amber-400"
+                            ? "bg-amber-700 text-white ring-amber-500"
                             : "bg-white text-jungle-950 ring-white"
-                          : "bg-jungle-900/50 text-jungle-400 ring-jungle-700 hover:bg-jungle-800/60"
+                          : "bg-jungle-900/50 text-jungle-300 ring-jungle-700 hover:bg-jungle-800/60"
                         }`}
                     >
                       {t.label}
-                      <span className="mt-0.5 text-[10px] font-semibold opacity-80">{t.price}</span>
+                      <span className="mt-0.5 text-[11px] font-semibold">{t.price}</span>
                     </button>
                   ))}
                 </div>
 
                 <input
                   type="email"
+                  aria-label="Correo electrónico"
+                  autoComplete="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -288,7 +290,7 @@ export default function PreciosPage() {
                   type="submit"
                   disabled={loading || !email}
                   className={`flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${selectedTier === "featured"
-                      ? "bg-amber-500 text-white hover:bg-amber-400"
+                      ? "bg-amber-700 text-white hover:bg-amber-600"
                       : "bg-white text-jungle-950 hover:bg-jungle-100"
                     }`}
                 >
@@ -300,7 +302,7 @@ export default function PreciosPage() {
                   )}
                 </button>
 
-                <p className="text-center text-[10px] text-jungle-500">
+                <p className="text-center text-[11px] text-jungle-300">
                   Pago seguro con Stripe. Cancela cuando quieras.
                 </p>
               </form>
@@ -317,7 +319,7 @@ export default function PreciosPage() {
                   </svg>
                   Pagar por transferencia bancaria
                 </a>
-                <p className="text-xs text-jungle-500">
+                <p className="text-xs text-jungle-300">
                   ¿Ya tienes cuenta?{" "}
                   <Link href="/owner/login" className="font-semibold text-jungle-300 hover:underline">
                     Iniciar sesión
@@ -381,12 +383,12 @@ function PlanCard({
     <div className={`relative rounded-3xl p-6 ring-1 shadow-[0_10px_30px_rgba(0,0,0,0.06)] ${isDestacado ? "bg-amber-50 ring-amber-300" : highlight ? "bg-white ring-jungle-400" : "bg-white ring-black/5"
       }`}>
       {(highlight || badge) && (
-        <span className={`absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[10px] font-bold text-white ${isDestacado ? "bg-amber-500" : "bg-jungle-700"
+        <span className={`absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[11px] font-bold text-white ${isDestacado ? "bg-amber-700" : "bg-jungle-700"
           }`}>
           {badge ?? "Más popular"}
         </span>
       )}
-      <p className={`text-xs font-bold uppercase tracking-widest ${isDestacado ? "text-amber-600" : "text-jungle-500"}`}>{title}</p>
+      <p className={`text-xs font-bold uppercase tracking-widest ${isDestacado ? "text-amber-700" : "text-jungle-600"}`}>{title}</p>
       <p className="mt-1 text-2xl font-bold text-jungle-950" style={{ fontFamily: "var(--font-syne)" }}>
         {price}
       </p>
@@ -394,12 +396,12 @@ function PlanCard({
       <ul className="mt-4 space-y-2">
         {features.map((f) => (
           <li key={f} className="flex items-start gap-2 text-xs text-jungle-700">
-            <CheckIcon className={`h-3.5 w-3.5 flex-shrink-0 mt-0.5 ${isDestacado ? "text-amber-500" : "text-jungle-500"}`} />
+            <CheckIcon className={`h-3.5 w-3.5 flex-shrink-0 mt-0.5 ${isDestacado ? "text-amber-500" : "text-jungle-600"}`} />
             {f}
           </li>
         ))}
         {missing?.map((f) => (
-          <li key={f} className="flex items-start gap-2 text-xs text-jungle-400">
+          <li key={f} className="flex items-start gap-2 text-xs text-jungle-600">
             <span className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-center leading-none">—</span>
             {f}
           </li>

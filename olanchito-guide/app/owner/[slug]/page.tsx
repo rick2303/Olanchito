@@ -576,7 +576,7 @@ export default function OwnerDashboard() {
               <p className="truncate text-sm font-bold text-jungle-950 leading-tight" style={{ fontFamily: "var(--font-syne)" }}>
                 {business.name}
               </p>
-              <p className="text-[10px] text-jungle-500">Portal del negocio</p>
+              <p className="text-[11px] text-jungle-600">Portal del negocio</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -648,7 +648,7 @@ export default function OwnerDashboard() {
               {tab.icon}
               <span className="hidden sm:inline">{tab.label}</span>
               {!tabAllowed(tab.id) && (
-                <span className="hidden sm:inline ml-1 rounded-full bg-amber-100 px-1.5 py-0.5 text-[9px] font-bold text-amber-700">
+                <span className="hidden sm:inline ml-1 rounded-full bg-amber-100 px-1.5 py-0.5 text-[11px] font-bold text-amber-700">
                   PRO
                 </span>
               )}
@@ -682,7 +682,7 @@ export default function OwnerDashboard() {
                 {imagePreview ? (
                   <Image src={imagePreview} alt="Preview" fill className="object-cover" />
                 ) : (
-                  <div className="flex flex-col items-center gap-2 text-jungle-400">
+                  <div className="flex flex-col items-center gap-2 text-jungle-600">
                     <ArrowUpTrayIcon className="h-8 w-8" />
                     <span className="text-xs font-semibold">Subir foto</span>
                   </div>
@@ -765,7 +765,7 @@ export default function OwnerDashboard() {
                     placeholder="Separados por coma: Ropa, Zapatos, Accesorios"
                     className="field"
                   />
-                  <p className="text-[10px] text-jungle-500">Separa cada item con una coma.</p>
+                  <p className="text-[11px] text-jungle-600">Separa cada item con una coma.</p>
                 </div>
               </div>
             </div>
@@ -802,7 +802,7 @@ export default function OwnerDashboard() {
             <div className="rounded-3xl bg-white p-6 ring-1 ring-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
               <div className="mb-4">
                 <h3 className="text-sm font-bold text-jungle-950">Ubicación en el mapa</h3>
-                <p className="mt-1 text-xs text-jungle-500">Busca tu dirección o haz clic en el mapa para colocar el pin.</p>
+                <p className="mt-1 text-xs text-jungle-600">Busca tu dirección o haz clic en el mapa para colocar el pin.</p>
               </div>
               <LocationPickerWrapper value={location} onChange={handleLocationChange} />
             </div>
@@ -811,9 +811,9 @@ export default function OwnerDashboard() {
             <div className={`rounded-3xl bg-white p-6 ring-1 ring-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.06)] ${!isPaid ? "opacity-60 pointer-events-none" : ""}`}>
               <div className="mb-1 flex items-center justify-between">
                 <h3 className="text-sm font-bold text-jungle-950">Link de reserva / cita</h3>
-                {!isPaid && <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700">Premium</span>}
+                {!isPaid && <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-bold text-amber-700">Premium</span>}
               </div>
-              <p className="mb-4 text-xs text-jungle-500">Aparece como botón &quot;Agendar cita&quot; en tu página pública. Puede ser un link de Calendly, WhatsApp, o cualquier otro servicio.</p>
+              <p className="mb-4 text-xs text-jungle-600">Aparece como botón &quot;Agendar cita&quot; en tu página pública. Puede ser un link de Calendly, WhatsApp, o cualquier otro servicio.</p>
               <input
                 type="text"
                 inputMode="url"
@@ -910,7 +910,7 @@ export default function OwnerDashboard() {
               <div className="rounded-3xl bg-white p-6 ring-1 ring-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
                 <p className="mb-4 text-sm font-bold text-jungle-950">Clics de contacto</p>
                 {eventsLoading ? (
-                  <p className="text-sm text-jungle-400">Cargando estadísticas...</p>
+                  <p className="text-sm text-jungle-600">Cargando estadísticas...</p>
                 ) : events !== null ? (() => {
                   const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
                   const waTotal = events.filter(e => e.event_type === "whatsapp_click").length;
@@ -945,7 +945,7 @@ export default function OwnerDashboard() {
                 Reseñas recientes ({reviews.length})
               </h3>
               {reviews.length === 0 ? (
-                <p className="text-sm text-jungle-500">Aún no tienes reseñas.</p>
+                <p className="text-sm text-jungle-600">Aún no tienes reseñas.</p>
               ) : (
                 <div className="space-y-4">
                   {reviews.map(r => {
@@ -970,13 +970,13 @@ export default function OwnerDashboard() {
                         {r.comment && (
                           <p className="mt-1.5 text-xs leading-relaxed text-jungle-700">{r.comment}</p>
                         )}
-                        <p className="mt-2 text-[10px] text-jungle-400">
+                        <p className="mt-2 text-[11px] text-jungle-600">
                           {new Date(r.created_at).toLocaleDateString("es-HN", { year: "numeric", month: "long", day: "numeric" })}
                         </p>
 
                         {/* Reply section */}
                         <div className="mt-3 border-t border-jungle-200 pt-3">
-                          <p className="mb-2 text-[10px] font-semibold text-jungle-600">Tu respuesta</p>
+                          <p className="mb-2 text-[11px] font-semibold text-jungle-600">Tu respuesta</p>
 
                           {/* Saved state — reply exists and not editing */}
                           {!showForm && (
@@ -986,7 +986,7 @@ export default function OwnerDashboard() {
                               <p className="min-w-0 flex-1 text-xs leading-relaxed text-jungle-800">{r.owner_reply}</p>
                               <button
                                 onClick={() => setEditingReplyIds(prev => new Set([...prev, r.id]))}
-                                className="flex-shrink-0 rounded-lg px-2 py-1 text-[10px] font-bold text-jungle-600 hover:bg-jungle-200"
+                                className="flex-shrink-0 rounded-lg px-2 py-1 text-[11px] font-bold text-jungle-600 hover:bg-jungle-200"
                               >
                                 Editar
                               </button>
@@ -995,7 +995,7 @@ export default function OwnerDashboard() {
 
                           {/* Just saved flash without existing text (reply was deleted) */}
                           {justSaved && !r.owner_reply && (
-                            <p className="text-[10px] font-semibold text-green-600">✓ Respuesta eliminada</p>
+                            <p className="text-[11px] font-semibold text-green-600">✓ Respuesta eliminada</p>
                           )}
 
                           {/* Edit form */}
@@ -1012,7 +1012,7 @@ export default function OwnerDashboard() {
                                 <button
                                   onClick={() => handleSaveReply(r.id)}
                                   disabled={isSaving}
-                                  className="rounded-xl bg-jungle-700 px-3 py-1.5 text-[10px] font-bold text-white hover:bg-jungle-800 disabled:opacity-50"
+                                  className="rounded-xl bg-jungle-700 px-3 py-1.5 text-[11px] font-bold text-white hover:bg-jungle-800 disabled:opacity-50"
                                 >
                                   {isSaving ? "Guardando..." : "Publicar respuesta"}
                                 </button>
@@ -1022,7 +1022,7 @@ export default function OwnerDashboard() {
                                       setEditingReplyIds(prev => { const n = new Set(prev); n.delete(r.id); return n; });
                                       setReplyDrafts(prev => { const n = { ...prev }; delete n[r.id]; return n; });
                                     }}
-                                    className="rounded-xl px-3 py-1.5 text-[10px] font-bold text-jungle-500 ring-1 ring-jungle-200 hover:bg-jungle-100"
+                                    className="rounded-xl px-3 py-1.5 text-[11px] font-bold text-jungle-600 ring-1 ring-jungle-200 hover:bg-jungle-100"
                                   >
                                     Cancelar
                                   </button>
@@ -1048,7 +1048,7 @@ export default function OwnerDashboard() {
                 <SparklesIcon className="h-5 w-5 text-amber-500" />
                 <h3 className="text-sm font-bold text-jungle-950">Anuncio temporal</h3>
               </div>
-              <p className="mb-5 text-xs text-jungle-500">
+              <p className="mb-5 text-xs text-jungle-600">
                 Aparece como un banner destacado en tu página pública. Ideal para promociones, novedades o avisos importantes. Desaparece automáticamente en la fecha de expiración.
               </p>
 
@@ -1059,7 +1059,7 @@ export default function OwnerDashboard() {
                   : false;
                 return expired ? (
                   <div className="mb-4 flex items-start gap-3 rounded-2xl bg-jungle-50 p-4 ring-1 ring-jungle-200">
-                    <ExclamationTriangleIcon className="mt-0.5 h-4 w-4 flex-shrink-0 text-jungle-500" />
+                    <ExclamationTriangleIcon className="mt-0.5 h-4 w-4 flex-shrink-0 text-jungle-600" />
                     <div className="min-w-0 flex-1">
                       <p className="text-xs font-bold text-jungle-800">Anuncio expirado</p>
                       <p className="mt-0.5 text-xs text-jungle-600">Ya no se muestra en la página pública. Puedes publicar uno nuevo o eliminarlo.</p>
@@ -1078,7 +1078,7 @@ export default function OwnerDashboard() {
                       <p className="text-xs font-bold text-green-800">Anuncio publicado</p>
                       <p className="mt-0.5 text-xs text-green-700 line-clamp-2">{business.announcement}</p>
                       {business.announcement_expires_at && (
-                        <p className="mt-1 text-[10px] text-green-600">
+                        <p className="mt-1 text-[11px] text-green-600">
                           Expira: {new Date(business.announcement_expires_at).toLocaleDateString("es-HN", { year: "numeric", month: "long", day: "numeric" })}
                         </p>
                       )}
@@ -1104,7 +1104,7 @@ export default function OwnerDashboard() {
                     className="field resize-none"
                     maxLength={280}
                   />
-                  <p className="text-[10px] text-jungle-400">{announcementText.length} / 280 caracteres</p>
+                  <p className="text-[11px] text-jungle-600">{announcementText.length} / 280 caracteres</p>
                 </div>
 
                 <div className="space-y-1.5">
@@ -1115,7 +1115,7 @@ export default function OwnerDashboard() {
                     onChange={(e) => { setAnnouncementExpires(e.target.value); setAnnouncementDirty(true); }}
                     className="field"
                   />
-                  <p className="text-[10px] text-jungle-400">Si no se establece, el anuncio se muestra indefinidamente.</p>
+                  <p className="text-[11px] text-jungle-600">Si no se establece, el anuncio se muestra indefinidamente.</p>
                 </div>
 
                 <div className="flex gap-2">
@@ -1156,10 +1156,10 @@ export default function OwnerDashboard() {
             {/* Preview */}
             {announcementText && (
               <div className="rounded-3xl bg-amber-50 p-5 ring-1 ring-amber-200">
-                <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-amber-600">Vista previa del anuncio</p>
+                <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-amber-600">Vista previa del anuncio</p>
                 <p className="text-sm font-semibold text-amber-900">{announcementText}</p>
                 {announcementExpires && (
-                  <p className="mt-1 text-[10px] text-amber-600">
+                  <p className="mt-1 text-[11px] text-amber-600">
                     Expira: {new Date(announcementExpires + "T12:00:00").toLocaleDateString("es-HN", { year: "numeric", month: "long", day: "numeric" })}
                   </p>
                 )}
@@ -1201,19 +1201,19 @@ export default function OwnerDashboard() {
               <h3 className="mb-4 text-sm font-bold text-jungle-950">Tu suscripción</h3>
               <div className="flex items-center justify-between rounded-2xl bg-jungle-50 px-4 py-3 ring-1 ring-jungle-100">
                 <div>
-                  <p className="text-xs text-jungle-500">Plan actual</p>
+                  <p className="text-xs text-jungle-600">Plan actual</p>
                   <p className="text-sm font-bold text-jungle-950 capitalize">
                     {tier === "featured" ? "Destacado" : tier === "premium" ? "Premium" : "Gratuito"}
                     {tier !== "free" && (
-                      <span className="ml-2 text-[10px] font-semibold text-jungle-500">
+                      <span className="ml-2 text-[11px] font-semibold text-jungle-600">
                         {tier === "featured" ? "$10/mes" : "$6/mes"}
                       </span>
                     )}
                   </p>
                 </div>
-                <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-bold ${business.subscription_active
+                <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${business.subscription_active
                   ? "bg-green-100 text-green-700"
-                  : "bg-jungle-100 text-jungle-500"
+                  : "bg-jungle-100 text-jungle-600"
                   }`}>
                   {business.subscription_active ? "Activo" : "Inactivo"}
                 </span>
@@ -1228,7 +1228,7 @@ export default function OwnerDashboard() {
                     <ArrowUpCircleIcon className="h-5 w-5 text-amber-500" />
                     <h3 className="text-sm font-bold text-jungle-950">Mejorar a Destacado</h3>
                   </div>
-                  <span className="rounded-full bg-amber-400 px-2.5 py-0.5 text-[10px] font-bold text-amber-900">$10/mes</span>
+                  <span className="rounded-full bg-amber-400 px-2.5 py-0.5 text-[11px] font-bold text-amber-900">$10/mes</span>
                 </div>
                 <p className="mb-4 mt-1 text-xs text-jungle-600">
                   Accede a todas las funciones del plan más completo.
@@ -1249,7 +1249,7 @@ export default function OwnerDashboard() {
                           <p className="text-xs leading-relaxed text-jungle-700">
                             A partir del siguiente ciclo, tu suscripción mensual pasará a <span className="font-bold">$10/mes</span>.
                           </p>
-                          <p className="text-[11px] text-jungle-500 pt-1">
+                          <p className="text-[11px] text-jungle-600 pt-1">
                             El cargo aparecerá en tu tarjeta con el concepto <span className="font-mono">Olanchito Guide — Destacado</span>.
                           </p>
                         </div>
@@ -1299,7 +1299,7 @@ export default function OwnerDashboard() {
                       </a>
                       <button
                         onClick={() => setSubAction(null)}
-                        className="w-full text-center text-xs text-jungle-500 hover:text-jungle-700"
+                        className="w-full text-center text-xs text-jungle-600 hover:text-jungle-700"
                       >
                         Cancelar
                       </button>
@@ -1387,7 +1387,7 @@ export default function OwnerDashboard() {
                 ) : (
                   /* ── Default state ── */
                   <>
-                    <p className="mb-4 mt-1 text-xs text-jungle-500">
+                    <p className="mb-4 mt-1 text-xs text-jungle-600">
                       Tu negocio seguirá visible en el directorio con el plan gratuito. Perderás acceso al portal de gestión y las fotos, catálogo y demás información se mantendrán pero no podrás editarlos.
                     </p>
                     <button
@@ -1432,11 +1432,11 @@ export default function OwnerDashboard() {
             <div className="mb-5 flex items-start justify-between">
               <div>
                 <h2 className="text-base font-bold text-jungle-950">Elige tu plan</h2>
-                <p className="mt-0.5 text-xs text-jungle-500">Serás redirigido a Stripe para completar el pago de forma segura.</p>
+                <p className="mt-0.5 text-xs text-jungle-600">Serás redirigido a Stripe para completar el pago de forma segura.</p>
               </div>
               <button
                 onClick={() => { setShowUpgradeModal(false); setUpgradeError(""); }}
-                className="rounded-xl p-1.5 text-jungle-400 hover:bg-jungle-50 hover:text-jungle-700 transition-colors"
+                className="rounded-xl p-1.5 text-jungle-600 hover:bg-jungle-50 hover:text-jungle-700 transition-colors"
               >
                 <XMarkIcon className="h-5 w-5" />
               </button>
@@ -1444,7 +1444,7 @@ export default function OwnerDashboard() {
 
             {upgradeError && (
               <div className="mb-4 flex items-start gap-2 rounded-2xl bg-red-50 px-4 py-3 ring-1 ring-red-200">
-                <ExclamationTriangleIcon className="h-4 w-4 flex-shrink-0 mt-0.5 text-red-500" />
+                <ExclamationTriangleIcon className="h-4 w-4 flex-shrink-0 mt-0.5 text-red-600" />
                 <p className="text-xs text-red-700">{upgradeError}</p>
               </div>
             )}
@@ -1455,7 +1455,7 @@ export default function OwnerDashboard() {
               <div className="flex flex-col rounded-2xl bg-jungle-50 p-4 ring-1 ring-jungle-200">
                 <p className="text-sm font-bold text-jungle-950">Premium</p>
                 <p className="mt-0.5 text-2xl font-bold text-jungle-800">
-                  $6<span className="text-xs font-semibold text-jungle-500">/mes</span>
+                  $6<span className="text-xs font-semibold text-jungle-600">/mes</span>
                 </p>
                 <ul className="mt-3 flex-1 space-y-1.5 mb-4">
                   {[
@@ -1484,7 +1484,7 @@ export default function OwnerDashboard() {
               <div className="flex flex-col rounded-2xl bg-amber-50 p-4 ring-2 ring-amber-400">
                 <div className="flex items-center justify-between">
                   <p className="text-sm font-bold text-jungle-950">Destacado</p>
-                  <span className="rounded-full bg-amber-400 px-2 py-0.5 text-[9px] font-bold text-amber-900">Más completo</span>
+                  <span className="rounded-full bg-amber-400 px-2 py-0.5 text-[11px] font-bold text-amber-900">Más completo</span>
                 </div>
                 <p className="mt-0.5 text-2xl font-bold text-amber-700">
                   $10<span className="text-xs font-semibold text-amber-500">/mes</span>
@@ -1517,12 +1517,12 @@ export default function OwnerDashboard() {
               </div>
             </div>
 
-            <p className="mt-4 text-center text-[10px] text-jungle-400">
+            <p className="mt-4 text-center text-[11px] text-jungle-600">
               Pago seguro con Stripe · Cancela cuando quieras desde Configuración
             </p>
 
             <div className="mt-3 flex flex-col items-center gap-2 border-t border-jungle-100 pt-4">
-              <p className="text-[11px] text-jungle-500">¿Prefieres pagar por transferencia bancaria?</p>
+              <p className="text-[11px] text-jungle-600">¿Prefieres pagar por transferencia bancaria?</p>
               <a
                 href={`https://wa.me/50497952651?text=${encodeURIComponent("Hola, quiero activar un plan para mi negocio en el directorio de Olanchito y prefiero pagar por transferencia bancaria.")}`}
                 target="_blank"
@@ -1549,7 +1549,7 @@ function StatCard({ icon, label, value, sub }: { icon: React.ReactNode; label: s
         {icon}
       </div>
       <p className="text-2xl font-bold text-jungle-950">{value}</p>
-      {sub && <p className="text-xs text-jungle-400">{sub}</p>}
+      {sub && <p className="text-xs text-jungle-600">{sub}</p>}
       <p className="mt-0.5 text-xs font-semibold text-jungle-600">{label}</p>
     </div>
   );

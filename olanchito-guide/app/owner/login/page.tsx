@@ -98,10 +98,10 @@ export default function OwnerLoginPage() {
           <Image src="/colibri.webp" alt="Olanchito" width={22} height={22} />
         </span>
         <div>
-          <p className="text-sm font-bold text-jungle-950" style={{ fontFamily: "var(--font-syne)" }}>
+          <h1 className="text-sm font-bold text-jungle-950" style={{ fontFamily: "var(--font-syne)" }}>
             Portal del Negocio
-          </p>
-          <p className="text-xs text-jungle-500">Directorio Olanchito</p>
+          </h1>
+          <p className="text-xs text-jungle-600">Directorio Olanchito</p>
         </div>
       </div>
 
@@ -112,7 +112,7 @@ export default function OwnerLoginPage() {
         {businesses.length > 1 ? (
           <div className="p-7">
             <p className="mb-1 text-sm font-bold text-jungle-950">Selecciona tu negocio</p>
-            <p className="mb-4 text-xs text-jungle-500">Tu correo está asociado a varios negocios.</p>
+            <p className="mb-4 text-xs text-jungle-600">Tu correo está asociado a varios negocios.</p>
             <div className="space-y-2">
               {businesses.map((b) => (
                 <button
@@ -122,7 +122,7 @@ export default function OwnerLoginPage() {
                 >
                   <BuildingStorefrontIcon className="h-5 w-5 flex-shrink-0 text-jungle-600" />
                   <span className="flex-1 text-sm font-semibold text-jungle-950">{b.name}</span>
-                  <ArrowRightIcon className="h-4 w-4 text-jungle-400" />
+                  <ArrowRightIcon className="h-4 w-4 text-jungle-600" />
                 </button>
               ))}
             </div>
@@ -133,8 +133,9 @@ export default function OwnerLoginPage() {
             <div className="p-7">
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-jungle-900">Correo electrónico</label>
+                  <label htmlFor="owner-email" className="text-xs font-semibold text-jungle-900">Correo electrónico</label>
                   <input
+                    id="owner-email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -148,7 +149,7 @@ export default function OwnerLoginPage() {
 
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <label className="flex items-center gap-1.5 text-xs font-semibold text-jungle-900">
+                    <label htmlFor="owner-password" className="flex items-center gap-1.5 text-xs font-semibold text-jungle-900">
                       <LockClosedIcon className="h-3.5 w-3.5" />
                       Contraseña
                     </label>
@@ -158,13 +159,14 @@ export default function OwnerLoginPage() {
                         type="button"
                         onClick={handleReset}
                         disabled={loading}
-                        className="text-[11px] text-jungle-500 hover:text-jungle-700 hover:underline disabled:opacity-50"
+                        className="text-[11px] text-jungle-600 hover:text-jungle-700 hover:underline disabled:opacity-50"
                       >
                         ¿Olvidaste la contraseña?
                       </button>
                     )}
                   </div>
                   <input
+                    id="owner-password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -185,9 +187,9 @@ export default function OwnerLoginPage() {
                         Enviamos un enlace a <span className="font-semibold">{email}</span>.
                       </p>
                       {resetCooldown > 0 ? (
-                        <p className="mt-1 text-[10px] text-green-600">Reenviar en {resetCooldown}s</p>
+                        <p className="mt-1 text-[11px] text-green-600">Reenviar en {resetCooldown}s</p>
                       ) : (
-                        <button type="button" onClick={handleReset} className="mt-1 text-[10px] font-semibold text-green-700 hover:underline">
+                        <button type="button" onClick={handleReset} className="mt-1 text-[11px] font-semibold text-green-700 hover:underline">
                           Reenviar enlace
                         </button>
                       )}
@@ -215,14 +217,14 @@ export default function OwnerLoginPage() {
 
             {/* No account section */}
             <div className="border-t border-jungle-100 px-7 py-4">
-              <p className="mb-2.5 text-[11px] font-semibold text-jungle-400 uppercase tracking-widest">¿Nuevo aquí?</p>
+              <p className="mb-2.5 text-[11px] font-semibold text-jungle-600 uppercase tracking-widest">¿Nuevo aquí?</p>
               <div className="flex flex-col gap-1.5">
                 <Link href="/precios" className="flex items-center gap-2 text-xs font-semibold text-jungle-700 hover:text-jungle-950 transition-colors">
-                  <ArrowRightIcon className="h-3.5 w-3.5 text-jungle-400" />
+                  <ArrowRightIcon className="h-3.5 w-3.5 text-jungle-600" />
                   Tengo negocio y quiero activar el portal
                 </Link>
                 <Link href="/registrar" className="flex items-center gap-2 text-xs font-semibold text-jungle-700 hover:text-jungle-950 transition-colors">
-                  <BuildingStorefrontIcon className="h-3.5 w-3.5 text-jungle-400" />
+                  <BuildingStorefrontIcon className="h-3.5 w-3.5 text-jungle-600" />
                   Mi negocio no está en el directorio
                 </Link>
               </div>
@@ -232,7 +234,7 @@ export default function OwnerLoginPage() {
       </div>
 
       {/* Help */}
-      <p className="mt-6 text-center text-[11px] text-jungle-400">
+      <p className="mt-6 text-center text-[11px] text-jungle-600">
         ¿Necesitas ayuda?{" "}
         <a href="mailto:support@olanchito.com" className="font-semibold text-jungle-600 hover:underline">
           support@olanchito.com

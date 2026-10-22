@@ -73,6 +73,8 @@ export default function DonateForm() {
         <input
           type="email"
           inputMode="email"
+          autoComplete="email"
+          aria-label="Su correo (opcional)"
           placeholder="Tu correo (opcional, para recibir un agradecimiento)"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -94,6 +96,7 @@ export default function DonateForm() {
         <input
           type="number"
           inputMode="decimal"
+          aria-label="Monto de la donación"
           min={1}
           max={5000}
           step="any"
@@ -131,9 +134,9 @@ export default function DonateForm() {
         onClick={handleDonate}
         disabled={!isValid || loading}
         className="w-full rounded-2xl py-3 text-sm font-bold transition-colors disabled:opacity-50"
-        style={{ background: "#BA7517", color: "#FAEEDA" }}
-        onMouseEnter={(e) => { if (isValid && !loading) e.currentTarget.style.background = "#854F0B" }}
-        onMouseLeave={(e) => { if (isValid && !loading) e.currentTarget.style.background = "#BA7517" }}
+        style={{ background: "#8A5512", color: "#FFFFFF" }}
+        onMouseEnter={(e) => { if (isValid && !loading) e.currentTarget.style.background = "#6B400C" }}
+        onMouseLeave={(e) => { if (isValid && !loading) e.currentTarget.style.background = "#8A5512" }}
       >
         {loading
           ? "Redirigiendo a pago…"

@@ -68,7 +68,7 @@ export default function AdminProposals({
               href={waLink(a.whatsapp, welcome(a))}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex flex-shrink-0 items-center gap-1.5 rounded-xl bg-green-600 px-3 py-2 text-xs font-semibold text-white hover:bg-green-700"
+              className="inline-flex flex-shrink-0 items-center gap-1.5 rounded-xl bg-green-700 px-3 py-2 text-xs font-semibold text-white hover:bg-green-800"
             >
               <ChatBubbleLeftRightIcon className="h-4 w-4" />
               Avisar por WhatsApp
@@ -81,9 +81,9 @@ export default function AdminProposals({
 
       {rows.length === 0 && (
         <div className="rounded-2xl bg-white p-8 text-center ring-1 ring-black/5">
-          <InboxIcon className="mx-auto mb-2 h-8 w-8 text-jungle-400" />
+          <InboxIcon className="mx-auto mb-2 h-8 w-8 text-jungle-600" />
           <p className="text-sm text-jungle-600">No hay propuestas pendientes.</p>
-          <p className="mt-1 text-xs text-jungle-400">
+          <p className="mt-1 text-xs text-jungle-600">
             Los vecinos sugieren negocios en <a href="/sugerir-negocio" target="_blank" className="underline">olanchito.com/sugerir-negocio</a>.
           </p>
         </div>
@@ -96,7 +96,7 @@ export default function AdminProposals({
           <div key={row.id} className="rounded-2xl bg-white p-4 ring-1 ring-black/5 sm:p-5">
             <div className="flex flex-wrap items-center gap-2">
               <p className="text-sm font-semibold text-jungle-950 sm:text-base">{p.name}</p>
-              <span className="text-[11px] text-jungle-400">
+              <span className="text-[11px] text-jungle-600">
                 {new Date(row.created_at).toLocaleDateString("es-HN", { day: "numeric", month: "short" })}
               </span>
             </div>
@@ -124,7 +124,7 @@ export default function AdminProposals({
               )}
               {p.description && <p className="text-jungle-600">{p.description}</p>}
               {(p.submitter_name || p.submitter_contact) && (
-                <p className="flex items-center gap-1.5 text-jungle-500">
+                <p className="flex items-center gap-1.5 text-jungle-600">
                   <UserIcon className="h-3.5 w-3.5" />
                   Sugerido por {[p.submitter_name, p.submitter_contact].filter(Boolean).join(" · ")}
                 </p>

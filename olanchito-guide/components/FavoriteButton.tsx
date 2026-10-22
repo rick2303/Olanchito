@@ -46,15 +46,15 @@ export default function FavoriteButton({
       aria-label={saved ? "Quitar de favoritos" : "Guardar en favoritos"}
       className={[
         "inline-flex items-center justify-center rounded-full transition-all duration-200",
-        "h-8 w-8 bg-white/90 backdrop-blur-sm shadow-sm ring-1 ring-black/10",
+        "h-10 w-10 bg-white/90 backdrop-blur-sm shadow-sm ring-1 ring-black/10",
         "hover:scale-110 active:scale-95",
         className,
       ].join(" ")}
     >
       {saved ? (
-        <HeartSolid className="h-4 w-4 text-red-500" />
+        <HeartSolid className="h-4 w-4 text-red-600" />
       ) : (
-        <HeartIcon className="h-4 w-4 text-jungle-500" />
+        <HeartIcon className="h-4 w-4 text-jungle-600" />
       )}
     </button>
   );

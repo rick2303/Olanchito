@@ -220,7 +220,7 @@ export default function CatalogManager({ businessId, slug, maxItems }: Props) {
             <h3 className="text-base font-bold text-jungle-950">
               {editId ? "Editar item" : "Agregar item al catálogo"}
             </h3>
-            <button onClick={resetForm} className="rounded-xl p-1.5 text-jungle-500 hover:bg-jungle-50">
+            <button onClick={resetForm} className="rounded-xl p-1.5 text-jungle-600 hover:bg-jungle-50">
               <XMarkIcon className="h-5 w-5" />
             </button>
           </div>
@@ -234,7 +234,7 @@ export default function CatalogManager({ businessId, slug, maxItems }: Props) {
               {imagePreview ? (
                 <Image src={imagePreview} alt="Preview" fill className="object-cover" />
               ) : (
-                <div className="flex flex-col items-center gap-2 text-jungle-500">
+                <div className="flex flex-col items-center gap-2 text-jungle-600">
                   <ArrowUpTrayIcon className="h-7 w-7" />
                   <span className="text-xs font-semibold">Subir imagen (opcional)</span>
                 </div>
@@ -263,7 +263,7 @@ export default function CatalogManager({ businessId, slug, maxItems }: Props) {
             <div className="space-y-1.5">
               <label className="text-xs font-semibold text-jungle-900">
                 Descripción (opcional)
-                <span className={`ml-2 font-normal ${form.description.length > 255 ? "text-red-500" : "text-jungle-500"}`}>
+                <span className={`ml-2 font-normal ${form.description.length > 255 ? "text-red-600" : "text-jungle-600"}`}>
                   {form.description.length}/255
                 </span>
               </label>
@@ -305,7 +305,7 @@ export default function CatalogManager({ businessId, slug, maxItems }: Props) {
                 />
               </div>
               {form.price && (
-                <p className="text-[10px] text-jungle-400">
+                <p className="text-[11px] text-jungle-600">
                   Se mostrará como: <span className="font-semibold">{form.currency === "HNL" ? `L. ${form.price}` : `$${form.price}`}</span>
                 </p>
               )}
@@ -343,7 +343,7 @@ export default function CatalogManager({ businessId, slug, maxItems }: Props) {
       ) : (
         <div className="space-y-2">
           {maxItems !== null && (
-            <p className="text-xs text-jungle-500 text-right">{items.length} / {maxItems} items</p>
+            <p className="text-xs text-jungle-600 text-right">{items.length} / {maxItems} items</p>
           )}
           <button
             onClick={() => setShowForm(true)}
@@ -366,10 +366,10 @@ export default function CatalogManager({ businessId, slug, maxItems }: Props) {
       ) : items.length === 0 ? (
         <div className="rounded-3xl bg-white p-8 ring-1 ring-black/5 text-center">
           <div className="mx-auto mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-jungle-50 ring-1 ring-jungle-200">
-            <TagIcon className="h-6 w-6 text-jungle-500" />
+            <TagIcon className="h-6 w-6 text-jungle-600" />
           </div>
           <p className="text-sm font-semibold text-jungle-700">Tu catálogo está vacío</p>
-          <p className="mt-1 text-xs text-jungle-500">Agrega productos o servicios para mostrarlos a tus clientes.</p>
+          <p className="mt-1 text-xs text-jungle-600">Agrega productos o servicios para mostrarlos a tus clientes.</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -398,15 +398,15 @@ export default function CatalogManager({ businessId, slug, maxItems }: Props) {
                     <p className="text-xs font-semibold text-jungle-600">{formatPrice(item.price, item.currency)}</p>
                   )}
                   {item.description && (
-                    <p className="mt-0.5 truncate text-xs text-jungle-500">{item.description}</p>
+                    <p className="mt-0.5 truncate text-xs text-jungle-600">{item.description}</p>
                   )}
                   {/* Availability badge — moves here on mobile to free up action row */}
                   <button
                     onClick={() => handleToggleAvailable(item)}
-                    className={`mt-1.5 rounded-lg px-2 py-0.5 text-[10px] font-bold transition-colors ${
+                    className={`mt-1.5 rounded-lg px-2 py-0.5 text-[11px] font-bold transition-colors ${
                       item.is_available
                         ? "bg-green-100 text-green-700 hover:bg-green-200"
-                        : "bg-jungle-100 text-jungle-500 hover:bg-jungle-200"
+                        : "bg-jungle-100 text-jungle-600 hover:bg-jungle-200"
                     }`}
                   >
                     {item.is_available ? "● Disponible" : "○ No disponible"}
@@ -417,7 +417,7 @@ export default function CatalogManager({ businessId, slug, maxItems }: Props) {
                 <div className="flex flex-shrink-0 items-center gap-1">
                   <button
                     onClick={() => handleEdit(item)}
-                    className="rounded-xl p-2 text-jungle-500 hover:bg-jungle-50"
+                    className="rounded-xl p-2 text-jungle-600 hover:bg-jungle-50"
                   >
                     <PencilSquareIcon className="h-4 w-4" />
                   </button>

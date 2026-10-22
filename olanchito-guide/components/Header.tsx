@@ -96,7 +96,7 @@ export default function Header() {
               >
                 Olanchito
               </span>
-              <span className="block text-[10px] font-medium" style={{ color: "var(--ink-3)" }}>
+              <span className="block text-[11px] font-medium" style={{ color: "var(--ink-3)" }}>
                 Guía empresarial local
               </span>
             </span>

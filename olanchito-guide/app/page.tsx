@@ -450,8 +450,8 @@ export default async function HomePage() {
                   Próximamente
                 </div>
                 <span
-                  className="text-[10px] font-bold uppercase tracking-[0.1em]"
-                  style={{ color: "rgba(255,255,255,0.35)" }}
+                  className="text-[11px] font-bold uppercase tracking-[0.1em]"
+                  style={{ color: "rgba(255,255,255,0.7)" }}
                 >
                   Solución para PYMEs
                 </span>

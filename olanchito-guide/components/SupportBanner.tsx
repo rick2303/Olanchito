@@ -34,14 +34,14 @@ export function SupportBanner() {
           <p className="text-[13px] font-medium" style={{ color: "#633806" }}>
             ¿Le ayudó este directorio?
           </p>
-          <p className="mt-0.5 text-[12px] leading-relaxed" style={{ color: "#9A6B3A" }}>
+          <p className="mt-0.5 text-[12px] leading-relaxed" style={{ color: "#8A5D2E" }}>
             Olanchito.com es gratuito y lo mantenemos con nuestro propio tiempo.
             Si les fue útil, pueden apoyarnos con una pequeña donación.
           </p>
           <Link
             href="/donar"
             className="mt-3 inline-block rounded-full px-4 py-1.5 text-[12px] font-semibold transition-opacity hover:opacity-80"
-            style={{ background: "#BA7517", color: "#FAEEDA" }}
+            style={{ background: "#8A5512", color: "#FFFFFF" }}
           >
             Apoyar el directorio
           </Link>

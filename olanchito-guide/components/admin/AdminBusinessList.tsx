@@ -366,7 +366,7 @@ export default function AdminBusinessList() {
     <div className="space-y-4">
       {/* Search */}
       <div className="relative">
-        <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-jungle-400" />
+        <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-jungle-600" />
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -376,7 +376,7 @@ export default function AdminBusinessList() {
       </div>
 
       {/* Count */}
-      <p className="text-xs text-jungle-500">
+      <p className="text-xs text-jungle-600">
         {filtered.length} negocio{filtered.length !== 1 ? "s" : ""}
         {search ? ` para "${search}"` : ""}
       </p>
@@ -426,18 +426,18 @@ export default function AdminBusinessList() {
                     )}
                     {/* Subscription tier badge */}
                     {b.owner_email && (
-                      <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold ring-1 ${
+                      <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold ring-1 ${
                         b.subscription_tier === "featured"
                           ? "bg-amber-100 text-amber-700 ring-amber-200"
                           : b.subscription_tier === "premium"
                             ? "bg-green-100 text-green-700 ring-green-200"
-                            : "bg-jungle-100 text-jungle-400 ring-jungle-200"
+                            : "bg-jungle-100 text-jungle-600 ring-jungle-200"
                       }`}>
                         {b.subscription_tier === "featured" ? "★ Destacado" : b.subscription_tier === "premium" ? "● Premium" : "○ Gratis"}
                       </span>
                     )}
                   </div>
-                  <p className="truncate text-[11px] text-jungle-400">
+                  <p className="truncate text-[11px] text-jungle-600">
                     /{b.slug} · {categoryName(b.category_id)} · {b.view_count ?? 0} vistas
                     {b.owner_email && <span className="ml-1 text-jungle-300">· {b.owner_email}</span>}
                   </p>
@@ -448,7 +448,7 @@ export default function AdminBusinessList() {
                     while (next <= today) next.setMonth(next.getMonth() + 1);
                     const daysLeft = Math.ceil((next.getTime() - today.getTime()) / 86400000);
                     return (
-                      <p className={`text-[10px] font-semibold ${daysLeft <= 5 ? "text-red-500" : "text-amber-500"}`}>
+                      <p className={`text-[11px] font-semibold ${daysLeft <= 5 ? "text-red-600" : "text-amber-500"}`}>
                         💳 Pago manual · desde {started.toLocaleDateString("es-HN", { day: "numeric", month: "short", year: "numeric" })} · próximo cobro {next.toLocaleDateString("es-HN", { day: "numeric", month: "short" })} ({daysLeft}d)
                       </p>
                     );
@@ -488,10 +488,10 @@ export default function AdminBusinessList() {
                       </button>
                     </div>
                     {inviteResult[b.id] && (
-                      <p className={`text-[10px] font-semibold ${
+                      <p className={`text-[11px] font-semibold ${
                         inviteResult[b.id] === "sent"   ? "text-green-600" :
-                        inviteResult[b.id] === "exists" ? "text-jungle-500" :
-                        "text-red-500"
+                        inviteResult[b.id] === "exists" ? "text-jungle-600" :
+                        "text-red-600"
                       }`}>
                         {inviteResult[b.id] === "sent"   ? "✓ Correo enviado" :
                          inviteResult[b.id] === "exists" ? "Ya tiene cuenta" :
@@ -648,7 +648,7 @@ export default function AdminBusinessList() {
                       <div className="space-y-1">
                         <label className="text-[11px] font-semibold text-jungle-700">
                           Email del dueño
-                          <span className="ml-1 font-normal text-jungle-400">— necesario para acceder al portal</span>
+                          <span className="ml-1 font-normal text-jungle-600">— necesario para acceder al portal</span>
                         </label>
                         <input
                           name="owner_email"
@@ -673,7 +673,7 @@ export default function AdminBusinessList() {
                                   ? t === "featured"
                                     ? "bg-amber-500 text-white"
                                     : t === "premium"
-                                      ? "bg-green-600 text-white"
+                                      ? "bg-green-700 text-white"
                                       : "bg-jungle-600 text-white"
                                   : "bg-white text-jungle-600 ring-1 ring-jungle-200 hover:bg-jungle-50"
                               }`}
@@ -727,7 +727,7 @@ export default function AdminBusinessList() {
                           <input type="file" accept="image/*" hidden onChange={handleImageChange} />
                         </label>
                         {editForm.newImage && (
-                          <span className="text-[11px] text-jungle-500 truncate max-w-[120px]">
+                          <span className="text-[11px] text-jungle-600 truncate max-w-[120px]">
                             {editForm.newImage.name}
                           </span>
                         )}

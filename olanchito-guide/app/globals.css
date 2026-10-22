@@ -16,7 +16,7 @@
     /* Ink / text */
     --ink: #0C1E17;
     --ink-2: #3A5749;
-    --ink-3: #6B8A7A;
+    --ink-3: #536F60; /* antes #6B8A7A (3.8:1); ahora ≥4.8:1 sobre todos los fondos claros */
 
     /* Brand */
     --primary: #124934;
@@ -24,6 +24,7 @@
     --primary-mid: #2E6B52;
     --accent: #35B98C;
     --accent-soft: #DEF4EA;
+    --accent-ink: #1B7F5B; /* acento para TEXTO: --accent no llega a 4.5:1 sobre fondo claro */
 
     /* System */
     --line: rgba(10, 30, 20, 0.07);
@@ -409,7 +410,7 @@
   /* ─── Section header ─────────────────────────────────── */
   .section-label {
     @apply text-xs font-bold uppercase tracking-[0.1em];
-    color: var(--accent);
+    color: var(--accent-ink);
   }
 
   /* ─── Scrollable row (filter pills) ─────────────────── */
@@ -547,5 +548,49 @@
 @media (max-width: 480px) {
   .mqy-macbook-wrap {
     --mqy-macbook-scale: 0.4;
+  }
+}
+
+/* ─── Accesibilidad ─────────────────────────────────── */
+
+/* Enlace "Saltar al contenido": invisible hasta que se navega con teclado */
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -100px;
+  z-index: 100;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+.skip-link:focus {
+  top: 1rem;
+}
+
+/* Foco visible en todo lo que se puede tocar con teclado */
+:where(a, button, input, select, textarea, [role="button"], [tabindex]):focus-visible {
+  outline: 2px solid var(--accent-ink);
+  outline-offset: 2px;
+}
+
+/* En celular los filtros se tocan con el dedo: área mínima cómoda */
+@media (max-width: 640px) {
+  .filter-pill {
+    min-height: 40px;
+  }
+}
+
+/* Respeta "reducir movimiento" del sistema */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

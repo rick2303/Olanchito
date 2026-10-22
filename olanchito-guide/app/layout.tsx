@@ -85,9 +85,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
 
       <body className={`${syne.variable} ${jakarta.variable} font-jakarta page-shell`}>
+        {!hideShell && (
+          <a href="#contenido" className="skip-link">
+            Saltar al contenido
+          </a>
+        )}
         <div className="min-h-screen flex flex-col">
           {!hideShell && <Header />}
-          <main className="relative flex-1">{children}</main>
+          {/* Cada página trae su propio <main>; aquí solo el contenedor (antes había dos <main>) */}
+          <div id="contenido" tabIndex={-1} className="relative flex-1 outline-none">{children}</div>
           {!hideShell && <Footer />}
         </div>
         {!hideShell && <CookieBanner />}

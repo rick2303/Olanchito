@@ -49,12 +49,12 @@ export default function AdminLoginPage() {
             <Image src="/colibri.webp" alt="Olanchito" width={24} height={24} />
           </span>
           <div>
-            <p
+            <h1
               className="text-base font-bold text-jungle-950"
               style={{ fontFamily: "var(--font-syne)" }}
             >
               Panel Admin
-            </p>
+            </h1>
             <p className="text-xs text-jungle-600">Directorio Olanchito</p>
           </div>
         </div>
@@ -62,10 +62,12 @@ export default function AdminLoginPage() {
         <div className="rounded-3xl bg-white p-7 ring-1 ring-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.07)]">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-jungle-900">
+              <label htmlFor="admin-email" className="text-xs font-semibold text-jungle-900">
                 Correo
               </label>
               <input
+                id="admin-email"
+                autoComplete="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -77,11 +79,13 @@ export default function AdminLoginPage() {
             </div>
 
             <div className="space-y-1.5">
-              <label className="flex items-center gap-1.5 text-xs font-semibold text-jungle-900">
+              <label htmlFor="admin-password" className="flex items-center gap-1.5 text-xs font-semibold text-jungle-900">
                 <LockClosedIcon className="h-3.5 w-3.5" />
                 Contraseña
               </label>
               <input
+                id="admin-password"
+                autoComplete="current-password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}

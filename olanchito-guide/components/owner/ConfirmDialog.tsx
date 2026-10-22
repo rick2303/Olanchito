@@ -23,7 +23,7 @@ export default function ConfirmDialog({
         {/* Icon */}
         <div className="mb-4 flex justify-center">
           <div className="grid h-14 w-14 place-items-center rounded-2xl bg-red-50 ring-1 ring-red-200">
-            <TrashIcon className="h-7 w-7 text-red-500" />
+            <TrashIcon className="h-7 w-7 text-red-600" />
           </div>
         </div>
 
@@ -33,7 +33,7 @@ export default function ConfirmDialog({
             {title}
           </p>
           {description && (
-            <p className="mt-1.5 text-sm text-jungle-500">{description}</p>
+            <p className="mt-1.5 text-sm text-jungle-600">{description}</p>
           )}
         </div>
 

@@ -155,9 +155,9 @@ export default function PhotoGallery({ businessId, slug, maxPhotos }: { business
               <p className="text-sm font-bold text-jungle-950">
                 {pending.length} foto{pending.length > 1 ? "s" : ""} seleccionada{pending.length > 1 ? "s" : ""}
               </p>
-              <p className="text-xs text-jungle-500">Revisa antes de subir. Haz click en una para quitarla.</p>
+              <p className="text-xs text-jungle-600">Revisa antes de subir. Haz click en una para quitarla.</p>
             </div>
-            <button onClick={clearPending} className="rounded-xl p-1.5 text-jungle-400 hover:bg-jungle-50">
+            <button onClick={clearPending} className="rounded-xl p-1.5 text-jungle-600 hover:bg-jungle-50">
               <XMarkIcon className="h-5 w-5" />
             </button>
           </div>
@@ -209,7 +209,7 @@ export default function PhotoGallery({ businessId, slug, maxPhotos }: { business
 
       {/* ── Header con contador y botón ── */}
       <div className="flex items-center justify-between gap-3">
-        <p className="flex-shrink-0 text-xs text-jungle-500">{photos.length} / {maxPhotos} fotos</p>
+        <p className="flex-shrink-0 text-xs text-jungle-600">{photos.length} / {maxPhotos} fotos</p>
         {photos.length < maxPhotos && pending.length === 0 && (
           <button
             onClick={() => fileRef.current?.click()}
@@ -242,7 +242,7 @@ export default function PhotoGallery({ businessId, slug, maxPhotos }: { business
         >
           <PhotoIcon className="h-10 w-10 text-jungle-300" />
           <p className="text-sm font-semibold text-jungle-600">Sube fotos de tu negocio</p>
-          <p className="text-xs text-jungle-400">Se muestran en tu página pública · Máx. {maxPhotos} fotos</p>
+          <p className="text-xs text-jungle-600">Se muestran en tu página pública · Máx. {maxPhotos} fotos</p>
         </div>
       ) : photos.length > 0 ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -260,10 +260,10 @@ export default function PhotoGallery({ businessId, slug, maxPhotos }: { business
           {slotsLeft > 0 && pending.length === 0 && (
             <button
               onClick={() => fileRef.current?.click()}
-              className="flex aspect-square flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-jungle-200 bg-jungle-50 text-jungle-400 hover:border-jungle-400 hover:bg-jungle-100 transition-colors"
+              className="flex aspect-square flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-jungle-200 bg-jungle-50 text-jungle-600 hover:border-jungle-400 hover:bg-jungle-100 transition-colors"
             >
               <ArrowUpTrayIcon className="h-6 w-6" />
-              <span className="text-[10px] font-semibold">Agregar</span>
+              <span className="text-[11px] font-semibold">Agregar</span>
             </button>
           )}
         </div>

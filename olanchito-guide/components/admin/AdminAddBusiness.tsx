@@ -222,7 +222,7 @@ export default function AdminAddBusiness() {
               : <ExclamationTriangleIcon className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600" />
             }
             <p className="flex-1 text-sm font-medium text-jungle-900">{toast.msg}</p>
-            <button onClick={() => setToast(null)} className="text-jungle-400">
+            <button onClick={() => setToast(null)} className="text-jungle-600">
               <XMarkIcon className="h-4 w-4" />
             </button>
           </div>
@@ -332,9 +332,9 @@ export default function AdminAddBusiness() {
             {/* Hours */}
             <div className="space-y-1.5">
               <label className="flex items-center gap-1.5 text-xs font-semibold text-jungle-800">
-                <ClockIcon className="h-4 w-4 text-jungle-500" />
+                <ClockIcon className="h-4 w-4 text-jungle-600" />
                 Horario
-                <span className="font-normal text-jungle-400">(opcional)</span>
+                <span className="font-normal text-jungle-600">(opcional)</span>
               </label>
               <HoursInput
                 value={form.hours}
@@ -400,9 +400,9 @@ export default function AdminAddBusiness() {
             {/* Location picker */}
             <div className="rounded-xl border border-jungle-200 bg-jungle-50/30 p-4 space-y-2">
               <p className="flex items-center gap-1.5 text-xs font-semibold text-jungle-800">
-                <MapPinIcon className="h-4 w-4 text-jungle-500" />
+                <MapPinIcon className="h-4 w-4 text-jungle-600" />
                 Ubicación en el mapa
-                <span className="font-normal text-jungle-400">(opcional)</span>
+                <span className="font-normal text-jungle-600">(opcional)</span>
               </p>
               <LocationPickerWrapper value={location} onChange={setLocation} />
             </div>
@@ -412,7 +412,7 @@ export default function AdminAddBusiness() {
               <p className="mb-3 flex items-center gap-1.5 text-xs font-semibold text-jungle-800">
                 <PhotoIcon className="h-4 w-4" />
                 Imagen del negocio
-                <span className="font-normal text-jungle-400">(opcional)</span>
+                <span className="font-normal text-jungle-600">(opcional)</span>
               </p>
               <div className="grid gap-3 sm:grid-cols-[1fr_100px]">
                 <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-jungle-200 bg-white py-6 text-xs font-medium text-jungle-600 transition-colors hover:bg-jungle-50">
@@ -431,7 +431,7 @@ export default function AdminAddBusiness() {
                         onError={() => setImgError(true)}
                       />
                     ) : (
-                      <div className="absolute inset-0 grid place-items-center text-[10px] text-jungle-400">
+                      <div className="absolute inset-0 grid place-items-center text-[11px] text-jungle-600">
                         Vista previa
                       </div>
                     )}
@@ -477,9 +477,9 @@ function Field({
             {icon}
           </span>
           {label}
-          {required && <span className="text-red-500">*</span>}
+          {required && <span className="text-red-600">*</span>}
         </label>
-        {hint && <span className="text-[11px] font-mono text-jungle-400">{hint}</span>}
+        {hint && <span className="text-[11px] font-mono text-jungle-600">{hint}</span>}
       </div>
       {children}
     </div>

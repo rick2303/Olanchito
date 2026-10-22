@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { cloneElement, isValidElement, useEffect, useId, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 function slugify(str: string) {
@@ -356,12 +356,12 @@ export default function JoinPage() {
           <aside className="space-y-4">
             {/* Process steps */}
             <div className="panel p-5">
-              <h3
+              <h2
                 className="text-sm font-semibold mb-4"
                 style={{ fontFamily: "var(--font-syne)", color: "var(--ink)" }}
               >
                 ¿Qué ocurre después?
-              </h3>
+              </h2>
               <div className="space-y-3">
                 <ProcessStep n="1" title="Revisión" desc="Validamos que los datos estén completos y sean correctos." />
                 <ProcessStep n="2" title="Confirmación" desc="Le contactamos si necesitamos información adicional." />
@@ -377,7 +377,7 @@ export default function JoinPage() {
             >
               <p
                 className="text-xs font-bold uppercase tracking-[0.08em] mb-2"
-                style={{ color: "rgba(255,255,255,0.5)" }}
+                style={{ color: "rgba(255,255,255,0.72)" }}
               >
                 Consejo
               </p>
@@ -411,10 +411,14 @@ function FormField({
   required?: boolean;
   children: React.ReactNode;
 }) {
+  // Conecta la etiqueta con su campo para lectores de pantalla y para que tocar la etiqueta enfoque el campo
+  const id = useId();
+  const field = isValidElement<{ id?: string }>(children) ? cloneElement(children, { id }) : children;
   return (
     <div className="space-y-1.5">
       <div className="flex items-center justify-between gap-2">
         <label
+          htmlFor={id}
           className="flex items-center gap-1.5 text-xs font-semibold"
           style={{ color: "var(--ink)" }}
         >
@@ -431,7 +435,7 @@ function FormField({
           <span className="text-[11px]" style={{ color: "var(--ink-3)" }}>{hint}</span>
         ) : null}
       </div>
-      {children}
+      {field}
     </div>
   );
 }

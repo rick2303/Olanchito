@@ -215,7 +215,7 @@ export default function AdminDashboard() {
               <p className="text-sm font-bold text-jungle-950" style={{ fontFamily: "var(--font-syne)" }}>
                 Panel Admin
               </p>
-              <p className="text-[10px] text-jungle-500">Directorio Olanchito</p>
+              <p className="text-[11px] text-jungle-600">Directorio Olanchito</p>
             </div>
           </div>
           <button
@@ -250,11 +250,11 @@ export default function AdminDashboard() {
             { label: "Sugerencias",   value: suggestionsCount, Icon: FlagIcon },
           ].map(({ label, value, Icon }) => (
             <div key={label} className="rounded-2xl bg-white p-4 ring-1 ring-black/5">
-              <Icon className="mb-1.5 h-5 w-5 text-jungle-500" />
+              <Icon className="mb-1.5 h-5 w-5 text-jungle-600" />
               <p className="text-xl font-bold text-jungle-950" style={{ fontFamily: "var(--font-syne)" }}>
                 {value}
               </p>
-              <p className="text-xs text-jungle-500">{label}</p>
+              <p className="text-xs text-jungle-600">{label}</p>
             </div>
           ))}
         </div>
@@ -271,7 +271,7 @@ export default function AdminDashboard() {
                 const pct = max > 0 ? Math.round((b.view_count / max) * 100) : 0;
                 return (
                   <div key={b.slug} className="flex items-center gap-3">
-                    <span className="w-4 flex-shrink-0 text-right text-xs font-bold text-jungle-400">
+                    <span className="w-4 flex-shrink-0 text-right text-xs font-bold text-jungle-600">
                       {i + 1}
                     </span>
                     <div className="min-w-0 flex-1">
@@ -316,7 +316,7 @@ export default function AdminDashboard() {
             <BuildingStorefrontIcon className="h-3.5 w-3.5" />
             Por verificar
             {unverifiedCount > 0 && (
-              <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-bold">
+              <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-[11px] font-bold">
                 {unverifiedCount}
               </span>
             )}
@@ -334,7 +334,7 @@ export default function AdminDashboard() {
             <StarIcon className="h-3.5 w-3.5" />
             Reseñas
             {hiddenCount > 0 && (
-              <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-bold">
+              <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-[11px] font-bold">
                 {hiddenCount}
               </span>
             )}
@@ -378,7 +378,7 @@ export default function AdminDashboard() {
             <FlagIcon className="h-3.5 w-3.5" />
             Sugerencias
             {suggestionsCount > 0 && (
-              <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-bold">
+              <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-[11px] font-bold">
                 {suggestionsCount}
               </span>
             )}
@@ -396,7 +396,7 @@ export default function AdminDashboard() {
             <LightBulbIcon className="h-3.5 w-3.5" />
             Propuestas
             {proposals.length > 0 && (
-              <span className="rounded-full bg-amber-400 px-1.5 py-0.5 text-[10px] font-bold text-white">
+              <span className="rounded-full bg-amber-400 px-1.5 py-0.5 text-[11px] font-bold text-white">
                 {proposals.length}
               </span>
             )}
@@ -414,7 +414,7 @@ export default function AdminDashboard() {
             <ClipboardDocumentCheckIcon className="h-3.5 w-3.5" />
             Fichas incompletas
             {incompleteCount !== null && incompleteCount > 0 && (
-              <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-bold">
+              <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-[11px] font-bold">
                 {incompleteCount}
               </span>
             )}
@@ -435,7 +435,7 @@ export default function AdminDashboard() {
               <div className="space-y-3">
                 {unverified.length === 0 && (
                   <div className="rounded-2xl bg-white p-8 text-center ring-1 ring-black/5">
-                    <CheckCircleIcon className="mx-auto mb-2 h-8 w-8 text-jungle-400" />
+                    <CheckCircleIcon className="mx-auto mb-2 h-8 w-8 text-jungle-600" />
                     <p className="text-sm text-jungle-600">No hay negocios pendientes de verificación.</p>
                   </div>
                 )}
@@ -488,7 +488,7 @@ export default function AdminDashboard() {
                         <button
                           onClick={() => verifyBusiness(b.id)}
                           disabled={busy}
-                          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-green-600 px-3 py-2 text-xs font-semibold text-white hover:bg-green-700 disabled:opacity-50 sm:flex-none sm:py-1.5"
+                          className="flex flex-1 items-center justify-center gap-1.5 rounded-xl bg-green-700 px-3 py-2 text-xs font-semibold text-white hover:bg-green-800 disabled:opacity-50 sm:flex-none sm:py-1.5"
                         >
                           <CheckCircleIcon className="h-3.5 w-3.5" />
                           {busy ? "..." : "Verificar"}
@@ -537,14 +537,14 @@ export default function AdminDashboard() {
                             </span>
                           )}
                         </div>
-                        <p className="mt-1 text-[11px] text-jungle-400">
+                        <p className="mt-1 text-[11px] text-jungle-600">
                           {s.business_slug} · {formatDate(s.created_at)}
                         </p>
                         <p className="mt-2 text-sm leading-relaxed text-jungle-700">{s.description}</p>
                       </div>
                       <button
                         onClick={() => deleteSuggestion(s.id)}
-                        className="flex-shrink-0 rounded-xl bg-white p-2 text-jungle-400 ring-1 ring-black/10 hover:bg-red-50 hover:text-red-600"
+                        className="flex-shrink-0 rounded-xl bg-white p-2 text-jungle-600 ring-1 ring-black/10 hover:bg-red-50 hover:text-red-600"
                         title="Marcar como revisado"
                       >
                         <TrashIcon className="h-4 w-4" />
@@ -595,7 +595,7 @@ export default function AdminDashboard() {
                             ))}
                           </div>
                           {!r.is_visible && (
-                            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-semibold text-gray-500 ring-1 ring-gray-200">
+                            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-semibold text-gray-500 ring-1 ring-gray-200">
                               Oculta
                             </span>
                           )}
@@ -628,7 +628,7 @@ export default function AdminDashboard() {
                       </div>
 
                       {/* Slug + date */}
-                      <p className="mt-1 text-[11px] text-jungle-500">
+                      <p className="mt-1 text-[11px] text-jungle-600">
                         {r.business_slug} · {formatDate(r.created_at)}
                       </p>
 

@@ -216,7 +216,7 @@ export default function BusinessMap({ businesses }: BusinessMapProps) {
                         borderRadius: 99,
                       }}
                     >
-                      ⭐ Destacado
+                      Destacado
                     </span>
                   )}
                   {b.isNew && (
@@ -230,7 +230,7 @@ export default function BusinessMap({ businesses }: BusinessMapProps) {
                         borderRadius: 99,
                       }}
                     >
-                      ✨ Nuevo
+                      Nuevo
                     </span>
                   )}
                 </div>

@@ -119,10 +119,10 @@ export default async function NovedadesSection() {
                       </p>
                     </div>
                     <span
-                      className="flex-shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                      className="flex-shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold"
                       style={{ background: "#dcfce7", color: "#15803d" }}
                     >
-                      ✨ Nuevo
+                      Nuevo
                     </span>
                   </Link>
                 );
@@ -182,7 +182,7 @@ export default async function NovedadesSection() {
                       "{r.comment}"
                     </p>
                   )}
-                  <p className="mt-1.5 text-[10px]" style={{ color: "var(--ink-3)" }}>
+                  <p className="mt-1.5 text-[11px]" style={{ color: "var(--ink-3)" }}>
                     — {r.author_name}
                   </p>
                 </Link>

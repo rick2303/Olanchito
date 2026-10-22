@@ -42,7 +42,7 @@ export default function ReviewRequest({ slug, name, reviewCount }: { slug: strin
           href={`https://wa.me/?text=${encodeURIComponent(message)}`}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center justify-center gap-2 rounded-2xl bg-green-600 px-4 py-2.5 text-xs font-semibold text-white hover:bg-green-700"
+          className="inline-flex items-center justify-center gap-2 rounded-2xl bg-green-700 px-4 py-2.5 text-xs font-semibold text-white hover:bg-green-800"
         >
           <ChatBubbleLeftRightIcon className="h-4 w-4" />
           Enviar por WhatsApp

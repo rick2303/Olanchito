@@ -27,7 +27,7 @@ export default function OpenNowBadge({ hours, size = "md" }: { hours?: string | 
       Abierto ahora
     </span>
   ) : (
-    <span className={`inline-flex items-center gap-1.5 rounded-full bg-red-50 ${pad} text-[11px] font-semibold text-red-600 ring-1 ring-red-200`}>
+    <span className={`inline-flex items-center gap-1.5 rounded-full bg-red-50 ${pad} text-[11px] font-semibold text-red-700 ring-1 ring-red-200`}>
       <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
       Cerrado
     </span>

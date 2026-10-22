@@ -59,7 +59,7 @@ export default function CategoryCard({ cat, iconDef, count }: CategoryCardProps)
 
       <div
         className="flex items-center gap-1 text-xs font-semibold transition-transform duration-200 group-hover:translate-x-0.5"
-        style={{ color: iconDef.accent }}
+        style={{ color: "var(--primary-mid)" }}
       >
         Explorar
         <ArrowRightIcon className="h-3 w-3" />

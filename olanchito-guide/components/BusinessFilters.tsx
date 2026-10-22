@@ -9,6 +9,7 @@ import {
   BuildingStorefrontIcon,
   MapPinIcon,
   ClockIcon,
+  SparklesIcon,
 } from "@heroicons/react/24/outline";
 import { trackEvent } from "@/lib/analytics";
 
@@ -185,6 +186,7 @@ export default function BusinessFilters({ categories }: { categories: Category[]
             onChange={(e) => setTerm(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && doSearch()}
             onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+            aria-label="Buscar negocios por nombre, producto o servicio"
             placeholder="Buscar por nombre, producto o servicio..."
             className="min-w-0 flex-1 bg-transparent text-sm font-medium outline-none placeholder:font-normal"
             style={{ color: "var(--ink)" }}
@@ -204,7 +206,8 @@ export default function BusinessFilters({ categories }: { categories: Category[]
           <button
             type="button"
             onClick={doSearch}
-            className="btn-primary !px-3 !py-1.5 !text-xs flex-shrink-0"
+            aria-label="Buscar"
+            className="btn-primary !px-3 !py-2 !text-xs min-h-[36px] min-w-[40px] flex-shrink-0"
           >
             <span className="hidden sm:block">Buscar</span>
             <ArrowRightIcon className="h-3.5 w-3.5 sm:hidden" />
@@ -297,9 +300,11 @@ export default function BusinessFilters({ categories }: { categories: Category[]
         <button
           type="button"
           onClick={() => pushWith({ nuevo: !nuevo })}
-          className={`filter-pill ${nuevo ? "active" : ""}`}
+          aria-pressed={nuevo}
+          className={`filter-pill inline-flex items-center gap-1.5 ${nuevo ? "active" : ""}`}
         >
-          ✨ Nuevo
+          <SparklesIcon className="h-3.5 w-3.5" />
+          Nuevo
         </button>
 
         {categories.map((cat) => (

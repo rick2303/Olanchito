@@ -47,7 +47,7 @@ export default function ContactButtons({ phone, waLink, businessName, businessId
           target="_blank"
           rel="noreferrer"
           onClick={() => track("whatsapp", businessName, businessId)}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-green-600 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-green-700"
+          className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-green-700 px-4 py-3 text-sm font-semibold text-white shadow-sm hover:bg-green-800"
         >
           <ChatBubbleLeftRightIcon className="h-5 w-5" />
           WhatsApp

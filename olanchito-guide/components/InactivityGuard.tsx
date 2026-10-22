@@ -97,7 +97,7 @@ export default function InactivityGuard({ redirectTo }: { redirectTo: string }) 
         {/* Countdown */}
         <div className="mb-5">
           <div className="mb-1.5 flex items-center justify-between text-xs font-semibold">
-            <span className="text-jungle-500">Cerrando sesión en</span>
+            <span className="text-jungle-600">Cerrando sesión en</span>
             <span className={`font-bold tabular-nums ${countdown <= 10 ? "text-red-600" : "text-jungle-800"}`}>
               {countdown}s
             </span>

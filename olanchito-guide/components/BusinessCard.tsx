@@ -8,7 +8,7 @@ import {
   ArrowRightIcon,
   PhotoIcon,
 } from "@heroicons/react/24/outline";
-import { StarIcon, CheckBadgeIcon } from "@heroicons/react/24/solid";
+import { StarIcon, CheckBadgeIcon, SparklesIcon } from "@heroicons/react/24/solid";
 import FavoriteButton from "@/components/FavoriteButton";
 import OpenNowBadge from "@/components/OpenNowBadge";
 import { formatDistance } from "@/lib/geo";
@@ -30,9 +30,12 @@ type BusinessCardProps = {
     distanceKm?: number;
   };
   className?: string;
+  // Nivel del título según la página: h2 bajo el h1 de un listado, h3 dentro de una sección con h2
+  headingLevel?: 2 | 3;
 };
 
-export default function BusinessCard({ business, className = "" }: BusinessCardProps) {
+export default function BusinessCard({ business, className = "", headingLevel = 2 }: BusinessCardProps) {
+  const Heading = headingLevel === 3 ? "h3" : "h2";
   const [imgError, setImgError] = useState(false);
 
   const shortDescription =
@@ -102,7 +105,8 @@ export default function BusinessCard({ business, className = "" }: BusinessCardP
                 className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold"
                 style={{ background: "#dcfce7", color: "#15803d" }}
               >
-                ✨ Nuevo
+                <SparklesIcon className="h-3 w-3" />
+                Nuevo
               </span>
             )}
             {business.category && (
@@ -112,12 +116,12 @@ export default function BusinessCard({ business, className = "" }: BusinessCardP
         ) : null}
 
         {/* Name */}
-        <h3
+        <Heading
           className="line-clamp-2 text-base font-semibold leading-snug"
           style={{ fontFamily: "var(--font-syne)", color: "var(--ink)", letterSpacing: "-0.015em" }}
         >
           {business.name}
-        </h3>
+        </Heading>
 
         {/* Address */}
         <p className="flex items-start gap-1.5 text-xs" style={{ color: "var(--ink-3)" }}>

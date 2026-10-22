@@ -289,6 +289,7 @@ export default async function VisitarOlanchitoPage() {
                 return (
                   <BusinessCard
                     key={b.id}
+                    headingLevel={3}
                     business={{
                       name: b.name,
                       slug: b.slug,

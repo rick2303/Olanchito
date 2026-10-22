@@ -39,7 +39,7 @@ const WHY: Record<MissingField, string> = {
 
 function MissingBadge() {
   return (
-    <span className="ml-2 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700 ring-1 ring-amber-200">
+    <span className="ml-2 rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700 ring-1 ring-amber-200">
       Falta
     </span>
   );
@@ -118,7 +118,7 @@ export default function UpdateBusinessForm({
               href={`https://wa.me/?text=${encodeURIComponent(`¡Hola! Si le gustó la atención en ${initial.name}, ¿nos deja una reseña? ${reviewLink}`)}`}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center justify-between gap-2 rounded-2xl bg-green-600 px-4 py-3 text-sm font-semibold text-white hover:bg-green-700"
+              className="inline-flex items-center justify-between gap-2 rounded-2xl bg-green-700 px-4 py-3 text-sm font-semibold text-white hover:bg-green-800"
             >
               <span className="inline-flex items-center gap-2">
                 <StarIcon className="h-4 w-4" />
@@ -186,6 +186,8 @@ export default function UpdateBusinessForm({
             <input
               value={values.address}
               onChange={(e) => set("address", e.target.value)}
+              aria-label="Dirección o referencia"
+              autoComplete="street-address"
               placeholder="Dirección o referencia (ej.: Barrio El Centro, frente al parque)"
               className={`${inputClass} mt-3`}
               style={inputStyle}
@@ -205,6 +207,8 @@ export default function UpdateBusinessForm({
               <input
                 value={values.whatsapp}
                 onChange={(e) => set("whatsapp", e.target.value)}
+                aria-label="WhatsApp"
+                type="tel"
                 placeholder="WhatsApp (8 dígitos)"
                 inputMode="tel"
                 className={inputClass}
@@ -213,6 +217,8 @@ export default function UpdateBusinessForm({
               <input
                 value={values.phone}
                 onChange={(e) => set("phone", e.target.value)}
+                aria-label="Teléfono (opcional)"
+                type="tel"
                 placeholder="Teléfono (opcional)"
                 inputMode="tel"
                 className={inputClass}
@@ -229,6 +235,7 @@ export default function UpdateBusinessForm({
               onChange={(e) => set("description", e.target.value)}
               rows={4}
               maxLength={1200}
+              aria-label="Descripción"
               placeholder="¿Qué vende o qué servicio ofrece? ¿Qué le hace diferente?"
               className={inputClass}
               style={inputStyle}
@@ -241,6 +248,7 @@ export default function UpdateBusinessForm({
             <input
               value={values.services}
               onChange={(e) => set("services", e.target.value)}
+              aria-label="Productos o servicios"
               placeholder="Separados por coma: reparación de celulares, accesorios, recargas"
               className={inputClass}
               style={inputStyle}

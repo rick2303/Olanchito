@@ -154,7 +154,7 @@ export default function ReviewSection({ businessSlug, initialReviews }: Props) {
                     <p className="text-sm font-semibold leading-none text-jungle-950">
                       {r.author_name}
                     </p>
-                    <p className="mt-0.5 text-[11px] text-jungle-500">
+                    <p className="mt-0.5 text-[11px] text-jungle-600">
                       {formatDate(r.created_at)}
                     </p>
                   </div>
@@ -168,7 +168,7 @@ export default function ReviewSection({ businessSlug, initialReviews }: Props) {
               )}
               {r.owner_reply && (
                 <div className="mt-3 rounded-xl bg-jungle-100 px-3 py-2.5 ring-1 ring-jungle-200">
-                  <p className="mb-0.5 text-[10px] font-bold uppercase tracking-wide text-jungle-600">Respuesta del negocio</p>
+                  <p className="mb-0.5 text-[11px] font-bold uppercase tracking-wide text-jungle-600">Respuesta del negocio</p>
                   <p className="text-xs leading-relaxed text-jungle-800">{r.owner_reply}</p>
                 </div>
               )}
@@ -225,10 +225,12 @@ export default function ReviewSection({ businessSlug, initialReviews }: Props) {
             <form onSubmit={handleSubmit} className="space-y-3">
               {/* Name */}
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-jungle-900">
-                  Nombre <span className="text-red-500">*</span>
+                <label htmlFor="review-name" className="text-xs font-semibold text-jungle-900">
+                  Nombre <span className="text-red-600">*</span>
                 </label>
                 <input
+                  id="review-name"
+                  autoComplete="name"
                   value={form.author_name}
                   onChange={(e) =>
                     setForm((p) => ({ ...p, author_name: e.target.value }))
@@ -241,10 +243,10 @@ export default function ReviewSection({ businessSlug, initialReviews }: Props) {
 
               {/* Star rating picker */}
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-jungle-900">
-                  Calificación <span className="text-red-500">*</span>
-                </label>
-                <div className="flex items-center gap-1">
+                <p id="review-rating" className="text-xs font-semibold text-jungle-900">
+                  Calificación <span className="text-red-600">*</span>
+                </p>
+                <div className="flex items-center gap-1" role="radiogroup" aria-labelledby="review-rating">
                   {[1, 2, 3, 4, 5].map((n) => (
                     <button
                       key={n}
@@ -252,7 +254,9 @@ export default function ReviewSection({ businessSlug, initialReviews }: Props) {
                       onClick={() => setForm((p) => ({ ...p, rating: n }))}
                       onMouseEnter={() => setHover(n)}
                       onMouseLeave={() => setHover(0)}
-                      className="transition-transform hover:scale-110"
+                      className="grid h-10 w-10 place-items-center transition-transform hover:scale-110"
+                      role="radio"
+                      aria-checked={form.rating === n}
                       aria-label={`${n} estrella${n !== 1 ? "s" : ""}`}
                     >
                       {n <= (hover || form.rating) ? (
@@ -272,10 +276,11 @@ export default function ReviewSection({ businessSlug, initialReviews }: Props) {
 
               {/* Comment */}
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-jungle-900">
-                  Comentario <span className="text-red-500">*</span>
+                <label htmlFor="review-comment" className="text-xs font-semibold text-jungle-900">
+                  Comentario <span className="text-red-600">*</span>
                 </label>
                 <textarea
+                  id="review-comment"
                   value={form.comment}
                   onChange={(e) =>
                     setForm((p) => ({ ...p, comment: e.target.value }))

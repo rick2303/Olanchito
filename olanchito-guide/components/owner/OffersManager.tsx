@@ -194,7 +194,7 @@ export default function OffersManager({ businessId, slug }: Props) {
               <p className="text-sm font-bold text-jungle-950">
                 {editId ? "Editar oferta" : "Nueva oferta"}
               </p>
-              <button type="button" onClick={resetForm} className="text-jungle-400 hover:text-jungle-700">
+              <button type="button" onClick={resetForm} className="text-jungle-600 hover:text-jungle-700">
                 <XMarkIcon className="h-5 w-5" />
               </button>
             </div>
@@ -249,7 +249,7 @@ export default function OffersManager({ businessId, slug }: Props) {
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-jungle-900">Precio original</label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-jungle-400 pointer-events-none">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-jungle-600 pointer-events-none">
                     {form.currency === "USD" ? "$" : "L."}
                   </span>
                   <input
@@ -267,7 +267,7 @@ export default function OffersManager({ businessId, slug }: Props) {
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-jungle-900">Precio oferta</label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-jungle-400 pointer-events-none">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-jungle-600 pointer-events-none">
                     {form.currency === "USD" ? "$" : "L."}
                   </span>
                   <input
@@ -340,9 +340,9 @@ export default function OffersManager({ businessId, slug }: Props) {
 
       {/* List */}
       {loading ? (
-        <p className="text-sm text-jungle-400">Cargando ofertas...</p>
+        <p className="text-sm text-jungle-600">Cargando ofertas...</p>
       ) : items.length === 0 && !showForm ? (
-        <p className="text-sm text-jungle-400">Aún no has agregado ninguna oferta.</p>
+        <p className="text-sm text-jungle-600">Aún no has agregado ninguna oferta.</p>
       ) : (
         <div className="space-y-3">
           {items.map(item => {
@@ -363,12 +363,12 @@ export default function OffersManager({ businessId, slug }: Props) {
                     <div className="flex flex-wrap items-center gap-2">
                       <p className="text-sm font-bold text-jungle-950">{item.title}</p>
                       {item.badge && (
-                        <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700">
+                        <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-bold text-amber-700">
                           {item.badge}
                         </span>
                       )}
                       {isExpired && (
-                        <span className="rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-600">
+                        <span className="rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-bold text-red-600">
                           Vencida
                         </span>
                       )}
@@ -376,7 +376,7 @@ export default function OffersManager({ businessId, slug }: Props) {
                     {item.description && (
                       <p className="mt-0.5 text-xs text-jungle-600 line-clamp-2">{item.description}</p>
                     )}
-                    <div className="mt-1.5 flex flex-wrap items-center gap-3 text-xs text-jungle-500">
+                    <div className="mt-1.5 flex flex-wrap items-center gap-3 text-xs text-jungle-600">
                       {item.original_price && (
                         <span className="line-through">{displayPrice(item.original_price, cur)}</span>
                       )}
@@ -396,7 +396,7 @@ export default function OffersManager({ businessId, slug }: Props) {
                     className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-bold transition-colors ${
                       item.active
                         ? "bg-green-100 text-green-700 hover:bg-green-200"
-                        : "bg-jungle-100 text-jungle-500 hover:bg-jungle-200"
+                        : "bg-jungle-100 text-jungle-600 hover:bg-jungle-200"
                     }`}
                   >
                     {item.active ? "Activa" : "Inactiva"}
@@ -410,7 +410,7 @@ export default function OffersManager({ businessId, slug }: Props) {
                   </button>
                   <button
                     onClick={() => setConfirmItem(item)}
-                    className="ml-auto flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold text-red-500 hover:bg-red-50 transition-colors"
+                    className="ml-auto flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[11px] font-semibold text-red-600 hover:bg-red-50 transition-colors"
                   >
                     <TrashIcon className="h-3.5 w-3.5" />
                     Eliminar

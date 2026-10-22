@@ -76,7 +76,7 @@ export default async function RelatedBusinesses({
                   {b.name}
                 </p>
                 {b.address && (
-                  <p className="mt-0.5 line-clamp-1 text-[10px] text-jungle-400">{b.address}</p>
+                  <p className="mt-0.5 line-clamp-1 text-[11px] text-jungle-600">{b.address}</p>
                 )}
               </div>
             </Link>

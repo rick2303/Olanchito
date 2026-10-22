@@ -93,7 +93,7 @@ export default function SuggestBusinessForm({ categories, initialName }: { categ
               target="_blank"
               rel="noreferrer"
               onClick={() => trackEvent("share", { method: "whatsapp", content_type: "suggest_page" })}
-              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-green-600 px-4 py-3 text-sm font-semibold text-white hover:bg-green-700"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-green-700 px-4 py-3 text-sm font-semibold text-white hover:bg-green-800"
             >
               Invitar a otros vecinos por WhatsApp
             </a>
@@ -176,11 +176,11 @@ export default function SuggestBusinessForm({ categories, initialName }: { categ
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
               <label className={labelClass} style={{ color: "var(--ink)" }} htmlFor="s-wa">WhatsApp del negocio *</label>
-              <input id="s-wa" value={form.whatsapp} onChange={(e) => set("whatsapp", e.target.value)} inputMode="tel" className={inputClass} style={inputStyle} placeholder="8 dígitos" />
+              <input id="s-wa" type="tel" value={form.whatsapp} onChange={(e) => set("whatsapp", e.target.value)} inputMode="tel" className={inputClass} style={inputStyle} placeholder="8 dígitos" />
             </div>
             <div>
               <label className={labelClass} style={{ color: "var(--ink)" }} htmlFor="s-ph">o teléfono</label>
-              <input id="s-ph" value={form.phone} onChange={(e) => set("phone", e.target.value)} inputMode="tel" className={inputClass} style={inputStyle} placeholder="8 dígitos" />
+              <input id="s-ph" type="tel" value={form.phone} onChange={(e) => set("phone", e.target.value)} inputMode="tel" className={inputClass} style={inputStyle} placeholder="8 dígitos" />
             </div>
           </div>
 

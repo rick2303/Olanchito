@@ -79,7 +79,7 @@ export default function FavoritesPage() {
       <section className="section-container pt-10 pb-6">
         <div className="flex items-center gap-3 mb-2">
           <div className="grid h-10 w-10 place-items-center rounded-2xl bg-red-50 ring-1 ring-red-200">
-            <HeartIcon className="h-5 w-5 text-red-500" />
+            <HeartIcon className="h-5 w-5 text-red-600" />
           </div>
           <div>
             <h1

@@ -190,7 +190,7 @@ export default function OwnerSetupPage() {
                 Ir a mi portal
                 <ArrowRightIcon className="h-3.5 w-3.5" />
               </a>
-              <p className="text-[11px] text-jungle-400">
+              <p className="text-[11px] text-jungle-600">
                 ¿Tienes algún problema? Contáctanos por WhatsApp.
               </p>
             </div>
@@ -208,7 +208,7 @@ export default function OwnerSetupPage() {
                   Revisa tu correo electrónico. Haz clic en el enlace para crear tu contraseña y acceder a tu portal.
                 </p>
               </div>
-              <p className="text-[11px] text-jungle-400">
+              <p className="text-[11px] text-jungle-600">
                 ¿No llegó? Revisa la carpeta de spam o escríbenos por WhatsApp.
               </p>
               <a
@@ -229,7 +229,7 @@ export default function OwnerSetupPage() {
           {mode === "expired" && (
             <div className="flex flex-col items-center gap-4 py-2 text-center">
               <span className="grid h-12 w-12 place-items-center rounded-2xl bg-red-50 ring-1 ring-red-200">
-                <ExclamationTriangleIcon className="h-6 w-6 text-red-500" />
+                <ExclamationTriangleIcon className="h-6 w-6 text-red-600" />
               </span>
               <div>
                 <p className="text-sm font-bold text-jungle-950">El enlace expiró</p>
@@ -243,7 +243,7 @@ export default function OwnerSetupPage() {
               >
                 Ir a inicio de sesión
               </a>
-              <p className="text-[11px] text-jungle-400">
+              <p className="text-[11px] text-jungle-600">
                 Si el problema persiste, contáctanos por WhatsApp.
               </p>
             </div>

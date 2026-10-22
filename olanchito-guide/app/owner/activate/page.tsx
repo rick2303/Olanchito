@@ -126,7 +126,7 @@ export default function ActivatePage() {
           {!missingParams && state === "error" && (
             <div className="flex flex-col items-center gap-4 py-2 text-center">
               <span className="grid h-12 w-12 place-items-center rounded-2xl bg-red-50 ring-1 ring-red-200">
-                <ExclamationTriangleIcon className="h-6 w-6 text-red-500" />
+                <ExclamationTriangleIcon className="h-6 w-6 text-red-600" />
               </span>
               <div>
                 <p className="text-sm font-bold text-jungle-950">El enlace expiró</p>
@@ -163,7 +163,7 @@ export default function ActivatePage() {
                 {state === "loading" ? "Verificando..." : buttonLabel}
                 {state !== "loading" && <ArrowRightIcon className="h-4 w-4" />}
               </button>
-              <p className="text-[11px] text-jungle-400">
+              <p className="text-[11px] text-jungle-600">
                 ¿No solicitaste esto?{" "}
                 <a href="/owner/login" className="font-semibold hover:underline">
                   Ignorar

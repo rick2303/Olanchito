@@ -40,8 +40,7 @@ export default function LocationPicker({
     });
   }, []);
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSearch = async () => {
     if (!search.trim()) return;
     setSearching(true);
     setSearchError("");
@@ -68,26 +67,35 @@ export default function LocationPicker({
 
   return (
     <div className="space-y-3">
-      {/* Search */}
-      <form onSubmit={handleSearch} className="flex gap-2">
+      {/* Search: no es un <form> porque este componente se usa dentro de otros formularios
+          (un form anidado haría que "Buscar" enviara el formulario de afuera) */}
+      <div role="search" className="flex gap-2">
         <input
           type="text"
+          aria-label="Buscar dirección en el mapa"
           value={search}
           onChange={(e) => { setSearch(e.target.value); setSearchError(""); }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              handleSearch();
+            }
+          }}
           placeholder="Buscar dirección en Olanchito…"
           className="field flex-1 text-sm"
         />
         <button
-          type="submit"
+          type="button"
+          onClick={handleSearch}
           disabled={searching || !search.trim()}
           className="rounded-xl bg-jungle-600 px-4 py-2 text-xs font-semibold text-white hover:bg-jungle-700 disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0"
         >
           {searching ? "…" : "Buscar"}
         </button>
-      </form>
+      </div>
 
       {searchError && (
-        <p className="text-xs text-red-600">{searchError}</p>
+        <p role="alert" className="text-xs text-red-600">{searchError}</p>
       )}
 
       {/* Map */}
@@ -106,7 +114,7 @@ export default function LocationPicker({
           {value && <Marker position={[value.lat, value.lng]} />}
         </MapContainer>
 
-        <p className="absolute bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-black/60 px-3 py-1 text-[10px] font-semibold text-white backdrop-blur pointer-events-none" style={{ zIndex: 400 }}>
+        <p className="absolute bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-black/60 px-3 py-1 text-[11px] font-semibold text-white backdrop-blur pointer-events-none" style={{ zIndex: 400 }}>
           Haz clic en el mapa para colocar el pin
         </p>
       </div>
@@ -115,18 +123,18 @@ export default function LocationPicker({
       {value ? (
         <div className="flex items-center justify-between rounded-xl bg-jungle-50 px-3 py-2 ring-1 ring-jungle-200">
           <p className="text-[11px] font-mono text-jungle-700">
-            📍 {value.lat.toFixed(6)}, {value.lng.toFixed(6)}
+            Pin en {value.lat.toFixed(5)}, {value.lng.toFixed(5)}
           </p>
           <button
             type="button"
             onClick={() => onChange(null)}
-            className="text-[11px] font-semibold text-red-500 hover:text-red-700"
+            className="text-[11px] font-semibold text-red-600 hover:text-red-700"
           >
             Borrar ubicación
           </button>
         </div>
       ) : (
-        <p className="text-[11px] text-jungle-400">Sin ubicación asignada.</p>
+        <p className="text-[11px] text-jungle-600">Sin ubicación asignada.</p>
       )}
     </div>
   );

@@ -156,6 +156,7 @@ export default function HoursInput({ value, onChange, required }: Props) {
         <ClockIcon className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2" style={{ color: "var(--ink-3)" }} />
         <input
           type="text"
+          aria-label="Horario de atención"
           value={value}
           required={required}
           onChange={(e) => onChange(e.target.value)}
@@ -163,7 +164,7 @@ export default function HoursInput({ value, onChange, required }: Props) {
           className="field !pl-8 !text-xs"
         />
       </div>
-      <p className="text-[10px]" style={{ color: "var(--ink-3)" }}>
+      <p className="text-[11px]" style={{ color: "var(--ink-3)" }}>
         Puedes editar el texto directamente si necesitas algo diferente.
       </p>
     </div>

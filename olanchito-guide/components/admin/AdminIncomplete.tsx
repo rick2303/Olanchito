@@ -120,7 +120,7 @@ export default function AdminIncomplete({ onCountChange }: { onCountChange?: (n:
         <div className="mt-2 h-2 overflow-hidden rounded-full bg-jungle-100">
           <div className="h-full rounded-full bg-jungle-500" style={{ width: `${total ? (complete / total) * 100 : 0}%` }} />
         </div>
-        <p className="mt-2 text-[11px] text-jungle-500">
+        <p className="mt-2 text-[11px] text-jungle-600">
           El enlace que se envía dura 30 días y deja al dueño completar ubicación, horario, WhatsApp, descripción y servicios sin crear cuenta.
         </p>
       </div>
@@ -154,19 +154,19 @@ export default function AdminIncomplete({ onCountChange }: { onCountChange?: (n:
                   <a href={`/negocios/${r.slug}`} target="_blank" rel="noreferrer" className="text-sm font-semibold text-jungle-950 hover:underline">
                     {r.name}
                   </a>
-                  <span className="inline-flex items-center gap-1 text-[11px] text-jungle-500">
+                  <span className="inline-flex items-center gap-1 text-[11px] text-jungle-600">
                     <EyeIcon className="h-3.5 w-3.5" />
                     {r.view_count ?? 0}
                   </span>
                   {sent[r.slug] && (
-                    <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-700 ring-1 ring-blue-200">
+                    <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-700 ring-1 ring-blue-200">
                       Pedido {daysAgo(sent[r.slug])}
                     </span>
                   )}
                 </div>
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {r.missing.map((m) => (
-                    <span key={m} className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700 ring-1 ring-amber-200">
+                    <span key={m} className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700 ring-1 ring-amber-200">
                       {MISSING_LABELS[m]}
                     </span>
                   ))}
@@ -177,13 +177,13 @@ export default function AdminIncomplete({ onCountChange }: { onCountChange?: (n:
                   <button
                     onClick={() => sendWhatsApp(r)}
                     disabled={busy === r.slug}
-                    className="inline-flex items-center gap-1.5 rounded-xl bg-green-600 px-3 py-2 text-xs font-semibold text-white hover:bg-green-700 disabled:opacity-60"
+                    className="inline-flex items-center gap-1.5 rounded-xl bg-green-700 px-3 py-2 text-xs font-semibold text-white hover:bg-green-800 disabled:opacity-60"
                   >
                     <ChatBubbleLeftRightIcon className="h-4 w-4" />
                     Pedir por WhatsApp
                   </button>
                 ) : (
-                  <span className="self-center text-[11px] text-jungle-400">Sin número</span>
+                  <span className="self-center text-[11px] text-jungle-600">Sin número</span>
                 )}
                 <button
                   onClick={() => copyLink(r)}
