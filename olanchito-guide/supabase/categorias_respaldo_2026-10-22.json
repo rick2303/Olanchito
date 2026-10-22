@@ -1,0 +1,442 @@
+[
+ {
+  "id": "a2c0ac5d-dcf5-494f-aa9f-681b8ccc52ad",
+  "slug": "agape-cafe",
+  "category_slug": "restaurantes"
+ },
+ {
+  "id": "b0707be9-ac4d-4d37-a1ec-734064c8317e",
+  "slug": "amalia-prints",
+  "category_slug": "imprentas-diseno"
+ },
+ {
+  "id": "2e1c50e3-905d-4d70-8d6f-d95c1312803b",
+  "slug": "anway-olanchito",
+  "category_slug": "tiendas-pulperias"
+ },
+ {
+  "id": "4134fddf-9ce0-47da-85fd-bf193f7c6774",
+  "slug": "apartamentos-florenze",
+  "category_slug": "hoteles-hospedaje"
+ },
+ {
+  "id": "ee13bf33-1acf-408c-8af8-5a5e61302c25",
+  "slug": "arte-peregrino",
+  "category_slug": "imprentas-diseno"
+ },
+ {
+  "id": "0751f311-801f-486a-bd8c-5dd347555e00",
+  "slug": "autocentro-hn",
+  "category_slug": "otros"
+ },
+ {
+  "id": "cfc86000-7a73-4724-afff-d4719df6310b",
+  "slug": "baruk-jojeria-y-accesorios",
+  "category_slug": "ropa-calzado"
+ },
+ {
+  "id": "af90aa8e-bde8-46b9-b1a5-afc16a763a79",
+  "slug": "bienes-raices-crisa",
+  "category_slug": "bienes-raices"
+ },
+ {
+  "id": "4444b148-4076-4fa5-a4d6-0965938c5949",
+  "slug": "bodega-caballero",
+  "category_slug": "supermercados"
+ },
+ {
+  "id": "d2491807-1710-42d2-8d0b-5854869c7fb0",
+  "slug": "bodega-la-colmena",
+  "category_slug": "supermercados"
+ },
+ {
+  "id": "fc39eabf-a6bc-473c-8142-38a85b223a5f",
+  "slug": "bomotanques-olanchito",
+  "category_slug": "ferreterias"
+ },
+ {
+  "id": "8c3e6d33-1f0b-4bd1-960c-c1e5cf20da09",
+  "slug": "boquitas-deluxe",
+  "category_slug": "restaurantes"
+ },
+ {
+  "id": "546843fa-2768-4183-94f3-944a7b7429a1",
+  "slug": "bufete-garcia-y-asociados",
+  "category_slug": "servicios-profesionales"
+ },
+ {
+  "id": "a76e538a-de14-45d0-96d9-4ce1d7152832",
+  "slug": "bytam-design",
+  "category_slug": "imprentas-diseno"
+ },
+ {
+  "id": "7f401998-1e1b-4af2-a571-bdaf937bbeb7",
+  "slug": "cafune",
+  "category_slug": "otros"
+ },
+ {
+  "id": "c8c2606a-f6f9-480b-9de0-6c47f8195b01",
+  "slug": "carlitos-express",
+  "category_slug": "mensajeria-envios"
+ },
+ {
+  "id": "55410724-e1c8-41f6-95a6-805bad970d22",
+  "slug": "carnes-y-embutidos-la-k-bra",
+  "category_slug": "otros"
+ },
+ {
+  "id": "9a250ccb-d33c-4674-86ee-4677802d6af5",
+  "slug": "casa-ventura-tornimas",
+  "category_slug": "ferreterias"
+ },
+ {
+  "id": "8a3b6372-96ec-44b8-8c2f-55fd220a1fc7",
+  "slug": "chipotle-burgers",
+  "category_slug": "restaurantes"
+ },
+ {
+  "id": "95fa2692-7625-475e-8c9b-ff31ca3d1341",
+  "slug": "chobby-tattoo",
+  "category_slug": "otros"
+ },
+ {
+  "id": "d0ae43e5-bd44-4135-8e42-039efc98249b",
+  "slug": "civicos-delivery",
+  "category_slug": "mensajeria-envios"
+ },
+ {
+  "id": "73ad42fd-6713-432f-9fe6-0789768b02f9",
+  "slug": "cliinica-dental",
+  "category_slug": "clinicas-salud"
+ },
+ {
+  "id": "c15b03a6-dac9-4faa-bbc1-41d1d050cc6e",
+  "slug": "comercial-roca-fuerte",
+  "category_slug": "tiendas-pulperias"
+ },
+ {
+  "id": "19191080-8380-435a-abcc-50b3ac88c7fe",
+  "slug": "complejo-turistico-las-mercedes",
+  "category_slug": "entretenimiento"
+ },
+ {
+  "id": "817c9fef-da18-41b3-a20b-324cd1ee2245",
+  "slug": "delicias-dona-paca",
+  "category_slug": "restaurantes"
+ },
+ {
+  "id": "9bf9c176-b19e-454c-9c29-2e8a657e28c3",
+  "slug": "delva-drinks",
+  "category_slug": "restaurantes"
+ },
+ {
+  "id": "193c8659-2d9a-4d4d-8a2d-52dc92bb8f68",
+  "slug": "abogado-mario-rivera",
+  "category_slug": "servicios-profesionales"
+ },
+ {
+  "id": "c084a875-61d8-49fd-8f62-dd72d8362609",
+  "slug": "despacho-legal-reyes-moya-y-asociados",
+  "category_slug": "servicios-profesionales"
+ },
+ {
+  "id": "0cdb1ecb-4c93-4cdb-9340-ad4ce2a4aae4",
+  "slug": "detalles-con-amor-1807",
+  "category_slug": "otros"
+ },
+ {
+  "id": "c3a0942f-6930-47fa-8779-e70b31fb6efe",
+  "slug": "diego-garcia",
+  "category_slug": "servicios-profesionales"
+ },
+ {
+  "id": "f7bd92dd-79af-43ef-871d-5dc202445696",
+  "slug": "donde-willy",
+  "category_slug": "eventos-catering"
+ },
+ {
+  "id": "49dcaaaf-f16b-4593-9612-b0954bc1d99d",
+  "slug": "dosmiltres-2003",
+  "category_slug": "belleza-barberias"
+ },
+ {
+  "id": "1acd7bcc-bc68-4841-9ad0-eb51553da881",
+  "slug": "duran-perfumeria",
+  "category_slug": "otros"
+ },
+ {
+  "id": "9a4d59fd-7a72-45c5-a80c-f2c4e4de5d9e",
+  "slug": "e-dermal",
+  "category_slug": "belleza-barberias"
+ },
+ {
+  "id": "453996ed-a18a-4c4a-a432-ea92c8634f19",
+  "slug": "el-garaje-hn",
+  "category_slug": "mensajeria-envios"
+ },
+ {
+  "id": "60cc275a-0153-45cc-99af-f565ca6a1a5e",
+  "slug": "escuela-joaquin-reyes-tejeda",
+  "category_slug": "educacion"
+ },
+ {
+  "id": "4a78d108-9ee8-4f17-8c74-5f22a232f618",
+  "slug": "farmacia-san-jorge",
+  "category_slug": "farmacias"
+ },
+ {
+  "id": "377573dc-5888-4201-bc05-9a8037224b70",
+  "slug": "fashion-colors",
+  "category_slug": "belleza-barberias"
+ },
+ {
+  "id": "bb3347af-2b8b-4a05-9bae-4c48dcce3589",
+  "slug": "hhd-electrodomesticos",
+  "category_slug": "tiendas-pulperias"
+ },
+ {
+  "id": "0942da45-a993-484e-a495-fecdd0b57a26",
+  "slug": "hospital-laboratorio-y-farmacias-olanchito",
+  "category_slug": "clinicas-salud"
+ },
+ {
+  "id": "69e0199d-c5c3-45b5-82fa-bf9aa6ae0041",
+  "slug": "hotel-h4",
+  "category_slug": "hoteles-hospedaje"
+ },
+ {
+  "id": "d2512ecf-2db7-4a91-8762-c490e35a41da",
+  "slug": "hotel-olanchito",
+  "category_slug": "hoteles-hospedaje"
+ },
+ {
+  "id": "30fba5bb-bfc0-421b-8437-aa1c43eb4c07",
+  "slug": "instituto-francisco-j-mejia",
+  "category_slug": "educacion"
+ },
+ {
+  "id": "fea9e4b9-21dd-4ea1-8e3f-328a6ffd7f60",
+  "slug": "instituto-guillermo-moore",
+  "category_slug": "educacion"
+ },
+ {
+  "id": "aa9c3094-803f-4de1-a151-34edbb5c671b",
+  "slug": "inversiones-jimenez",
+  "category_slug": "servicios-profesionales"
+ },
+ {
+  "id": "3b7e9218-cab2-4c1b-835d-0adb7873c061",
+  "slug": "jassas-fashion",
+  "category_slug": "ropa-calzado"
+ },
+ {
+  "id": "6e1b1017-aa32-4de3-90ba-74cfe982cb77",
+  "slug": "la-casa-del-pollo-rey",
+  "category_slug": "tiendas-pulperias"
+ },
+ {
+  "id": "156743a9-6213-431c-9f12-6214b7aed6bc",
+  "slug": "la-esquina-del-sabor",
+  "category_slug": "restaurantes"
+ },
+ {
+  "id": "883d6173-06ce-4651-a39d-fffed19ebefd",
+  "slug": "la-pergola",
+  "category_slug": "restaurantes"
+ },
+ {
+  "id": "f5e91a72-e88c-4e4f-a1aa-e23bc721f305",
+  "slug": "laboratorio-medylab",
+  "category_slug": "clinicas-salud"
+ },
+ {
+  "id": "94f2e1fa-9795-4ee0-a3fb-d2cf4c3c9c62",
+  "slug": "lavanderia-ebenezer",
+  "category_slug": "otros"
+ },
+ {
+  "id": "b4b849da-412a-489b-b80b-59687aa3256e",
+  "slug": "los-potros-de-manny",
+  "category_slug": "entretenimiento"
+ },
+ {
+  "id": "b75b2486-b7bb-403a-a567-9e49cf934f35",
+  "slug": "lubricentro-pacura",
+  "category_slug": "repuestos-talleres"
+ },
+ {
+  "id": "9621e7b8-4c7e-4f59-94bd-217b8c730b77",
+  "slug": "mandaditos-coran",
+  "category_slug": "mensajeria-envios"
+ },
+ {
+  "id": "9d11dc02-91c0-4f44-a096-68ba41f12f63",
+  "slug": "mi-casa-restaurant",
+  "category_slug": "restaurantes"
+ },
+ {
+  "id": "bf64ab19-064f-485a-863b-ed6cb8565d8c",
+  "slug": "milly-shop",
+  "category_slug": "belleza-barberias"
+ },
+ {
+  "id": "533b06e3-7540-4dcc-a2b6-d4f3a2b69ffe",
+  "slug": "minisuper-y-variedades-nancy",
+  "category_slug": "supermercados"
+ },
+ {
+  "id": "8a71d45f-1e53-415c-a3dd-6042ed85df40",
+  "slug": "molino-el-centro",
+  "category_slug": "otros"
+ },
+ {
+  "id": "caa13547-6d00-43a6-93a0-40903f5219c3",
+  "slug": "muebles-y-disenos-valle-aguan",
+  "category_slug": "repuestos-talleres"
+ },
+ {
+  "id": "5a5f51ae-dcab-4eb2-8858-bed645eacfe0",
+  "slug": "multicon",
+  "category_slug": "construccion"
+ },
+ {
+  "id": "a1f7601c-298e-41f8-b924-8e9b9d963b68",
+  "slug": "mundo-eterno",
+  "category_slug": "eventos-catering"
+ },
+ {
+  "id": "f44cec56-b820-4954-81aa-bdac1d0162fd",
+  "slug": "native-pro",
+  "category_slug": "educacion"
+ },
+ {
+  "id": "cc73564e-127f-4a1b-bd47-57fbc0db470a",
+  "slug": "nexus-rentacar",
+  "category_slug": "otros"
+ },
+ {
+  "id": "12734d6a-5df3-4e11-9657-920c5bbaa2a1",
+  "slug": "nutrixhn",
+  "category_slug": "gimnasios-deportes"
+ },
+ {
+  "id": "4c94086d-d9b0-410c-abff-2236095a74e5",
+  "slug": "papa-crush",
+  "category_slug": "restaurantes"
+ },
+ {
+  "id": "46cb7c58-0a8b-4ee8-afa4-9aa154cb42bc",
+  "slug": "plasticos-ropa-y-mas",
+  "category_slug": "otros"
+ },
+ {
+  "id": "5a49b948-45c0-4efc-9fab-32770b2be17d",
+  "slug": "pupusas-y-licuados-el-boulevard",
+  "category_slug": "restaurantes"
+ },
+ {
+  "id": "981f7343-4789-4592-875c-28fab556431e",
+  "slug": "qali-t",
+  "category_slug": "servicios-profesionales"
+ },
+ {
+  "id": "d525f8b2-1eaf-4259-9e40-ba705fe89491",
+  "slug": "reposteria-sweet-vanilla",
+  "category_slug": "restaurantes"
+ },
+ {
+  "id": "8a7ac73a-81be-4735-b4c4-7679d7df0228",
+  "slug": "repuestos-la-colmena",
+  "category_slug": "repuestos-talleres"
+ },
+ {
+  "id": "15b6c2c2-b936-4599-a69e-46b94d630c82",
+  "slug": "restaurante-y-comidas-valle-arriba",
+  "category_slug": "restaurantes"
+ },
+ {
+  "id": "14c2fdbe-ce64-411a-8710-2a0ad896f1ef",
+  "slug": "saew-shop",
+  "category_slug": "ropa-calzado"
+ },
+ {
+  "id": "5fe8c523-ba36-48d5-ae0a-052dba1cf1b1",
+  "slug": "seplan",
+  "category_slug": "construccion"
+ },
+ {
+  "id": "97f35bf8-dc1e-4fe1-bf36-49ac0302b701",
+  "slug": "sweet-stacys",
+  "category_slug": "restaurantes"
+ },
+ {
+  "id": "f6b5feaf-e7e9-4afc-8038-a157a80e2821",
+  "slug": "taller-industrial-plm",
+  "category_slug": "repuestos-talleres"
+ },
+ {
+  "id": "bffac273-828c-4cdf-9129-3ce11a4090a5",
+  "slug": "teitos",
+  "category_slug": "restaurantes"
+ },
+ {
+  "id": "293ccaf4-1038-48fd-8a0c-2275ac014f96",
+  "slug": "telcom-sa",
+  "category_slug": "internet-telecomunicaciones"
+ },
+ {
+  "id": "fbc170d0-b2a7-4a19-ab5b-246197047466",
+  "slug": "tiendas-jm",
+  "category_slug": "ropa-calzado"
+ },
+ {
+  "id": "581ea24b-a0da-41fc-bf84-b9860cda356a",
+  "slug": "transporte-urbina",
+  "category_slug": "transporte-taxis"
+ },
+ {
+  "id": "79a0f893-8343-4392-8ba3-b475af9b21d6",
+  "slug": "tu-visafacilhn",
+  "category_slug": "servicios-profesionales"
+ },
+ {
+  "id": "91f7a480-e10f-49b3-b629-b96caf5f161c",
+  "slug": "unah-tec-aguan",
+  "category_slug": "educacion"
+ },
+ {
+  "id": "712f920a-2a2f-4269-9db1-d3cfcb2bdb24",
+  "slug": "universidad-catolica-de-honduras-campus-san-jorge",
+  "category_slug": "educacion"
+ },
+ {
+  "id": "6ea27489-67be-4acd-bf69-4af071de8e00",
+  "slug": "valeria-express",
+  "category_slug": "transporte-taxis"
+ },
+ {
+  "id": "232c83e0-8078-4777-96ee-d853eb3d3671",
+  "slug": "verduras-santa",
+  "category_slug": "supermercados"
+ },
+ {
+  "id": "e0f13654-0069-47d1-84e2-8eafe6dafe77",
+  "slug": "vidrieria-jonathan",
+  "category_slug": "construccion"
+ },
+ {
+  "id": "9e449980-0d29-415a-ab23-b261f9f64865",
+  "slug": "vikalan",
+  "category_slug": "ropa-calzado"
+ },
+ {
+  "id": "b72873bd-ef97-46e2-8f14-a12daa74add4",
+  "slug": "welking-connection",
+  "category_slug": "internet-telecomunicaciones"
+ },
+ {
+  "id": "2807699b-d4bb-4486-8aaf-b321a066ab87",
+  "slug": "yojana-salon",
+  "category_slug": "belleza-barberias"
+ }
+]

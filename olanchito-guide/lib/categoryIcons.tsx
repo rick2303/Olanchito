@@ -4,6 +4,7 @@ import {
   FaCar, FaBolt, FaFaucet, FaHardHat, FaBook, FaPen, FaMobile, FaWifi,
   FaPrint, FaTshirt, FaCut, FaBed, FaTaxi, FaTruck, FaWallet, FaHome,
   FaCalendar, FaDumbbell, FaMusic, FaChurch, FaBriefcase, FaBuilding,
+  FaBirthdayCake, FaGem, FaGift, FaBoxOpen, FaSoap, FaCouch, FaDrumstickBite,
 } from "react-icons/fa";
 import type { JSX } from "react";
 
@@ -39,6 +40,13 @@ export const iconMap: Record<string, IconDef> = {
   church:         { el: <FaChurch size={17} />,       accent: "rgb(75,85,99)",    bg: "rgba(75,85,99,0.08)"    },
   briefcase:      { el: <FaBriefcase size={17} />,    accent: "rgb(55,65,81)",    bg: "rgba(55,65,81,0.08)"    },
   building:       { el: <FaBuilding size={17} />,     accent: "rgb(55,65,81)",    bg: "rgba(55,65,81,0.08)"    },
+  cake:           { el: <FaBirthdayCake size={17} />, accent: "rgb(190,24,93)",   bg: "rgba(190,24,93,0.08)"   },
+  gem:            { el: <FaGem size={17} />,          accent: "rgb(124,58,237)",  bg: "rgba(124,58,237,0.08)"  },
+  gift:           { el: <FaGift size={17} />,         accent: "rgb(219,39,119)",  bg: "rgba(219,39,119,0.08)"  },
+  box:            { el: <FaBoxOpen size={17} />,      accent: "rgb(29,78,216)",   bg: "rgba(29,78,216,0.08)"   },
+  soap:           { el: <FaSoap size={17} />,         accent: "rgb(14,116,144)",  bg: "rgba(14,116,144,0.08)"  },
+  couch:          { el: <FaCouch size={17} />,        accent: "rgb(146,64,14)",   bg: "rgba(146,64,14,0.08)"   },
+  drumstick:      { el: <FaDrumstickBite size={17} />,accent: "rgb(185,28,28)",   bg: "rgba(185,28,28,0.08)"   },
 };
 
 export function categoryIcon(icon?: string | null): IconDef {

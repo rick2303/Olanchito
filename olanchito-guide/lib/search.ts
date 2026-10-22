@@ -33,9 +33,18 @@ const SYNONYMS: [string[], string[]][] = [
   [["imprenta", "impresion", "rotulos", "diseno", "banner", "sublimacion"], ["imprenta", "impresion", "diseno", "rotulo", "sublimacion"]],
   [["abogado", "notario", "contador", "contabilidad", "legal"], ["abogad", "notari", "contab", "legal"]],
   [["internet", "cable", "wifi", "telefonia"], ["internet", "cable", "telecomunicacion", "wifi"]],
+  [["joyeria", "joyas", "aretes", "pulsera", "pulseras", "collar", "collares", "anillo", "anillos", "reloj", "relojes", "bisuteria"], ["joyeria", "joya", "arete", "pulsera", "collar", "anillo", "bisuteria", "accesorio"]],
+  [["flores", "floristeria", "regalo", "regalos", "globos", "arreglo", "arreglos", "detalle", "detalles", "sorpresa"], ["flores", "floristeria", "rosas", "regalo", "globo", "arreglo", "detalle", "sorpresa"]],
+  [["amazon", "shein", "encargo", "encargos", "usa", "estados unidos", "temu"], ["encargo", "amazon", "shein", "estados unidos", "tiendas de usa"]],
+  [["lavanderia", "lavar ropa", "limpieza", "aseo"], ["lavanderia", "limpieza", "lavado"]],
+  [["muebles", "mueble", "electrodomesticos", "refrigeradora", "lavadora", "cocina", "ropero"], ["mueble", "electrodomestico", "hogar", "ropero", "cocina"]],
+  [["carne", "carnes", "pollo", "carniceria", "polleria", "embutidos"], ["carne", "pollo", "carniceria", "polleria", "embutido"]],
+  [["panaderia", "pan", "pasteles", "pastel", "reposteria"], ["panaderia", "reposteria", "pastel", "postre"]],
 ];
 
-export type QueryTerm = { term: string; weight: number };
+// wholeWord: la forma en singular solo cuenta como palabra completa ("flor"/"flores"),
+// no como inicio de otra ("Florenze")
+export type QueryTerm = { term: string; weight: number; wholeWord?: boolean };
 
 // Una coincidencia por sinónimo vale menos que la palabra que escribió el usuario
 const SYNONYM_WEIGHT = 0.6;
@@ -45,14 +54,15 @@ export function expandQuery(query: string): QueryTerm[][] {
   // Cada palabra de la búsqueda debe coincidir con al menos una de sus variantes
   return words.map((word) => {
     const variants = new Map<string, number>([[word, 1]]);
-    // "ferreterias" → "ferreteria", "farmacias" → "farmacia"
-    if (word.length > 4 && word.endsWith("s")) variants.set(word.slice(0, -1), 1);
+    // "ferreterias" → "ferreteria", "flores" → "flor"
+    const singular = word.length > 4 && word.endsWith("s") ? word.replace(/(?<=[rlndzj])es$|s$/, "") : null;
+    if (singular) variants.set(singular, 1);
     for (const [triggers, terms] of SYNONYMS) {
       if (triggers.some((t) => t === word || (word.length > 4 && t.startsWith(word)))) {
         for (const t of terms) if (!variants.has(t)) variants.set(t, SYNONYM_WEIGHT);
       }
     }
-    return [...variants].map(([term, weight]) => ({ term, weight }));
+    return [...variants].map(([term, weight]) => ({ term, weight, wholeWord: term === singular }));
   });
 }
 
@@ -76,13 +86,16 @@ export function scoreMatch(item: Searchable, groups: QueryTerm[][]): number {
   let total = 0;
   for (const variants of groups) {
     let best = 0;
-    for (const { term: v, weight } of variants) {
+    for (const { term: v, weight, wholeWord } of variants) {
+      const has = wholeWord
+        ? (text: string) => new RegExp(`(^| )${v}(es|s)?( |$)`).test(text)
+        : (text: string) => text.includes(v);
       let points = 0;
-      if (name.includes(v)) points = name.startsWith(v) ? 12 : 10;
-      else if (category.includes(v)) points = 9;
-      else if (services.includes(v)) points = 5;
-      else if (description.includes(v)) points = 3;
-      else if (address.includes(v)) points = 2;
+      if (has(name)) points = name.startsWith(v) ? 12 : 10;
+      else if (has(category)) points = 9;
+      else if (has(services)) points = 5;
+      else if (has(description)) points = 3;
+      else if (has(address)) points = 2;
       best = Math.max(best, points * weight);
     }
     if (best === 0) return 0;

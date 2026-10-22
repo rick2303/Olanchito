@@ -41,6 +41,20 @@ const categoryDescriptions: Record<string, string> = {
     "Talleres mecánicos y repuestos en Olanchito, Yoro, Honduras. Encuentra talleres de confianza con horarios, direcciones y contacto por WhatsApp.",
   "hoteles-hospedaje":
     "Hoteles y hospedajes en Olanchito, Honduras para viajeros y visitantes del Valle del Aguán. Información de precios, ubicación y contacto directo.",
+  "panaderias-reposteria":
+    "Panaderías, reposterías y pasteles por encargo en Olanchito, Honduras. Pasteles, chocoflan, postres y más con contacto directo por WhatsApp.",
+  "joyeria-accesorios":
+    "Joyería, bisutería y accesorios en Olanchito, Honduras: aretes, pulseras, collares y relojes, con envíos y pedidos por WhatsApp.",
+  "floristerias-regalos":
+    "Floristerías y regalos en Olanchito, Honduras: flores, rosas eternas, globos, cajas personalizadas y desayunos sorpresa para toda ocasión.",
+  "encargos-compras-usa":
+    "Encargos y compras en tiendas de Estados Unidos desde Olanchito: Amazon, Shein, Sephora y más, con entrega en Honduras.",
+  "limpieza-lavanderia":
+    "Lavanderías y servicios de limpieza en Olanchito, Honduras para hogares, negocios, hoteles e iglesias.",
+  "muebles-hogar":
+    "Muebles, electrodomésticos y artículos para el hogar en Olanchito, Honduras. Fabricación de muebles, roperos, cocinas y más.",
+  "carnicerias-pollerias":
+    "Carnicerías y pollerías en Olanchito, Honduras: pollo fresco, cortes de carne y embutidos para su hogar o negocio.",
 };
 
 // Longer body text shown on the category page (150–200 words) for priority categories
