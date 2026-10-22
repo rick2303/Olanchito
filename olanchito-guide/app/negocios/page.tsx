@@ -401,9 +401,13 @@ export default async function NegociosPage({ searchParams }: Props) {
 
               <p className="mx-auto mt-6 max-w-md text-xs" style={{ color: "var(--ink-3)" }}>
                 ¿Conoce un negocio que debería estar aquí?{" "}
-                <Link href="/registrar" className="inline-flex items-center gap-1 font-semibold underline" style={{ color: "var(--primary-mid)" }}>
+                <Link
+                  href={q ? `/sugerir-negocio?nombre=${encodeURIComponent(q)}` : "/sugerir-negocio"}
+                  className="inline-flex items-center gap-1 font-semibold underline"
+                  style={{ color: "var(--primary-mid)" }}
+                >
                   <PlusCircleIcon className="h-3.5 w-3.5" />
-                  Regístrelo gratis
+                  Sugiéralo en un minuto
                 </Link>
               </p>
             </div>
@@ -435,6 +439,13 @@ export default async function NegociosPage({ searchParams }: Props) {
               <div className="mt-8">
                 <PaginationBar page={page} totalPages={totalPages} buildPageHref={buildPageHref} />
               </div>
+              <p className="mt-8 text-center text-xs" style={{ color: "var(--ink-3)" }}>
+                ¿Falta algún negocio?{" "}
+                <Link href="/sugerir-negocio" className="font-semibold underline" style={{ color: "var(--primary-mid)" }}>
+                  Sugiéralo
+                </Link>{" "}
+                y ayude a completar el directorio de Olanchito.
+              </p>
             </>
           )
         )}

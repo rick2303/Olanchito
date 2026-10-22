@@ -19,10 +19,15 @@ import {
   PlusCircleIcon,
   TrashIcon,
   FlagIcon,
+  ClipboardDocumentCheckIcon,
+  LightBulbIcon,
 } from "@heroicons/react/24/outline";
 import { StarIcon as StarSolid } from "@heroicons/react/24/solid";
 import AdminAddBusiness from "./AdminAddBusiness";
 import AdminBusinessList from "./AdminBusinessList";
+import AdminIncomplete from "./AdminIncomplete";
+import AdminProposals, { type ProposalRow } from "./AdminProposals";
+import { NEW_BUSINESS_FIELD, OWNER_UPDATE_FIELD } from "@/lib/businessFields";
 
 type TopBusiness = {
   name: string;
@@ -76,14 +81,17 @@ export default function AdminDashboard() {
   const [topBusinesses, setTopBusinesses]       = useState<TopBusiness[]>([]);
   const [totalViews, setTotalViews]             = useState(0);
   const [suggestions, setSuggestions]           = useState<Suggestion[]>([]);
-  const [tab, setTab]                           = useState<"unverified" | "reviews" | "add" | "businesses" | "suggestions">("unverified");
+  const [proposals, setProposals]               = useState<ProposalRow[]>([]);
+  const [categories, setCategories]             = useState<{ id: string; name: string }[]>([]);
+  const [incompleteCount, setIncompleteCount]   = useState<number | null>(null);
+  const [tab, setTab]                           = useState<"unverified" | "reviews" | "add" | "businesses" | "suggestions" | "incomplete" | "proposals">("unverified");
   const [loadingData, setLoadingData]           = useState(true);
   const [loadingId, setLoadingId]               = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId]   = useState<string | null>(null);
 
   const fetchData = useCallback(async () => {
     setLoadingData(true);
-    const [{ data: unverifiedData }, { data: revs }, { data: top }, { data: views }, { data: suggs }] =
+    const [{ data: unverifiedData }, { data: revs }, { data: top }, { data: views }, { data: suggs }, { data: cats }] =
       await Promise.all([
         supabase
           .from("businesses")
@@ -105,10 +113,25 @@ export default function AdminDashboard() {
           .from("correction_suggestions")
           .select("id, business_name, business_slug, field, description, created_at")
           .order("created_at", { ascending: false }),
+        supabase.from("categories").select("id, name").order("name", { ascending: true }),
       ]);
     setUnverified(unverifiedData ?? []);
     setReviews(revs ?? []);
-    setSuggestions(suggs ?? []);
+    // Las propuestas de negocios nuevos viven en la misma tabla, marcadas con su propio field
+    const allSuggs = (suggs ?? []) as Suggestion[];
+    setSuggestions(allSuggs.filter((s) => s.field !== NEW_BUSINESS_FIELD));
+    setProposals(
+      allSuggs
+        .filter((s) => s.field === NEW_BUSINESS_FIELD)
+        .flatMap((s) => {
+          try {
+            return [{ id: s.id, created_at: s.created_at, proposal: JSON.parse(s.description) }];
+          } catch {
+            return [];
+          }
+        }),
+    );
+    setCategories(cats ?? []);
     setTopBusinesses(top ?? []);
     setTotalViews((views ?? []).reduce((s, b) => s + (b.view_count ?? 0), 0));
     setLoadingData(false);
@@ -356,6 +379,42 @@ export default function AdminDashboard() {
               </span>
             )}
           </button>
+
+          <button
+            onClick={() => setTab("proposals")}
+            className="inline-flex flex-shrink-0 items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold transition-colors"
+            style={
+              tab === "proposals"
+                ? { background: "var(--primary)", color: "white" }
+                : { background: "white", color: "var(--ink-2)", border: "1px solid var(--line)" }
+            }
+          >
+            <LightBulbIcon className="h-3.5 w-3.5" />
+            Propuestas
+            {proposals.length > 0 && (
+              <span className="rounded-full bg-amber-400 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                {proposals.length}
+              </span>
+            )}
+          </button>
+
+          <button
+            onClick={() => setTab("incomplete")}
+            className="inline-flex flex-shrink-0 items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-semibold transition-colors"
+            style={
+              tab === "incomplete"
+                ? { background: "var(--primary)", color: "white" }
+                : { background: "white", color: "var(--ink-2)", border: "1px solid var(--line)" }
+            }
+          >
+            <ClipboardDocumentCheckIcon className="h-3.5 w-3.5" />
+            Fichas incompletas
+            {incompleteCount !== null && incompleteCount > 0 && (
+              <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-bold">
+                {incompleteCount}
+              </span>
+            )}
+          </button>
         </div>
 
         {/* ── Content ── */}
@@ -441,6 +500,16 @@ export default function AdminDashboard() {
             {tab === "businesses" && <AdminBusinessList />}
 
             {/* Suggestions */}
+            {tab === "proposals" && (
+              <AdminProposals
+                rows={proposals}
+                categories={categories}
+                onResolved={(id) => setProposals((prev) => prev.filter((p) => p.id !== id))}
+              />
+            )}
+
+            {tab === "incomplete" && <AdminIncomplete onCountChange={setIncompleteCount} />}
+
             {tab === "suggestions" && (
               <div className="space-y-3">
                 {suggestions.length === 0 && (
@@ -454,9 +523,15 @@ export default function AdminDashboard() {
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <p className="text-sm font-semibold text-jungle-950">{s.business_name}</p>
-                          <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700 ring-1 ring-amber-200">
-                            {s.field}
-                          </span>
+                          {s.field === OWNER_UPDATE_FIELD ? (
+                            <span className="rounded-full bg-green-50 px-2 py-0.5 text-[11px] font-semibold text-green-700 ring-1 ring-green-200">
+                              Actualizado por el dueño
+                            </span>
+                          ) : (
+                            <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700 ring-1 ring-amber-200">
+                              {s.field}
+                            </span>
+                          )}
                         </div>
                         <p className="mt-1 text-[11px] text-jungle-400">
                           {s.business_slug} · {formatDate(s.created_at)}

@@ -263,12 +263,17 @@ export default async function CategoriaPage({
               Aún no hay negocios en esta categoría
             </p>
             <p className="mt-1 text-xs" style={{ color: "var(--ink-3)" }}>
-              ¿Tienes un negocio de {category.name}? ¡Regístralo gratis!
+              ¿Conoce uno? Ayude a completar el directorio de Olanchito.
             </p>
-            <Link href="/registrar" className="btn-primary mt-5 inline-flex !text-xs !py-2">
-              Registrar negocio
-              <ArrowRightIcon className="h-3.5 w-3.5" />
-            </Link>
+            <div className="mt-5 flex flex-col justify-center gap-2 sm:flex-row">
+              <Link href="/sugerir-negocio" className="btn-primary inline-flex !text-xs !py-2">
+                Sugerir un negocio
+                <ArrowRightIcon className="h-3.5 w-3.5" />
+              </Link>
+              <Link href="/registrar" className="btn-secondary inline-flex !text-xs !py-2">
+                Soy el dueño
+              </Link>
+            </div>
           </div>
         ) : (
           <>
@@ -302,12 +307,17 @@ export default async function CategoriaPage({
                 ¿Tu negocio de {category.name} no aparece?
               </p>
               <p className="mt-1 text-xs" style={{ color: "var(--ink-3)" }}>
-                Regístralo gratis y llega a más clientes en Olanchito.
+                Regístralo gratis y llega a más clientes en Olanchito. ¿Conoces uno que falta? Sugiérelo.
               </p>
-              <Link href="/registrar" className="btn-primary mt-4 inline-flex !text-xs !py-2">
-                Registrar negocio
-                <ArrowRightIcon className="h-3.5 w-3.5" />
-              </Link>
+              <div className="mt-4 flex flex-col justify-center gap-2 sm:flex-row">
+                <Link href="/registrar" className="btn-primary inline-flex !text-xs !py-2">
+                  Registrar negocio
+                  <ArrowRightIcon className="h-3.5 w-3.5" />
+                </Link>
+                <Link href="/sugerir-negocio" className="btn-secondary inline-flex !text-xs !py-2">
+                  Sugerir un negocio
+                </Link>
+              </div>
             </div>
           </>
         )}

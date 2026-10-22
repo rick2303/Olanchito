@@ -395,7 +395,7 @@ export default async function HomePage() {
                 ¿Tiene un negocio en Olanchito?
               </h3>
               <p className="mt-2 text-sm" style={{ color: "var(--ink-2)" }}>
-                Aparezca en el directorio gratis y mejore su visibilidad local. Miles de vecinos buscan aquí.
+                Aparezca en el directorio gratis y mejore su visibilidad local. ¿No es el dueño pero conoce uno que falta? Sugiéralo y lo agregamos.
               </p>
             </div>
 
@@ -404,8 +404,8 @@ export default async function HomePage() {
                 Registrar negocio
                 <ArrowRightIcon className="h-4 w-4" />
               </Link>
-              <Link href="/negocios" className="btn-secondary">
-                Ver directorio
+              <Link href="/sugerir-negocio" className="btn-secondary">
+                Sugerir un negocio
               </Link>
             </div>
           </div>
