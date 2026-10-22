@@ -9,14 +9,12 @@ import {
   ArrowRightIcon,
   BuildingStorefrontIcon,
 } from "@heroicons/react/24/outline";
+import { businessImageUrl } from "@/lib/businessImage";
 
 export const revalidate = 300;
 
 const BASE_URL = "https://olanchito.com";
 const BUCKET_NAME = process.env.BUCKET_NAME ?? "Olanchito-guide";
-const FALLBACK_IMAGE =
-  process.env.FALLBACK_BUCKET_IMG ??
-  "https://lvvciuhvhpjgfzediulv.supabase.co/storage/v1/object/public/Olanchito-guide/default-business.png";
 
 const categoryDescriptions: Record<string, string> = {
   restaurantes:
@@ -165,12 +163,7 @@ export default async function CategoriaPage({
         : false;
       const stats = reviewStats[b.slug];
       const score = (b.view_count ?? 0) + (stats?.positive ?? 0) * 3;
-      let imageUrl = FALLBACK_IMAGE;
-      if (b.image) {
-        const clean = b.image.startsWith("business/") ? b.image : `business/${b.image}`;
-        const { data: img } = supabase.storage.from(BUCKET_NAME).getPublicUrl(clean);
-        imageUrl = img?.publicUrl ?? FALLBACK_IMAGE;
-      }
+      const imageUrl = businessImageUrl(b.image, b.slug);
       return {
         ...b,
         isNew,

@@ -5,11 +5,9 @@ import { supabase } from "@/lib/supabase";
 import BusinessCard from "@/components/BusinessCard";
 import Link from "next/link";
 import { HeartIcon, BuildingStorefrontIcon } from "@heroicons/react/24/outline";
+import { businessImageUrl } from "@/lib/businessImage";
 
 const BUCKET = process.env.NEXT_PUBLIC_STORAGE_BUCKET ?? "Olanchito-guide";
-const FALLBACK =
-  process.env.NEXT_PUBLIC_FALLBACK_IMG ??
-  "https://lvvciuhvhpjgfzediulv.supabase.co/storage/v1/object/public/Olanchito-guide/default-business.png";
 
 type Business = {
   id: string;
@@ -53,11 +51,7 @@ export default function FavoritesPage() {
       const catMap = Object.fromEntries((cats ?? []).map((c) => [c.id, c.name]));
 
       const mapped = (biz ?? []).map((b) => {
-        let imageUrl = FALLBACK;
-        if (b.image) {
-          const clean = b.image.startsWith("business/") ? b.image : `business/${b.image}`;
-          imageUrl = supabase.storage.from(BUCKET).getPublicUrl(clean).data.publicUrl ?? FALLBACK;
-        }
+        const imageUrl = businessImageUrl(b.image, b.slug);
         return {
           ...b,
           image: imageUrl,
@@ -126,7 +120,7 @@ export default function FavoritesPage() {
                 business={{
                   name: b.name,
                   slug: b.slug,
-                  image: b.image ?? FALLBACK,
+                  image: b.image ?? businessImageUrl(null, b.slug),
                   address: b.address ?? "",
                   description: b.description ?? "",
                   category: b.categoryName,

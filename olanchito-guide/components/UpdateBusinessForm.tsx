@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
   CheckCircleIcon,
@@ -11,6 +11,7 @@ import {
   WrenchScrewdriverIcon,
   ArrowRightIcon,
   StarIcon,
+  CameraIcon,
 } from "@heroicons/react/24/outline";
 import HoursInput from "@/components/HoursInput";
 import LocationPickerWrapper from "@/components/LocationPickerWrapper";
@@ -27,9 +28,13 @@ type Values = {
   phone: string;
   location: LatLng | null;
   services: string;
+  // Foto: URL para mostrar (real o portada automática) y si ya tiene una foto real
+  imageUrl: string;
+  hasImage: boolean;
 };
 
 const WHY: Record<MissingField, string> = {
+  image: "Una foto real de su negocio da más confianza que la portada automática.",
   location: "Sin ubicación no aparece en el mapa ni en “Cerca de mí”.",
   hours: "Con horario aparece en el filtro “Abierto ahora”.",
   description: "Una buena descripción le ayuda a salir en más búsquedas.",
@@ -65,6 +70,7 @@ export default function UpdateBusinessForm({
   const stillMissing = useMemo(
     () =>
       missingFields({
+        image: values.hasImage ? "foto" : null,
         location: values.location,
         hours: values.hours,
         description: values.description,
@@ -73,7 +79,8 @@ export default function UpdateBusinessForm({
       }),
     [values],
   );
-  const progress = Math.round(((5 - stillMissing.length) / 5) * 100);
+  const totalFields = Object.keys(MISSING_LABELS).length;
+  const progress = Math.round(((totalFields - stillMissing.length) / totalFields) * 100);
 
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -179,6 +186,18 @@ export default function UpdateBusinessForm({
 
         <form onSubmit={save} className="mt-6 space-y-5">
           <div className="panel p-5">
+            {label("image", "Foto del negocio", CameraIcon)}
+            <PhotoUploader
+              slug={initial.slug}
+              token={token}
+              imageUrl={values.imageUrl}
+              hasImage={values.hasImage}
+              onUploaded={(url) => setValues((v) => ({ ...v, imageUrl: url, hasImage: true }))}
+            />
+            {hint("image")}
+          </div>
+
+          <div className="panel p-5">
             {label("location", "Ubicación en el mapa", MapPinIcon)}
             <p className="mb-3 text-xs" style={{ color: "var(--ink-3)" }}>Toque el mapa donde está su negocio.</p>
             <LocationPickerWrapper value={values.location} onChange={(loc) => set("location", loc)} />
@@ -268,5 +287,110 @@ export default function UpdateBusinessForm({
         </form>
       </div>
     </section>
+  );
+}
+
+// Reduce la foto en el navegador (lado mayor 1600 px, JPEG): las fotos de celular pesan
+// varios MB y el servidor acepta hasta 4 MB. Si el navegador no puede leerla (p. ej. HEIC
+// fuera de Safari) se manda tal cual.
+async function compressImage(file: File): Promise<File> {
+  try {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, 1600 / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(bitmap.width * scale);
+    canvas.height = Math.round(bitmap.height * scale);
+    canvas.getContext("2d")?.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.85));
+    return blob ? new File([blob], "foto.jpg", { type: "image/jpeg" }) : file;
+  } catch {
+    return file;
+  }
+}
+
+function PhotoUploader({
+  slug,
+  token,
+  imageUrl,
+  hasImage,
+  onUploaded,
+}: {
+  slug: string;
+  token: string;
+  imageUrl: string;
+  hasImage: boolean;
+  onUploaded: (url: string) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+  const [saved, setSaved] = useState(false);
+
+  const upload = async (file: File | undefined) => {
+    if (!file) return;
+    setError("");
+    setSaved(false);
+    if (!file.type.startsWith("image/")) {
+      setError("Elija una foto (JPG o PNG).");
+      return;
+    }
+    setUploading(true);
+    try {
+      const photo = await compressImage(file);
+      const body = new FormData();
+      body.append("slug", slug);
+      body.append("token", token);
+      body.append("file", photo);
+      const res = await fetch("/api/actualizar/foto", { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "No se pudo subir la foto.");
+      onUploaded(data.url);
+      setSaved(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "No se pudo subir la foto.");
+    } finally {
+      setUploading(false);
+      if (inputRef.current) inputRef.current.value = "";
+    }
+  };
+
+  return (
+    <div>
+      <div className="relative aspect-[16/9] w-full overflow-hidden rounded-xl" style={{ background: "var(--surface-2)" }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={imageUrl} alt="Foto actual del negocio" className="h-full w-full object-cover" />
+        {!hasImage && (
+          <span className="absolute left-3 top-3 rounded-full bg-black/60 px-2.5 py-1 text-[11px] font-semibold text-white">
+            Portada automática
+          </span>
+        )}
+      </div>
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        aria-label="Elegir foto del negocio"
+        onChange={(e) => upload(e.target.files?.[0])}
+      />
+      <button
+        type="button"
+        onClick={() => inputRef.current?.click()}
+        disabled={uploading}
+        className="btn-secondary mt-3 w-full justify-center"
+      >
+        <CameraIcon className="h-4 w-4" />
+        {uploading ? "Subiendo foto..." : hasImage ? "Cambiar foto" : "Subir foto del negocio"}
+      </button>
+      <p className="mt-1.5 text-xs" style={{ color: "var(--ink-3)" }}>
+        La fachada, el interior o sus productos. Se publica al momento.
+      </p>
+      {saved && (
+        <p role="status" className="mt-2 text-sm font-semibold text-green-700">Foto publicada.</p>
+      )}
+      {error && (
+        <p role="alert" className="mt-2 text-sm font-semibold text-red-700">{error}</p>
+      )}
+    </div>
   );
 }

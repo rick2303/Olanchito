@@ -8,11 +8,9 @@ import {
   ChatBubbleLeftIcon,
 } from "@heroicons/react/24/outline";
 import { StarIcon as StarSolid } from "@heroicons/react/24/solid";
+import { businessImageUrl } from "@/lib/businessImage";
 
 const BUCKET_NAME = process.env.BUCKET_NAME ?? "Olanchito-guide";
-const FALLBACK_IMAGE =
-  process.env.FALLBACK_BUCKET_IMG ??
-  "https://lvvciuhvhpjgfzediulv.supabase.co/storage/v1/object/public/Olanchito-guide/default-business.png";
 
 const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -78,12 +76,7 @@ export default async function NovedadesSection() {
 
             <div className="space-y-3">
               {(newBusinesses ?? []).map((b) => {
-                let imageUrl = FALLBACK_IMAGE;
-                if (b.image) {
-                  const clean = b.image.startsWith("business/") ? b.image : `business/${b.image}`;
-                  const { data: img } = supabase.storage.from(BUCKET_NAME).getPublicUrl(clean);
-                  imageUrl = img?.publicUrl ?? FALLBACK_IMAGE;
-                }
+                const imageUrl = businessImageUrl(b.image, b.slug);
                 return (
                   <Link
                     key={b.id}

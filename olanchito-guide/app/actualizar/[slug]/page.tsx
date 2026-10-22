@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { createServerClient } from "@/lib/supabase-server";
 import { verifyUpdateToken } from "@/lib/updateLink";
 import { missingFields } from "@/lib/businessFields";
+import { businessImageUrl, hasPhoto } from "@/lib/businessImage";
 import UpdateBusinessForm from "@/components/UpdateBusinessForm";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 
@@ -22,7 +23,7 @@ export default async function ActualizarPage({ params, searchParams }: Props) {
   const { data: business } = valid
     ? await createServerClient()
         .from("businesses")
-        .select("name, slug, description, hours, address, whatsapp, phone, location, services")
+        .select("name, slug, image, description, hours, address, whatsapp, phone, location, services")
         .eq("slug", params.slug)
         .maybeSingle()
     : { data: null };
@@ -66,6 +67,8 @@ export default async function ActualizarPage({ params, searchParams }: Props) {
           phone: business.phone ?? "",
           location: location?.lat && location?.lng ? { lat: location.lat, lng: location.lng } : null,
           services: Array.isArray(business.services) ? (business.services as string[]).join(", ") : "",
+          imageUrl: businessImageUrl(business.image, business.slug),
+          hasImage: hasPhoto(business.image),
         }}
         missing={missingFields(business)}
       />

@@ -30,6 +30,7 @@ import {
   MegaphoneIcon,
 } from "@heroicons/react/24/outline";
 import { CheckBadgeIcon } from "@heroicons/react/24/solid";
+import { businessImageUrl, hasPhoto } from "@/lib/businessImage";
 
 export const revalidate = 300;
 
@@ -40,19 +41,10 @@ export async function generateStaticParams() {
 
 const BASE_URL = "https://olanchito.com";
 const BUCKET_NAME = process.env.BUCKET_NAME ?? "Olanchito-guide";
-const FALLBACK_IMAGE =
-  process.env.FALLBACK_BUCKET_IMG ??
-  "https://lvvciuhvhpjgfzediulv.supabase.co/storage/v1/object/public/Olanchito-guide/default-business.png";
 
 type Props = {
   params: { slug: string };
 };
-
-function getImageUrl(path: string | null | undefined): string {
-  if (!path) return FALLBACK_IMAGE;
-  const cleanPath = path.startsWith("business/") ? path : `business/${path}`;
-  return supabase.storage.from(BUCKET_NAME).getPublicUrl(cleanPath).data.publicUrl ?? FALLBACK_IMAGE;
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { data } = await supabase
@@ -72,7 +64,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ? rawDesc.length > 155 ? `${rawDesc.slice(0, 152)}…` : rawDesc
     : `${data.name} en Olanchito, Honduras. Encuentra teléfono, dirección, horario y reseñas de clientes en el Directorio Olanchito.`;
 
-  const imageUrl = getImageUrl(data.image);
+  const imageUrl = businessImageUrl(data.image, data.slug, true);
   const canonical = `${BASE_URL}/negocios/${data.slug}`;
 
   return {
@@ -171,7 +163,7 @@ export default async function BusinessDetail({ params }: Props) {
     );
   }
 
-  const imageUrl = getImageUrl(data.image);
+  const imageUrl = businessImageUrl(data.image, data.slug);
 
   // Categoria
   let category: { name: string; slug: string } | null = null;
@@ -279,7 +271,7 @@ export default async function BusinessDetail({ params }: Props) {
     "@type": "LocalBusiness",
     name: data.name,
     ...(data.description && { description: data.description }),
-    ...(imageUrl !== FALLBACK_IMAGE && { image: imageUrl }),
+    ...(hasPhoto(data.image) && { image: imageUrl }),
     ...(phoneForSchema && { telephone: phoneForSchema }),
     url: `https://olanchito.com/negocios/${data.slug}`,
     address: {

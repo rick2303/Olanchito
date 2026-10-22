@@ -2,17 +2,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { ArrowRightIcon, PhotoIcon } from "@heroicons/react/24/outline";
+import { businessImageUrl } from "@/lib/businessImage";
 
 const BUCKET = process.env.BUCKET_NAME ?? "Olanchito-guide";
-const FALLBACK =
-  process.env.FALLBACK_BUCKET_IMG ??
-  "https://lvvciuhvhpjgfzediulv.supabase.co/storage/v1/object/public/Olanchito-guide/default-business.png";
-
-function getImageUrl(path: string | null): string {
-  if (!path) return FALLBACK;
-  const clean = path.startsWith("business/") ? path : `business/${path}`;
-  return supabase.storage.from(BUCKET).getPublicUrl(clean).data.publicUrl ?? FALLBACK;
-}
 
 export default async function RelatedBusinesses({
   categoryId,
@@ -49,7 +41,7 @@ export default async function RelatedBusinesses({
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {data.map((b) => {
-          const img = getImageUrl(b.image);
+          const img = businessImageUrl(b.image, b.slug);
           return (
             <Link
               key={b.id}
@@ -57,19 +49,13 @@ export default async function RelatedBusinesses({
               className="group overflow-hidden rounded-2xl bg-white ring-1 ring-black/5 transition-all hover:-translate-y-0.5 hover:shadow-md"
             >
               <div className="relative aspect-square w-full overflow-hidden bg-jungle-50">
-                {img !== FALLBACK ? (
-                  <Image
+                                  <Image
                     src={img}
                     alt={b.name}
                     fill
                     sizes="(max-width: 640px) 50vw, 25vw"
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
                   />
-                ) : (
-                  <div className="absolute inset-0 grid place-items-center">
-                    <PhotoIcon className="h-7 w-7 text-jungle-200" />
-                  </div>
-                )}
               </div>
               <div className="p-3">
                 <p className="line-clamp-2 text-xs font-semibold text-jungle-950 leading-snug">

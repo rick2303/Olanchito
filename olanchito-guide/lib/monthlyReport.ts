@@ -69,7 +69,7 @@ export async function buildReports(period: ReportPeriod): Promise<BusinessReport
   const [{ data: businesses }, { data: categories }, { data: events }, { data: reviews }, { data: optOuts }] = await Promise.all([
     supabase
       .from("businesses")
-      .select("id, name, slug, owner_email, whatsapp, phone, view_count, category_id, subscription_tier, subscription_active, location, hours, description, services"),
+      .select("id, name, slug, owner_email, whatsapp, phone, image, view_count, category_id, subscription_tier, subscription_active, location, hours, description, services"),
     supabase.from("categories").select("id, name"),
     supabase
       .from("business_events")

@@ -49,9 +49,10 @@ export function slugify(str: string): string {
 }
 
 // Qué le falta a una ficha para estar completa (lo usan el admin y la página del dueño)
-export type MissingField = "location" | "hours" | "description" | "whatsapp" | "services";
+export type MissingField = "image" | "location" | "hours" | "description" | "whatsapp" | "services";
 
 export const MISSING_LABELS: Record<MissingField, string> = {
+  image: "Foto del negocio",
   location: "Ubicación en el mapa",
   hours: "Horario",
   description: "Descripción",
@@ -60,6 +61,7 @@ export const MISSING_LABELS: Record<MissingField, string> = {
 };
 
 export function missingFields(b: {
+  image?: string | null;
   location?: unknown;
   hours?: string | null;
   description?: string | null;
@@ -67,6 +69,7 @@ export function missingFields(b: {
   services?: unknown;
 }): MissingField[] {
   const missing: MissingField[] = [];
+  if (!b.image?.trim()) missing.push("image");
   const loc = b.location as { lat?: number; lng?: number } | null;
   if (!loc?.lat || !loc?.lng) missing.push("location");
   if (!b.hours?.trim()) missing.push("hours");

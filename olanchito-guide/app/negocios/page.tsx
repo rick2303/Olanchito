@@ -17,6 +17,7 @@ import {
   MapIcon,
   PlusCircleIcon,
 } from "@heroicons/react/24/outline";
+import { businessImageUrl } from "@/lib/businessImage";
 
 export const dynamic = "force-dynamic";
 
@@ -91,9 +92,6 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 }
 
 const BUCKET_NAME = process.env.BUCKET_NAME ?? "Olanchito-guide";
-const FALLBACK_IMAGE =
-  process.env.FALLBACK_BUCKET_IMG ??
-  "https://lvvciuhvhpjgfzediulv.supabase.co/storage/v1/object/public/Olanchito-guide/default-business.png";
 const PAGE_SIZE = 12;
 // Más allá de esto el usuario no está en Olanchito: se ordena desde el centro de la ciudad
 const MAX_NEAR_ME_KM = 40;
@@ -206,12 +204,7 @@ export default async function NegociosPage({ searchParams }: Props) {
   const pageStart = (page - 1) * PAGE_SIZE;
 
   const businesses = scored.slice(pageStart, pageStart + PAGE_SIZE).map((b) => {
-    let imageUrl = FALLBACK_IMAGE;
-    if (b.image && typeof b.image === "string") {
-      const cleanPath = b.image.startsWith("business/") ? b.image : `business/${b.image}`;
-      const { data: imgData } = supabase.storage.from(BUCKET_NAME).getPublicUrl(cleanPath);
-      imageUrl = imgData?.publicUrl ?? FALLBACK_IMAGE;
-    }
+    const imageUrl = businessImageUrl(b.image, b.slug);
     const stats = reviewStats[b.slug];
     const avgRating = stats && stats.count > 0 ? stats.sum / stats.count : null;
     return {

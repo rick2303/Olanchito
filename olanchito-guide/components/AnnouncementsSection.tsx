@@ -2,17 +2,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { ArrowRightIcon, MegaphoneIcon } from "@heroicons/react/24/outline";
+import { businessImageUrl } from "@/lib/businessImage";
 
 const BUCKET_NAME = process.env.BUCKET_NAME ?? "Olanchito-guide";
-const FALLBACK_IMAGE =
-  process.env.FALLBACK_BUCKET_IMG ??
-  "https://lvvciuhvhpjgfzediulv.supabase.co/storage/v1/object/public/Olanchito-guide/default-business.png";
-
-function getImageUrl(path: string | null | undefined): string {
-  if (!path) return FALLBACK_IMAGE;
-  const cleanPath = path.startsWith("business/") ? path : `business/${path}`;
-  return supabase.storage.from(BUCKET_NAME).getPublicUrl(cleanPath).data.publicUrl ?? FALLBACK_IMAGE;
-}
 
 export default async function AnnouncementsSection() {
   const now = new Date().toISOString();
@@ -51,7 +43,7 @@ export default async function AnnouncementsSection() {
             {/* Business image */}
             <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-2xl bg-jungle-50 ring-1 ring-black/5">
               <Image
-                src={getImageUrl(biz.image)}
+                src={businessImageUrl(biz.image, biz.slug)}
                 alt={biz.name}
                 fill
                 className="object-cover"

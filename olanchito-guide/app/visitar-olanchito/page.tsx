@@ -11,14 +11,12 @@ import {
   PhoneIcon,
   MapIcon,
 } from "@heroicons/react/24/outline";
+import { businessImageUrl } from "@/lib/businessImage";
 
 export const revalidate = 300;
 
 const BASE_URL = "https://olanchito.com";
 const BUCKET_NAME = process.env.BUCKET_NAME ?? "Olanchito-guide";
-const FALLBACK_IMAGE =
-  process.env.FALLBACK_BUCKET_IMG ??
-  "https://lvvciuhvhpjgfzediulv.supabase.co/storage/v1/object/public/Olanchito-guide/default-business.png";
 
 const TITLE = "Visitar Olanchito: dónde dormir, comer y moverse";
 const DESCRIPTION =
@@ -105,12 +103,6 @@ type Row = {
   view_count: number | null;
   category_id: string | null;
 };
-
-function imageUrl(path: string | null): string {
-  if (!path) return FALLBACK_IMAGE;
-  const clean = path.startsWith("business/") ? path : `business/${path}`;
-  return supabase.storage.from(BUCKET_NAME).getPublicUrl(clean).data.publicUrl ?? FALLBACK_IMAGE;
-}
 
 export default async function VisitarOlanchitoPage() {
   const allSlugs = SECTIONS.flatMap((s) => s.slugs);
@@ -293,7 +285,7 @@ export default async function VisitarOlanchitoPage() {
                     business={{
                       name: b.name,
                       slug: b.slug,
-                      image: imageUrl(b.image),
+                      image: businessImageUrl(b.image, b.slug),
                       address: b.address ?? "",
                       description: b.description ?? "",
                       category: section.categoryName(b.category_id),

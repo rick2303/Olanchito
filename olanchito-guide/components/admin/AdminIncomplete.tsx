@@ -47,7 +47,7 @@ export default function AdminIncomplete({ onCountChange }: { onCountChange?: (n:
     setSent(readSent());
     supabase
       .from("businesses")
-      .select("id, name, slug, whatsapp, phone, view_count, location, hours, description, services")
+      .select("id, name, slug, image, whatsapp, phone, view_count, location, hours, description, services")
       .order("view_count", { ascending: false })
       .then(({ data }) => {
         const all = (data ?? []).map((b) => ({ ...b, missing: missingFields(b) }));
@@ -121,12 +121,12 @@ export default function AdminIncomplete({ onCountChange }: { onCountChange?: (n:
           <div className="h-full rounded-full bg-jungle-500" style={{ width: `${total ? (complete / total) * 100 : 0}%` }} />
         </div>
         <p className="mt-2 text-[11px] text-jungle-600">
-          El enlace que se envía dura 30 días y deja al dueño completar ubicación, horario, WhatsApp, descripción y servicios sin crear cuenta.
+          El enlace que se envía dura 30 días y deja al dueño subir su foto y completar ubicación, horario, WhatsApp, descripción y servicios sin crear cuenta.
         </p>
       </div>
 
       <div className="flex gap-2 overflow-x-auto pb-1">
-        {(["all", "location", "hours", "description", "whatsapp", "services"] as const).map((f) => (
+        {(["all", "image", "location", "hours", "description", "whatsapp", "services"] as const).map((f) => (
           <button
             key={f}
             onClick={() => setFilter(f)}
