@@ -123,7 +123,16 @@ export default function AdminProposals({
                 </p>
               )}
               {p.hours && <p className="text-jungle-700">Horario: {p.hours}</p>}
-              {p.description && <p className="text-jungle-600">{p.description}</p>}
+              {p.admin_note && (
+                <p className="rounded-lg bg-amber-50 px-2.5 py-1.5 text-amber-900 ring-1 ring-amber-200">
+                  <span className="font-semibold">Nota interna (no se publica):</span> {p.admin_note}
+                </p>
+              )}
+              {p.description && (
+                <p className="text-jungle-600">
+                  <span className="font-semibold text-jungle-700">Descripción pública:</span> {p.description}
+                </p>
+              )}
               {(p.submitter_name || p.submitter_contact) && (
                 <p className="flex items-center gap-1.5 text-jungle-600">
                   <UserIcon className="h-3.5 w-3.5" />

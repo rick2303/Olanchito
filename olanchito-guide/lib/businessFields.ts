@@ -97,6 +97,8 @@ export type NewBusinessProposal = {
   submitter_contact: string | null;
   // Opcional: lo traen las propuestas cargadas desde Google Maps
   hours?: string | null;
+  // Fuente y pendientes para el admin. NUNCA se publica: la ficha usa solo `description`
+  admin_note?: string | null;
 };
 
 // Reclamo de un negocio sin dueño (pendiente de aprobación del admin)
