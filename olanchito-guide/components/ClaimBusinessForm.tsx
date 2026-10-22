@@ -61,10 +61,13 @@ export default function ClaimBusinessForm({ name, slug }: { name: string; slug: 
             Recibimos su solicitud
           </h1>
           <p className="mt-2 text-sm" style={{ color: "var(--ink-2)" }}>
-            Vamos a confirmar con usted por WhatsApp que es el responsable de {name}. Cuando lo aprobemos le llegará al correo
-            el acceso a su portal. Normalmente toma menos de 2 días.
+            Para proteger el negocio, enviaremos un <strong>código de 6 dígitos al teléfono o WhatsApp que aparece en la ficha de {name}</strong>.
+            Cuando lo reciba, ingréselo en la página de verificación junto con su correo. Normalmente lo enviamos en menos de 2 días.
           </p>
-          <Link href={`/negocios/${slug}`} className="btn-secondary mt-6 inline-flex">Volver a la ficha</Link>
+          <div className="mt-6 flex flex-col justify-center gap-2 sm:flex-row">
+            <Link href={`/reclamar/${slug}/verificar`} className="btn-primary inline-flex justify-center">Ya tengo el código</Link>
+            <Link href={`/negocios/${slug}`} className="btn-secondary inline-flex justify-center">Volver a la ficha</Link>
+          </div>
         </div>
       </section>
     );
@@ -99,7 +102,7 @@ export default function ClaimBusinessForm({ name, slug }: { name: string; slug: 
             ))}
           </ul>
           <p className="mt-6 text-xs leading-relaxed" style={{ color: "var(--ink-3)" }}>
-            Para proteger a los negocios revisamos cada solicitud. Es más rápido si usa el mismo WhatsApp que aparece en la ficha.
+            Para proteger a los negocios, enviamos un código al teléfono que aparece en la ficha: solo quien tiene acceso a ese número puede reclamarla.
           </p>
         </div>
 

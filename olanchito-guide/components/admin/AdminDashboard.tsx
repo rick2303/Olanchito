@@ -571,6 +571,7 @@ export default function AdminDashboard() {
                 onResolved={(id, slug) =>
                   setClaims((prev) => prev.filter((c) => c.id !== id && (!slug || c.business_slug !== slug)))
                 }
+                onRefresh={fetchData}
               />
             )}
 

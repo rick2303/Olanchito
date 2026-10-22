@@ -118,4 +118,14 @@ export type ClaimRequest = {
   message: string | null;
   // El WhatsApp que dio coincide con el de la ficha: señal fuerte de que es el dueño
   phone_matches: boolean;
+  // Código enviado al número PÚBLICO del negocio (no al de quien reclama)
+  verification?: ClaimVerification;
+};
+
+export type ClaimVerification = {
+  code_hash: string;
+  sent_at: string;
+  expires_at: string;
+  attempts: number;
+  verified_at: string | null;
 };
