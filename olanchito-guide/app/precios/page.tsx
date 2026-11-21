@@ -1,16 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import {
   CheckIcon,
-  SparklesIcon,
   ArrowRightIcon,
   ExclamationTriangleIcon,
   BuildingStorefrontIcon,
+  TrophyIcon,
 } from "@heroicons/react/24/outline";
-import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 
 interface BusinessOption {
   id: string;
@@ -20,11 +18,57 @@ interface BusinessOption {
   subscription_tier: string;
 }
 
+const WHATSAPP = "50497952651";
+const waLink = (text: string) => `https://wa.me/${WHATSAPP}?text=${encodeURIComponent(text)}`;
+
+const FREE_FEATURES = [
+  "Nombre, categoría y descripción",
+  "Teléfono y botón de WhatsApp",
+  "Horario y aviso de abierto ahora",
+  "Ubicación en el mapa y redes sociales",
+  "Portal para corregir tus datos",
+  "Cuántos clientes te contactaron",
+];
+
+const FEATURED_FEATURES = [
+  "Primer lugar en tu categoría y en las búsquedas",
+  "Insignia de negocio destacado",
+  "Galería de hasta 15 fotos",
+  "Catálogo ilimitado de productos",
+  "Ofertas, promociones y anuncio en tu ficha",
+  "Responder reseñas y link de citas",
+  "Contactos por WhatsApp y llamada, semana a semana",
+  "QR descargable para tu local",
+];
+
+const FAQ = [
+  {
+    q: "¿Aparecer en el directorio cuesta algo?",
+    a: "No. La ficha gratuita no se vence, no pide tarjeta y nadie te va a cobrar después. Destacado es opcional.",
+  },
+  {
+    q: "¿Cómo pago si no tengo tarjeta?",
+    a: "Por transferencia o depósito bancario. Nos escribes por WhatsApp, te damos los datos y activamos tu plan el mismo día que recibimos el comprobante.",
+  },
+  {
+    q: "¿Por qué solo 3 destacados por categoría?",
+    a: "Porque si todos salen primero, nadie sale primero. Con 3 cupos, quien paga realmente queda arriba cuando buscan su categoría.",
+  },
+  {
+    q: "¿Qué pasa si no renuevo?",
+    a: "Tu negocio sigue en el directorio con la ficha gratuita y conservas el portal para corregir tus datos. Solo se libera tu cupo de destacado.",
+  },
+  {
+    q: "¿Necesito saber de tecnología?",
+    a: "No. Si puedes usar WhatsApp, puedes usar el portal. Y si prefieres, nos mandas tus fotos y las subimos por ti.",
+  },
+];
+
 export default function PreciosPage() {
   const [email, setEmail] = useState("");
-  const [selectedTier, setSelectedTier] = useState<"premium" | "featured">("premium");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showCard, setShowCard] = useState(false);
   const [pickerBusinesses, setPickerBusinesses] = useState<BusinessOption[]>([]);
   const [selectedBusinessId, setSelectedBusinessId] = useState<string>("");
 
@@ -35,7 +79,7 @@ export default function PreciosPage() {
     const res = await fetch("/api/stripe/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, tier: selectedTier, business_id: businessId }),
+      body: JSON.stringify({ email, tier: "featured", business_id: businessId }),
     });
 
     const data = await res.json();
@@ -59,353 +103,206 @@ export default function PreciosPage() {
     await submitCheckout();
   };
 
-  const handlePickBusiness = async () => {
-    if (!selectedBusinessId) return;
-    await submitCheckout(selectedBusinessId);
-  };
-
   return (
     <main className="min-h-screen bg-jungle-50">
-      <section className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
-        {/* Header */}
-        <div className="mb-12 text-center">
-          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-jungle-600">Planes</p>
-          <h1 className="text-3xl font-bold text-jungle-950 sm:text-4xl" style={{ fontFamily: "var(--font-syne)" }}>
-            Más visibilidad para tu negocio
+      <section className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
+
+        {/* Encabezado */}
+        <div className="mb-10 text-center">
+          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-jungle-600 animate-fade-up">Planes</p>
+          <h1 className="text-3xl font-bold text-jungle-950 sm:text-4xl animate-fade-up anim-delay-1" style={{ fontFamily: "var(--font-syne)" }}>
+            Aparecer es gratis. Salir primero es opcional.
           </h1>
-          <p className="mx-auto mt-3 max-w-xl text-sm text-jungle-600">
-Aparecer es gratis. Los planes de pago son para salir primero en tu categoría y mostrar más de tu negocio.
+          <p className="mx-auto mt-3 max-w-xl text-sm text-jungle-700 animate-fade-up anim-delay-2">
+            Todos los negocios de Olanchito tienen su ficha sin pagar. El plan Destacado es para quien quiere quedar arriba cuando buscan su categoría.
           </p>
         </div>
 
-        {/* Plans grid */}
-        <div className="grid gap-5 sm:grid-cols-3 mb-14">
-          <PlanCard
-            title="Gratis"
-            price="$0"
-            description="Presencia básica en el directorio"
-            features={[
-              "Nombre, categoría y descripción",
-              "Horario de atención",
-              "Teléfono y WhatsApp visibles",
-              "Redes sociales y sitio web",
-              "Ubicación en Google Maps",
-              "Portal para corregir tus datos",
-              "Cuántos clientes te contactaron",
-            ]}
-            missing={[
-              "Galería de fotos",
-              "Catálogo de productos",
-              "Responder reseñas",
-              "Aparecer primero en tu categoría",
-            ]}
-          />
-          <PlanCard
-            title="Premium"
-            price="$6 / mes"
-            highlight
-            description="Convierte visitas en clientes"
-            features={[
-              "Todo lo del plan Gratis",
-              "Galería de hasta 5 fotos",
-              "Catálogo de hasta 10 productos",
-              "Link de citas / reservas",
-              "Responder reseñas de clientes",
-            ]}
-            missing={[
-              "Aparecer primero en tu categoría",
-              "Ofertas y promociones",
-              "Contactos por WhatsApp y llamada, por semana",
-              "QR descargable para tu local",
-            ]}
-          />
-          <PlanCard
-            title="Destacado"
-            price="$10 / mes"
-            description="Sal primero cuando buscan tu categoría"
-            badge="Más visibilidad"
-            features={[
-              "Aparece primero en tu categoría y en las búsquedas",
-              "Insignia de negocio destacado",
-              "Todo lo del plan Premium",
-              "Galería de hasta 15 fotos",
-              "Catálogo ilimitado de productos",
-              "Ofertas y promociones con precios",
-              "Anuncio destacado en tu página",
-              "Contactos por WhatsApp y llamada, por semana",
-              "QR descargable para tu local",
-            ]}
-          />
-        </div>
+        {/* Planes */}
+        <div className="grid gap-5 sm:grid-cols-2">
 
-        {/* Owner Portal highlight */}
-        <div className="rounded-3xl bg-jungle-900 p-8 text-white ring-1 ring-jungle-800 shadow-[0_20px_60px_rgba(0,0,0,0.18)] sm:p-10">
-          <div className="grid gap-8 lg:grid-cols-2 lg:items-center">
-            <div>
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-jungle-700/60 px-3 py-1 ring-1 ring-jungle-600">
-                <SparklesIcon className="h-3.5 w-3.5 text-jungle-300" />
-                <span className="text-xs font-bold text-jungle-200">Owner Portal</span>
-              </div>
-              <h2 className="text-2xl font-bold sm:text-3xl" style={{ fontFamily: "var(--font-syne)" }}>
-                Gestiona tu negocio tú mismo
-              </h2>
-              <p className="mt-3 text-sm text-jungle-300">
-                Todos los negocios registrados tienen acceso <span className="font-bold text-white">gratis</span> al portal: ahí corriges horario, teléfono y dirección, y ves cuántos clientes te contactaron. Premium y Destacado suman esto:
-              </p>
-              <ul className="mt-5 space-y-2.5">
-                {[
-                  { text: "Galería de fotos (5 Premium / 15 Destacado)", tier: "premium" },
-                  { text: "Catálogo de productos (10 Premium / ∞ Destacado)", tier: "premium" },
-                  { text: "Link de citas o reservas en tu ficha", tier: "premium" },
-                  { text: "Responde reseñas de tus clientes", tier: "premium" },
-                  { text: "Primer lugar en tu categoría e insignia de destacado", tier: "featured" },
-                  { text: "Ofertas y promociones con precios y vigencia", tier: "featured" },
-                  { text: "Anuncio destacado en tu página pública", tier: "featured" },
-                  { text: "Contactos por WhatsApp y llamada, semana a semana", tier: "featured" },
-                  { text: "QR descargable para imprimir en tu local", tier: "featured" },
-                ].map((f) => (
-                  <li key={f.text} className="flex items-start gap-2.5 text-sm text-jungle-200">
-                    <CheckBadgeIcon className={`h-4 w-4 flex-shrink-0 mt-0.5 ${f.tier === "featured" ? "text-amber-400" : "text-jungle-300"}`} />
-                    <span>
-                      {f.text}
-                      {f.tier === "featured" && (
-                        <span className="ml-1.5 inline-flex items-center rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-amber-300">Destacado</span>
-                      )}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          {/* Gratis */}
+          <div className="flex flex-col rounded-3xl bg-white p-6 ring-1 ring-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.06)] animate-fade-up anim-delay-2">
+            <p className="text-xs font-bold uppercase tracking-widest text-jungle-600">Gratis</p>
+            <p className="mt-1 text-3xl font-bold text-jungle-950" style={{ fontFamily: "var(--font-syne)" }}>L 0</p>
+            <p className="mt-1 text-xs text-jungle-600">Para siempre, sin tarjeta</p>
+            <ul className="mt-5 flex-1 space-y-2.5">
+              {FREE_FEATURES.map((f) => (
+                <li key={f} className="flex items-start gap-2 text-sm text-jungle-800">
+                  <CheckIcon className="mt-0.5 h-4 w-4 flex-shrink-0 text-jungle-600" />
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <Link
+              href="/registrar"
+              className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-jungle-900 py-3 text-sm font-bold text-white transition-colors hover:bg-jungle-800"
+            >
+              Registrar mi negocio
+              <ArrowRightIcon className="h-4 w-4" />
+            </Link>
+          </div>
 
-            {/* Checkout form */}
-            <div className="rounded-2xl bg-jungle-800/70 p-6 ring-1 ring-jungle-700 backdrop-blur">
-              <p className="mb-1 text-base font-bold text-white">Activa el Owner Portal</p>
-              <p className="mb-5 text-xs text-jungle-200">
-                Ingresa el correo con el que registraste tu negocio. Si aún no está en el directorio,{" "}
-                <Link href="/registrar" className="font-semibold text-white underline underline-offset-2">regístralo aquí primero</Link>.
-              </p>
+          {/* Destacado */}
+          <div className="relative flex flex-col rounded-3xl bg-amber-50 p-6 ring-2 ring-amber-400 shadow-[0_10px_30px_rgba(0,0,0,0.08)] animate-fade-up anim-delay-3">
+            <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-amber-700 px-3 py-1 text-[11px] font-bold text-white">
+              Máximo 3 por categoría
+            </span>
+            <p className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-amber-800">
+              <TrophyIcon className="h-4 w-4" />
+              Destacado
+            </p>
+            <p className="mt-1 text-3xl font-bold text-jungle-950" style={{ fontFamily: "var(--font-syne)" }}>
+              L 2,500 <span className="text-sm font-semibold text-jungle-700">al año</span>
+            </p>
+            <p className="mt-1 text-xs text-jungle-700">
+              Sale a L 208 al mes. También puedes pagar L 250 mes a mes.
+            </p>
+            <ul className="mt-5 flex-1 space-y-2.5">
+              {FEATURED_FEATURES.map((f, i) => (
+                <li key={f} className={`flex items-start gap-2 text-sm ${i === 0 ? "font-bold text-jungle-950" : "text-jungle-800"}`}>
+                  <CheckIcon className="mt-0.5 h-4 w-4 flex-shrink-0 text-amber-600" />
+                  {f}
+                </li>
+              ))}
+            </ul>
 
-              {pickerBusinesses.length > 0 && (
-                <div className="mb-5 space-y-3">
-                  <p className="text-sm font-bold text-white">¿Para cuál negocio?</p>
-                  <p className="text-xs text-jungle-300">Tu correo está asociado a varios negocios. Selecciona el que quieres activar.</p>
-                  <div className="space-y-2">
-                    {pickerBusinesses.map((b) => {
-                      const alreadyActive = b.subscription_active;
-                      const isSelected = selectedBusinessId === b.id;
-                      return (
-                        <button
-                          key={b.id}
-                          type="button"
-                          disabled={alreadyActive}
-                          onClick={() => setSelectedBusinessId(b.id)}
-                          className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm transition-colors ring-1 ${alreadyActive
-                              ? "opacity-50 cursor-not-allowed bg-jungle-900/30 ring-jungle-700 text-jungle-300"
-                              : isSelected
-                                ? "bg-white text-jungle-950 ring-white font-semibold"
-                                : "bg-jungle-900/50 text-jungle-300 ring-jungle-700 hover:bg-jungle-800/60"
+            <a
+              href={waLink("Hola, quiero el plan Destacado para mi negocio en olanchito.com. ¿Cómo hago la transferencia?")}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-[#128C7E] py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-[#0f7a6e]"
+            >
+              Pedir Destacado por WhatsApp
+              <ArrowRightIcon className="h-4 w-4" />
+            </a>
+            <p className="mt-2 text-center text-xs text-jungle-700">
+              Pagas por transferencia o depósito. Activamos el mismo día.
+            </p>
+
+            <button
+              type="button"
+              onClick={() => setShowCard((v) => !v)}
+              className="mt-3 text-center text-xs font-semibold text-amber-800 underline underline-offset-2 hover:text-amber-900"
+              aria-expanded={showCard}
+            >
+              {showCard ? "Ocultar pago con tarjeta" : "Prefiero pagar con tarjeta ($10 al mes)"}
+            </button>
+
+            {showCard && (
+              <div className="mt-3 rounded-2xl bg-white p-4 ring-1 ring-amber-200 animate-fade-up">
+                {pickerBusinesses.length > 0 ? (
+                  <div className="space-y-3">
+                    <p className="text-sm font-bold text-jungle-950">¿Para cuál negocio?</p>
+                    <div className="space-y-2">
+                      {pickerBusinesses.map((b) => {
+                        const isSelected = selectedBusinessId === b.id;
+                        return (
+                          <button
+                            key={b.id}
+                            type="button"
+                            disabled={b.subscription_active}
+                            onClick={() => setSelectedBusinessId(b.id)}
+                            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm ring-1 transition-colors ${
+                              b.subscription_active
+                                ? "cursor-not-allowed opacity-50 ring-jungle-200 text-jungle-600"
+                                : isSelected
+                                  ? "bg-jungle-900 font-semibold text-white ring-jungle-900"
+                                  : "text-jungle-800 ring-jungle-200 hover:bg-jungle-50"
                             }`}
-                        >
-                          <BuildingStorefrontIcon className="h-4 w-4 flex-shrink-0" />
-                          <span className="flex-1">{b.name}</span>
-                          {alreadyActive && (
-                            <span className="text-[11px] font-bold uppercase tracking-wide text-jungle-300">Ya activo</span>
-                          )}
-                          {isSelected && !alreadyActive && (
-                            <CheckIcon className="h-4 w-4 text-jungle-300" />
-                          )}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <button
-                    type="button"
-                    disabled={!selectedBusinessId || loading}
-                    onClick={handlePickBusiness}
-                    className={`flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${selectedTier === "featured"
-                        ? "bg-amber-700 text-white hover:bg-amber-600"
-                        : "bg-white text-jungle-950 hover:bg-jungle-100"
-                      }`}
-                  >
-                    {loading ? "Redirigiendo a pago..." : (
-                      <>
-                        Activar {selectedTier === "featured" ? "Destacado" : "Premium"} para este negocio
-                        <ArrowRightIcon className="h-4 w-4" />
-                      </>
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setPickerBusinesses([]); setSelectedBusinessId(""); }}
-                    className="w-full text-center text-xs text-jungle-300 hover:text-jungle-300"
-                  >
-                    ← Volver
-                  </button>
-                </div>
-              )}
-
-              <form onSubmit={handleCheckout} className={`space-y-3 ${pickerBusinesses.length > 0 ? "hidden" : ""}`}>
-                <div className="flex gap-2">
-                  {([
-                    { id: "premium", label: "Premium", price: "$6/mes" },
-                    { id: "featured", label: "Destacado", price: "$10/mes" },
-                  ] as const).map((t) => (
+                          >
+                            <BuildingStorefrontIcon className="h-4 w-4 flex-shrink-0" />
+                            <span className="flex-1">{b.name}</span>
+                            {b.subscription_active && <span className="text-[11px] font-bold uppercase">Ya activo</span>}
+                          </button>
+                        );
+                      })}
+                    </div>
                     <button
-                      key={t.id}
                       type="button"
-                      onClick={() => setSelectedTier(t.id)}
-                      className={`flex flex-1 flex-col items-center rounded-xl px-3 py-2.5 text-xs font-bold transition-colors ring-1 ${selectedTier === t.id
-                          ? t.id === "featured"
-                            ? "bg-amber-700 text-white ring-amber-500"
-                            : "bg-white text-jungle-950 ring-white"
-                          : "bg-jungle-900/50 text-jungle-300 ring-jungle-700 hover:bg-jungle-800/60"
-                        }`}
+                      disabled={!selectedBusinessId || loading}
+                      onClick={() => submitCheckout(selectedBusinessId)}
+                      className="flex w-full items-center justify-center gap-2 rounded-xl bg-amber-700 py-2.5 text-sm font-bold text-white transition-colors hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-50"
                     >
-                      {t.label}
-                      <span className="mt-0.5 text-[11px] font-semibold">{t.price}</span>
+                      {loading ? "Redirigiendo al pago..." : "Continuar al pago"}
                     </button>
-                  ))}
-                </div>
-
-                <input
-                  type="email"
-                  aria-label="Correo electrónico"
-                  autoComplete="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  placeholder="tu@correo.com"
-                  className="w-full rounded-xl bg-jungle-900/70 px-4 py-3 text-sm text-white placeholder-jungle-500 ring-1 ring-jungle-600 outline-none focus:ring-jungle-400"
-                />
-
-                {error && (
-                  <div className="flex items-start gap-2 rounded-xl bg-red-900/40 px-3 py-2.5 ring-1 ring-red-700">
-                    <ExclamationTriangleIcon className="h-4 w-4 flex-shrink-0 mt-0.5 text-red-400" />
-                    <p className="text-xs text-red-300">{error}</p>
                   </div>
+                ) : (
+                  <form onSubmit={handleCheckout} className="space-y-2.5">
+                    <label htmlFor="correo-pago" className="block text-xs font-semibold text-jungle-800">
+                      Correo con el que registraste tu negocio
+                    </label>
+                    <input
+                      id="correo-pago"
+                      type="email"
+                      autoComplete="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      placeholder="tu@correo.com"
+                      className="field"
+                    />
+                    <button
+                      type="submit"
+                      disabled={loading || !email}
+                      className="flex w-full items-center justify-center gap-2 rounded-xl bg-amber-700 py-2.5 text-sm font-bold text-white transition-colors hover:bg-amber-600 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {loading ? "Redirigiendo al pago..." : "Pagar con tarjeta: $10 al mes"}
+                    </button>
+                    <p className="text-center text-[11px] text-jungle-600">Pago seguro con Stripe. Cancelas cuando quieras.</p>
+                  </form>
                 )}
 
-                <button
-                  type="submit"
-                  disabled={loading || !email}
-                  className={`flex w-full items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${selectedTier === "featured"
-                      ? "bg-amber-700 text-white hover:bg-amber-600"
-                      : "bg-white text-jungle-950 hover:bg-jungle-100"
-                    }`}
-                >
-                  {loading ? "Redirigiendo a pago..." : (
-                    <>
-                      Activar {selectedTier === "featured" ? "Destacado" : "Premium"} — {selectedTier === "featured" ? "$10" : "$6"}/mes
-                      <ArrowRightIcon className="h-4 w-4" />
-                    </>
-                  )}
-                </button>
-
-                <p className="text-center text-[11px] text-jungle-300">
-                  Pago seguro con Stripe. Cancela cuando quieras.
-                </p>
-              </form>
-
-              <div className="mt-5 border-t border-jungle-700 pt-4 space-y-3">
-                <a
-                  href={`https://wa.me/50497952651?text=${encodeURIComponent("Hola, me interesa activar el Owner Portal para mi negocio en Olanchito. ¿Cómo puedo pagar por transferencia bancaria?")}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#25D366]/10 py-2.5 text-xs font-semibold text-[#25D366] ring-1 ring-[#25D366]/30 hover:bg-[#25D366]/20 transition-colors"
-                >
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4 flex-shrink-0">
-                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
-                  </svg>
-                  Pagar por transferencia bancaria
-                </a>
-                <p className="text-xs text-jungle-300">
-                  ¿Ya tienes cuenta?{" "}
-                  <Link href="/owner/login" className="font-semibold text-jungle-300 hover:underline">
-                    Iniciar sesión
-                  </Link>
-                </p>
+                {error && (
+                  <div role="alert" className="mt-3 flex items-start gap-2 rounded-xl bg-red-50 px-3 py-2.5 ring-1 ring-red-200">
+                    <ExclamationTriangleIcon className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-600" />
+                    <p className="text-xs text-red-800">{error}</p>
+                  </div>
+                )}
               </div>
-            </div>
+            )}
           </div>
         </div>
 
-        {/* FAQ */}
+        {/* Oferta de lanzamiento */}
+        <div className="mt-6 rounded-3xl bg-jungle-900 p-6 text-white sm:flex sm:items-center sm:justify-between sm:gap-6 sm:p-7 animate-fade-up anim-delay-4">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-widest text-jungle-300">Lanzamiento</p>
+            <p className="mt-1 text-lg font-bold" style={{ fontFamily: "var(--font-syne)" }}>
+              Los primeros 10 negocios prueban Destacado 2 meses sin pagar
+            </p>
+            <p className="mt-1 text-sm text-jungle-200">
+              Si al final no te trajo clientes, vuelves a la ficha gratuita y no debes nada.
+            </p>
+          </div>
+          <a
+            href={waLink("Hola, quiero probar el plan Destacado 2 meses gratis para mi negocio en olanchito.com.")}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 inline-flex flex-shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 text-sm font-bold text-jungle-950 transition-colors hover:bg-jungle-100 sm:mt-0"
+          >
+            Quiero probarlo
+            <ArrowRightIcon className="h-4 w-4" />
+          </a>
+        </div>
+
+        {/* Preguntas */}
         <div className="mt-12 grid gap-4 sm:grid-cols-2">
-          {[
-            {
-              q: "¿Necesito saber de tecnología?",
-              a: "No. El portal es muy fácil de usar. Si puedes usar WhatsApp, puedes usar el portal.",
-            },
-            {
-              q: "¿Cómo recibo acceso después de pagar?",
-              a: "Te llega un correo para crear tu contraseña. Es el único correo que recibirás.",
-            },
-            {
-              q: "¿Qué pasa si cancelo?",
-              a: "Tu negocio sigue en el directorio con el plan gratuito y conservas el portal para corregir tus datos. Solo pierdes las funciones de pago.",
-            },
-            {
-              q: "¿Mi catálogo se ve en la página de mi negocio?",
-              a: "Sí. Tus clientes pueden ver los productos y servicios disponibles directamente en tu página.",
-            },
-          ].map(({ q, a }) => (
+          {FAQ.map(({ q, a }) => (
             <div key={q} className="rounded-2xl bg-white p-5 ring-1 ring-black/5">
               <p className="text-sm font-bold text-jungle-950">{q}</p>
-              <p className="mt-1.5 text-xs leading-relaxed text-jungle-600">{a}</p>
+              <p className="mt-1.5 text-xs leading-relaxed text-jungle-700">{a}</p>
             </div>
           ))}
         </div>
+
+        <p className="mt-8 text-center text-xs text-jungle-600">
+          ¿Ya tienes cuenta?{" "}
+          <Link href="/owner/login" className="font-semibold text-jungle-800 hover:underline">
+            Entra a tu portal
+          </Link>
+        </p>
       </section>
     </main>
-  );
-}
-
-function PlanCard({
-  title,
-  price,
-  description,
-  features,
-  missing,
-  highlight,
-  badge,
-}: {
-  title: string;
-  price: string;
-  description: string;
-  features: string[];
-  missing?: string[];
-  highlight?: boolean;
-  badge?: string;
-}) {
-  const isDestacado = title === "Destacado";
-  return (
-    <div className={`relative rounded-3xl p-6 ring-1 shadow-[0_10px_30px_rgba(0,0,0,0.06)] ${isDestacado ? "bg-amber-50 ring-amber-300" : highlight ? "bg-white ring-jungle-400" : "bg-white ring-black/5"
-      }`}>
-      {(highlight || badge) && (
-        <span className={`absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[11px] font-bold text-white ${isDestacado ? "bg-amber-700" : "bg-jungle-700"
-          }`}>
-          {badge ?? "Más popular"}
-        </span>
-      )}
-      <p className={`text-xs font-bold uppercase tracking-widest ${isDestacado ? "text-amber-700" : "text-jungle-600"}`}>{title}</p>
-      <p className="mt-1 text-2xl font-bold text-jungle-950" style={{ fontFamily: "var(--font-syne)" }}>
-        {price}
-      </p>
-      <p className="mt-1 text-xs text-jungle-600">{description}</p>
-      <ul className="mt-4 space-y-2">
-        {features.map((f) => (
-          <li key={f} className="flex items-start gap-2 text-xs text-jungle-700">
-            <CheckIcon className={`h-3.5 w-3.5 flex-shrink-0 mt-0.5 ${isDestacado ? "text-amber-500" : "text-jungle-600"}`} />
-            {f}
-          </li>
-        ))}
-        {missing?.map((f) => (
-          <li key={f} className="flex items-start gap-2 text-xs text-jungle-600">
-            <span className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-center leading-none">—</span>
-            {f}
-          </li>
-        ))}
-      </ul>
-    </div>
   );
 }

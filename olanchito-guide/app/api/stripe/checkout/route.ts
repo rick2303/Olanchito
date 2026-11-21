@@ -9,6 +9,8 @@ const PRICE_IDS: Record<string, string> = {
   featured: process.env.STRIPE_FEATURED_PRICE_ID!,
 }
 
+const MAX_FEATURED_PER_CATEGORY = 3
+
 export async function POST(req: NextRequest) {
   const { email, tier = 'premium', business_id, return_slug } = await req.json()
 
@@ -65,6 +67,32 @@ export async function POST(req: NextRequest) {
       { error: 'Este negocio ya tiene una suscripción activa. Inicia sesión en tu portal para cambiar de plan.' },
       { status: 400 }
     )
+  }
+
+  // Cupo de Destacado: máximo 3 negocios por categoría (quien ya es Destacado no cuenta contra sí mismo)
+  if (tier === 'featured') {
+    const { data: full } = await supabase
+      .from('businesses')
+      .select('category_id')
+      .eq('id', business.id)
+      .single()
+
+    if (full?.category_id) {
+      const { count } = await supabase
+        .from('businesses')
+        .select('id', { count: 'exact', head: true })
+        .eq('category_id', full.category_id)
+        .eq('subscription_active', true)
+        .eq('subscription_tier', 'featured')
+        .neq('id', business.id)
+
+      if ((count ?? 0) >= MAX_FEATURED_PER_CATEGORY) {
+        return NextResponse.json(
+          { error: 'Los 3 cupos de Destacado de tu categoría ya están ocupados. Escríbenos por WhatsApp y te avisamos cuando se libere uno.' },
+          { status: 409 }
+        )
+      }
+    }
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL
