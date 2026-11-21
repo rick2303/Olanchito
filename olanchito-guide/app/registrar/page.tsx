@@ -510,7 +510,7 @@ export default function JoinPage() {
                   Ninguna. Aparecer en el directorio es gratis: no pedimos tarjeta y no hay prueba que se venza.
                 </p>
                 <p className="mt-2 text-xs leading-relaxed" style={{ color: "var(--ink-2)" }}>
-                  El sitio se mantiene con planes opcionales desde $6 al mes para quien quiera galería de fotos, catálogo y estadísticas. Si no los quiere, su negocio sigue apareciendo igual.
+                  El sitio se mantiene con planes opcionales desde $6 al mes para quien quiera salir primero en su categoría, galería de fotos o catálogo. Si no los quiere, su negocio sigue apareciendo igual.
                 </p>
                 <Link href="/precios" className="mt-3 inline-flex items-center gap-1 text-xs font-semibold hover:underline" style={{ color: "var(--accent-ink)" }}>
                   Ver los planes

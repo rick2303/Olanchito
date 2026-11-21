@@ -151,14 +151,14 @@ function upsell(r: BusinessReport): { title: string; body: string; cta: string }
   if (r.tier === "free") {
     return {
       title: "¿Quiere que le contacten más clientes?",
-      body: "Con el plan Premium su ficha muestra galería de fotos, catálogo de productos y enlace para agendar citas, y usted ve sus estadísticas en el portal.",
+      body: "Con el plan Destacado su negocio sale primero en su categoría y en las búsquedas del directorio. Con Premium su ficha muestra galería de fotos, catálogo de productos y enlace para agendar citas.",
       cta: "Ver planes",
     };
   }
   if (r.tier === "premium") {
     return {
       title: "Aparezca primero en el directorio",
-      body: "Con el plan Destacado su negocio sale arriba en las búsquedas, en la página de inicio y puede publicar ofertas y anuncios.",
+      body: "Con el plan Destacado su negocio sale primero en su categoría y en las búsquedas, y puede publicar ofertas y anuncios.",
       cta: "Pasar a Destacado",
     };
   }

@@ -74,7 +74,7 @@ export default function PreciosPage() {
             Más visibilidad para tu negocio
           </h1>
           <p className="mx-auto mt-3 max-w-xl text-sm text-jungle-600">
-            Desde aparecer en el directorio hasta tener tu propio portal de gestión.
+Aparecer es gratis. Los planes de pago son para salir primero en tu categoría y mostrar más de tu negocio.
           </p>
         </div>
 
@@ -90,12 +90,14 @@ export default function PreciosPage() {
               "Teléfono y WhatsApp visibles",
               "Redes sociales y sitio web",
               "Ubicación en Google Maps",
+              "Portal para corregir tus datos",
+              "Cuántos clientes te contactaron",
             ]}
             missing={[
               "Galería de fotos",
               "Catálogo de productos",
-              "Estadísticas de visitas",
               "Responder reseñas",
+              "Aparecer primero en tu categoría",
             ]}
           />
           <PlanCard
@@ -109,30 +111,29 @@ export default function PreciosPage() {
               "Catálogo de hasta 10 productos",
               "Link de citas / reservas",
               "Responder reseñas de clientes",
-              "Estadísticas de visitas totales",
             ]}
             missing={[
+              "Aparecer primero en tu categoría",
               "Ofertas y promociones",
-              "Estadísticas de clics de contacto",
-              "Anuncio destacado en tu página",
+              "Contactos por WhatsApp y llamada, por semana",
               "QR descargable para tu local",
             ]}
           />
           <PlanCard
             title="Destacado"
             price="$10 / mes"
-            description="Máxima visibilidad y herramientas"
-            badge="Más completo"
+            description="Sal primero cuando buscan tu categoría"
+            badge="Más visibilidad"
             features={[
+              "Aparece primero en tu categoría y en las búsquedas",
+              "Insignia de negocio destacado",
               "Todo lo del plan Premium",
               "Galería de hasta 15 fotos",
               "Catálogo ilimitado de productos",
               "Ofertas y promociones con precios",
               "Anuncio destacado en tu página",
-              "Estadísticas de clics WA y teléfono",
+              "Contactos por WhatsApp y llamada, por semana",
               "QR descargable para tu local",
-              "Aparece primero en los listados",
-              "Insignia de negocio destacado",
             ]}
           />
         </div>
@@ -149,21 +150,19 @@ export default function PreciosPage() {
                 Gestiona tu negocio tú mismo
               </h2>
               <p className="mt-3 text-sm text-jungle-300">
-                Todos los negocios registrados tienen acceso <span className="font-bold text-white">gratis</span> al portal básico. Activa Premium o Destacado para desbloquear el resto de funciones.
+                Todos los negocios registrados tienen acceso <span className="font-bold text-white">gratis</span> al portal: ahí corriges horario, teléfono y dirección, y ves cuántos clientes te contactaron. Premium y Destacado suman esto:
               </p>
               <ul className="mt-5 space-y-2.5">
                 {[
-                  { text: "Edita horarios, descripción y contacto", tier: "premium" },
                   { text: "Galería de fotos (5 Premium / 15 Destacado)", tier: "premium" },
                   { text: "Catálogo de productos (10 Premium / ∞ Destacado)", tier: "premium" },
-                  { text: "Link de citas y redes sociales visibles", tier: "premium" },
+                  { text: "Link de citas o reservas en tu ficha", tier: "premium" },
                   { text: "Responde reseñas de tus clientes", tier: "premium" },
-                  { text: "Estadísticas de visitas totales", tier: "premium" },
+                  { text: "Primer lugar en tu categoría e insignia de destacado", tier: "featured" },
                   { text: "Ofertas y promociones con precios y vigencia", tier: "featured" },
                   { text: "Anuncio destacado en tu página pública", tier: "featured" },
-                  { text: "Estadísticas de clics en WhatsApp y teléfono", tier: "featured" },
+                  { text: "Contactos por WhatsApp y llamada, semana a semana", tier: "featured" },
                   { text: "QR descargable para imprimir en tu local", tier: "featured" },
-                  { text: "Prioridad e insignia de negocio destacado", tier: "featured" },
                 ].map((f) => (
                   <li key={f.text} className="flex items-start gap-2.5 text-sm text-jungle-200">
                     <CheckBadgeIcon className={`h-4 w-4 flex-shrink-0 mt-0.5 ${f.tier === "featured" ? "text-amber-400" : "text-jungle-300"}`} />
@@ -343,7 +342,7 @@ export default function PreciosPage() {
             },
             {
               q: "¿Qué pasa si cancelo?",
-              a: "Tu negocio sigue en el directorio con el plan gratuito. Solo pierdes acceso al portal de gestión.",
+              a: "Tu negocio sigue en el directorio con el plan gratuito y conservas el portal para corregir tus datos. Solo pierdes las funciones de pago.",
             },
             {
               q: "¿Mi catálogo se ve en la página de mi negocio?",

@@ -498,11 +498,10 @@ export default function OwnerDashboard() {
     revalidatePublicPage(slug as string);
   };
 
-  // Lazy-load events for detailed stats (featured only, fires once when stats tab opens)
+  // Carga los contactos al abrir Estadísticas (una sola vez). El total lo ven todos los planes:
+  // es la prueba de que el directorio le trae clientes. El desglose es del plan Destacado.
   useEffect(() => {
     if (activeTab !== "stats" || !business || events !== null) return;
-    const tier = business.subscription_tier ?? "free";
-    if (tier !== "featured") return;
     setEventsLoading(true);
     supabase
       .from("business_events")
@@ -540,10 +539,10 @@ export default function OwnerDashboard() {
 
   const isPaid = business.subscription_active && tier !== "free";
 
-  // Free users can only access info + settings
+  // Plan gratuito: datos del negocio, estadísticas básicas (vistas y total de contactos) y ajustes
   const tabAllowed = (tabId: Tab) => {
-    if (tabId === "info" || tabId === "settings") return true;
-    if (tabId === "stats" || tabId === "catalog" || tabId === "photos") return isPaid;
+    if (tabId === "info" || tabId === "settings" || tabId === "stats") return true;
+    if (tabId === "catalog" || tabId === "photos") return isPaid;
     if (tabId === "announcement" || tabId === "offers") return tier === "featured";
     return false;
   };
@@ -905,6 +904,42 @@ export default function OwnerDashboard() {
               />
             </div>
 
+            {/* Total de contactos: visible en todos los planes */}
+            {tier !== "featured" && (() => {
+              const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
+              const total = events?.length ?? 0;
+              const thisMonth = events?.filter(e => e.created_at >= monthStart).length ?? 0;
+              return (
+                <div className="rounded-3xl bg-white p-6 ring-1 ring-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
+                  <p className="text-sm font-bold text-jungle-950">Clientes que te contactaron</p>
+                  <p className="mt-1 text-xs text-jungle-600">Toques en los botones de WhatsApp y llamada de tu ficha.</p>
+                  {eventsLoading || events === null ? (
+                    <p className="mt-4 text-sm text-jungle-600">Cargando...</p>
+                  ) : (
+                    <div className="mt-4 flex items-end gap-3">
+                      <p className="text-4xl font-bold leading-none text-jungle-950" style={{ fontFamily: "var(--font-syne)" }}>
+                        {total.toLocaleString()}
+                      </p>
+                      <p className="pb-0.5 text-xs font-semibold text-jungle-600">
+                        en total · {thisMonth.toLocaleString()} este mes
+                      </p>
+                    </div>
+                  )}
+                  <div className="mt-5 flex flex-col gap-3 rounded-2xl bg-amber-50 p-4 ring-1 ring-amber-200 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="text-xs leading-relaxed text-amber-900">
+                      <span className="font-bold">Con Destacado</span> apareces primero en tu categoría y ves cuántos llegaron por WhatsApp y cuántos por llamada, semana a semana.
+                    </p>
+                    <button
+                      onClick={() => setShowUpgradeModal(true)}
+                      className="flex-shrink-0 rounded-xl bg-amber-700 px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-amber-600"
+                    >
+                      Ver planes
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
+
             {/* Detailed click stats — featured only */}
             {tier === "featured" && (
               <div className="rounded-3xl bg-white p-6 ring-1 ring-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
@@ -954,7 +989,8 @@ export default function OwnerDashboard() {
                     const isSaving = savingReply === r.id;
                     const draft = replyDrafts[r.id] ?? r.owner_reply ?? "";
                     const hasReply = !!r.owner_reply;
-                    const showForm = isEditing || !hasReply;
+                    // Responder reseñas es de Premium: en el plan gratuito se leen, no se contestan
+                    const showForm = isPaid && (isEditing || !hasReply);
 
                     return (
                       <div key={r.id} className="rounded-2xl bg-jungle-50 p-4 ring-1 ring-jungle-100">
@@ -977,6 +1013,10 @@ export default function OwnerDashboard() {
                         {/* Reply section */}
                         <div className="mt-3 border-t border-jungle-200 pt-3">
                           <p className="mb-2 text-[11px] font-semibold text-jungle-600">Tu respuesta</p>
+
+                          {!isPaid && !hasReply && (
+                            <p className="text-[11px] text-jungle-600">Responder reseñas es parte del plan Premium.</p>
+                          )}
 
                           {/* Saved state — reply exists and not editing */}
                           {!showForm && (
