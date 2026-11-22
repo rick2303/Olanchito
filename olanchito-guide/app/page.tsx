@@ -19,6 +19,8 @@ import QuickFilters from "@/components/QuickFilters";
 import { categoryIcon } from "@/lib/categoryIcons";
 import { getOpenStatus } from "@/lib/hours";
 
+export const metadata = { alternates: { canonical: "https://olanchito.com" } };
+
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 

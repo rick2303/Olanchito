@@ -207,9 +207,30 @@ export default function JoinPage() {
     }
   };
 
+  const validateStep = (s: number): string => {
+    if (s === 0) {
+      if (!form.business_name.trim()) return "Escriba el nombre de su negocio.";
+      if (!form.category) return "Elija la categoría que más se parece a su negocio.";
+    }
+    if (s === 1) {
+      if (form.phone.replace(/\D/g, "").length < 8) return "Escriba el teléfono completo (8 dígitos) para que los clientes puedan llamarle.";
+    }
+    if (s === 2) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) return "Escriba un correo válido. Ahí le llega el acceso a su portal gratuito.";
+    }
+    return "";
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (loading) return;
+    const problem = validateStep(step);
+    if (problem) {
+      // Se limpia primero para que la animación del aviso se repita en cada intento
+      setError("");
+      requestAnimationFrame(() => setError(problem));
+      return;
+    }
     if (step < STEPS.length - 1) {
       goTo(step + 1);
       return;
@@ -312,7 +333,7 @@ export default function JoinPage() {
               </ol>
             </div>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} noValidate>
               <div
                 key={step}
                 className={`space-y-5 ${direction === "next" ? "animate-step-next" : "animate-step-back"}`}

@@ -45,7 +45,6 @@ export const metadata: Metadata = {
     "directorio empresarial Olanchito",
     "ciudad cívica de Honduras",
   ],
-  alternates: { canonical: "https://olanchito.com/" },
   icons: { icon: "/colibri.webp", shortcut: "/colibri.webp", apple: "/logo.png" },
   openGraph: {
     title: "Olanchito Honduras | Directorio de Negocios Locales",

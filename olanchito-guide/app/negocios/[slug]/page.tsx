@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import Image from "next/image";
 import type { Metadata } from "next";
 import { supabase } from "@/lib/supabase";
@@ -49,7 +50,7 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { data } = await supabase
     .from("businesses")
-    .select("name, description, image, slug, address, hours")
+    .select("name, description, image, slug, address, hours, categories(name)")
     .eq("slug", params.slug)
     .single();
 
@@ -57,12 +58,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: "Negocio no encontrado", robots: { index: false } };
   }
 
-  const title = `${data.name} en Olanchito`;
+  // La categoría va en el título: la gente busca "ferretería en Olanchito", no solo el nombre
+  const catRel = (data as { categories?: { name: string } | { name: string }[] | null }).categories;
+  const catName = (Array.isArray(catRel) ? catRel[0]?.name : catRel?.name) ?? null;
+  const title = catName ? `${data.name} — ${catName} en Olanchito` : `${data.name} en Olanchito`;
   const socialTitle = `${title} | Directorio Olanchito`;
-  const rawDesc = data.description?.trim();
-  const description = rawDesc
-    ? rawDesc.length > 155 ? `${rawDesc.slice(0, 152)}…` : rawDesc
-    : `${data.name} en Olanchito, Honduras. Encuentra teléfono, dirección, horario y reseñas de clientes en el Directorio Olanchito.`;
+  const rawDesc = data.description?.trim() ?? "";
+  const facts = [
+    `${data.name}${catName ? `, ${catName.toLowerCase()}` : ""} en Olanchito, Yoro.`,
+    data.address ? `Dirección: ${data.address}.` : "",
+    typeof data.hours === "string" && data.hours.trim() ? `Horario: ${data.hours.trim()}.` : "",
+    "Teléfono, WhatsApp y reseñas.",
+  ].filter(Boolean).join(" ");
+  const fullDesc = rawDesc.length >= 90 ? rawDesc : rawDesc ? `${rawDesc.replace(/[.\s]+$/, "")}. ${facts}` : facts;
+  const description = fullDesc.length > 158 ? `${fullDesc.slice(0, 155)}…` : fullDesc;
 
   const imageUrl = businessImageUrl(data.image, data.slug, true);
   const canonical = `${BASE_URL}/negocios/${data.slug}`;
@@ -100,6 +109,13 @@ function normalizeUrl(url?: string | null) {
 function normalizePhone(raw?: string | null) {
   if (!raw) return "";
   return raw.replace(/[^\d+]/g, "");
+}
+
+// 8 dígitos hondureños → "+504 9999-9999"; cualquier otro formato se deja como está
+function prettyPhone(raw: string) {
+  const d = raw.replace(/\D/g, "");
+  const local = d.length === 11 && d.startsWith("504") ? d.slice(3) : d;
+  return local.length === 8 ? `+504 ${local.slice(0, 4)}-${local.slice(4)}` : raw.trim();
 }
 
 function buildWhatsAppLink(raw?: string | null) {
@@ -141,27 +157,8 @@ export default async function BusinessDetail({ params }: Props) {
     .eq("slug", slug)
     .single();
 
-  if (error || !data) {
-    console.error("Error cargando negocio:", error);
-    return (
-      <main className="min-h-screen bg-jungle-50">
-        <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
-          <div className="rounded-3xl bg-white p-8 ring-1 ring-black/5">
-            <p className="text-sm font-semibold text-jungle-700">
-              Negocio no encontrado
-            </p>
-            <Link
-              href="/negocios"
-              className="mt-6 inline-flex items-center gap-2 rounded-2xl bg-jungle-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-jungle-700"
-            >
-              <ArrowLeftIcon className="h-5 w-5" />
-              Volver a negocios
-            </Link>
-          </div>
-        </section>
-      </main>
-    );
-  }
+  // 404 real: antes respondía 200 con "no encontrado" y Google lo contaba como página válida vacía
+  if (error || !data) notFound();
 
   const imageUrl = businessImageUrl(data.image, data.slug);
 
@@ -256,6 +253,18 @@ export default async function BusinessDetail({ params }: Props) {
   const services = Array.isArray(data.services)
     ? (data.services as string[]).filter(Boolean)
     : [];
+
+  // Datos reales de la ficha en formato pregunta/respuesta: da texto propio a fichas con descripción corta
+  const hoursText = typeof data.hours === "string" ? data.hours.trim() : "";
+  const addressText = (data.address ?? "").trim().replace(/[.,\s]+$/, "");
+  const realServices = services.filter((s) => s.trim().toLowerCase() !== "otros");
+  const quickFacts: { q: string; a: string }[] = [
+    ...(category ? [{ q: `¿Qué es ${data.name}?`, a: `${data.name} es un negocio de la categoría ${category.name} en Olanchito, Yoro, Honduras.` }] : []),
+    ...(data.address ? [{ q: `¿Dónde queda ${data.name}?`, a: `Queda en ${addressText}${/olanchito/i.test(addressText) ? "" : ", Olanchito, Yoro"}.` }] : []),
+    ...(hoursText ? [{ q: `¿Cuál es el horario de ${data.name}?`, a: `Atiende ${hoursText}.` }] : []),
+    ...(data.phone ? [{ q: `¿Cuál es el teléfono de ${data.name}?`, a: `El teléfono es ${prettyPhone(data.phone)}.${waLink ? " También atiende por WhatsApp." : ""}` }] : []),
+    ...(realServices.length > 0 ? [{ q: `¿Qué ofrece ${data.name}?`, a: `${realServices.join(", ")}.` }] : []),
+  ];
 
   // JSON-LD
   const avgRating = initialReviews.length > 0
@@ -583,6 +592,21 @@ export default async function BusinessDetail({ params }: Props) {
                 </p>
               )}
             </div>
+
+            {/* Datos rápidos */}
+            {quickFacts.length >= 2 && (
+              <div className="rounded-3xl bg-white p-6 ring-1 ring-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.06)] sm:p-7">
+                <h2 className="text-lg font-bold text-jungle-950">Datos de {data.name}</h2>
+                <dl className="mt-4 space-y-4">
+                  {quickFacts.map((f) => (
+                    <div key={f.q}>
+                      <dt className="text-sm font-semibold text-jungle-950">{f.q}</dt>
+                      <dd className="mt-1 text-sm leading-relaxed text-jungle-800">{f.a}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
+            )}
 
             {/* Galería de fotos */}
             {galleryPhotos.length > 0 && (
