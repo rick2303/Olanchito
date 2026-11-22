@@ -151,14 +151,14 @@ function upsell(r: BusinessReport): { title: string; body: string; cta: string }
   if (r.tier === "free") {
     return {
       title: "¿Quiere que le contacten más clientes?",
-      body: "Con el plan Premium su ficha muestra galería de fotos, catálogo de productos y enlace para agendar citas, y usted ve sus estadísticas en el portal.",
-      cta: "Ver planes",
+      body: "Con el plan Destacado (L 250 al mes o L 2,500 al año, por transferencia) su negocio sale primero en su categoría y en las búsquedas, con galería de fotos y catálogo. Solo hay 3 cupos por categoría.",
+      cta: "Ver el plan Destacado",
     };
   }
   if (r.tier === "premium") {
     return {
       title: "Aparezca primero en el directorio",
-      body: "Con el plan Destacado su negocio sale arriba en las búsquedas, en la página de inicio y puede publicar ofertas y anuncios.",
+      body: "Con el plan Destacado su negocio sale primero en su categoría y en las búsquedas, y puede publicar ofertas y anuncios.",
       cta: "Pasar a Destacado",
     };
   }

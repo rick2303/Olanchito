@@ -1,18 +1,42 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function CookieBanner() {
   const [visible, setVisible] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!localStorage.getItem("cookie_notice")) {
-      setVisible(true);
+    try {
+      if (!localStorage.getItem("cookie_notice")) setVisible(true);
+    } catch {
+      /* sin almacenamiento: no se muestra */
     }
   }, []);
 
+  // En celular el aviso ocupa el borde inferior: se reserva ese espacio al final de la página
+  // para que ningún botón quede tapado sin poder subirlo con el dedo.
+  useEffect(() => {
+    if (!visible || !ref.current) return;
+    const el = ref.current;
+    const apply = () => {
+      const mobile = window.matchMedia("(max-width: 639px)").matches;
+      document.body.style.paddingBottom = mobile ? `${el.offsetHeight}px` : "";
+    };
+    apply();
+    window.addEventListener("resize", apply);
+    return () => {
+      window.removeEventListener("resize", apply);
+      document.body.style.paddingBottom = "";
+    };
+  }, [visible]);
+
   const handleAccept = () => {
-    localStorage.setItem("cookie_notice", "ok");
+    try {
+      localStorage.setItem("cookie_notice", "ok");
+    } catch {
+      /* nada */
+    }
     setVisible(false);
   };
 
@@ -20,29 +44,22 @@ export default function CookieBanner() {
 
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-50 animate-fade-up sm:bottom-4 sm:left-1/2 sm:right-auto sm:w-auto sm:max-w-md sm:-translate-x-1/2"
+      ref={ref}
+      role="region"
+      aria-label="Aviso de cookies"
+      className="fixed bottom-0 left-0 right-0 z-50 animate-fade-up rounded-t-2xl sm:bottom-4 sm:left-4 sm:right-auto sm:w-72 sm:rounded-2xl"
       style={{
         background: "var(--surface)",
         border: "1px solid var(--line-strong)",
-        borderRadius: "16px 16px 0 0",
         boxShadow: "0 -4px 24px rgba(10,30,20,0.12)",
-        padding: "16px 20px calc(16px + env(safe-area-inset-bottom)) 20px",
+        padding: "10px 14px calc(10px + env(safe-area-inset-bottom)) 14px",
       }}
     >
-      {/* sm+ overrides the mobile border radius */}
-      <style>{`@media(min-width:640px){.cookie-inner{border-radius:16px!important;padding-bottom:16px!important}}`}</style>
-      <div className="cookie-inner flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-        <div className="flex items-start gap-2.5">
-          <span className="mt-0.5 text-base leading-none" aria-hidden>🍪</span>
-          <p className="text-xs leading-relaxed" style={{ color: "var(--ink-2)" }}>
-            Este sitio usa cookies de analítica (Google Analytics) para mejorar tu experiencia.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={handleAccept}
-          className="btn-primary w-full !py-2.5 !text-xs sm:w-auto sm:flex-shrink-0 sm:!py-1.5"
-        >
+      <div className="flex items-center gap-3">
+        <p className="flex-1 text-xs leading-snug" style={{ color: "var(--ink-2)" }}>
+          Este sitio usa cookies de analítica (Google Analytics).
+        </p>
+        <button type="button" onClick={handleAccept} className="btn-primary flex-shrink-0 !px-3.5 !py-2 !text-xs">
           Entendido
         </button>
       </div>

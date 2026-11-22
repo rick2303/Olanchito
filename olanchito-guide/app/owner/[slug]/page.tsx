@@ -498,11 +498,10 @@ export default function OwnerDashboard() {
     revalidatePublicPage(slug as string);
   };
 
-  // Lazy-load events for detailed stats (featured only, fires once when stats tab opens)
+  // Carga los contactos al abrir Estadísticas (una sola vez). El total lo ven todos los planes:
+  // es la prueba de que el directorio le trae clientes. El desglose es del plan Destacado.
   useEffect(() => {
     if (activeTab !== "stats" || !business || events !== null) return;
-    const tier = business.subscription_tier ?? "free";
-    if (tier !== "featured") return;
     setEventsLoading(true);
     supabase
       .from("business_events")
@@ -540,10 +539,10 @@ export default function OwnerDashboard() {
 
   const isPaid = business.subscription_active && tier !== "free";
 
-  // Free users can only access info + settings
+  // Plan gratuito: datos del negocio, estadísticas básicas (vistas y total de contactos) y ajustes
   const tabAllowed = (tabId: Tab) => {
-    if (tabId === "info" || tabId === "settings") return true;
-    if (tabId === "stats" || tabId === "catalog" || tabId === "photos") return isPaid;
+    if (tabId === "info" || tabId === "settings" || tabId === "stats") return true;
+    if (tabId === "catalog" || tabId === "photos") return isPaid;
     if (tabId === "announcement" || tabId === "offers") return tier === "featured";
     return false;
   };
@@ -603,7 +602,7 @@ export default function OwnerDashboard() {
         <div className="mx-auto max-w-4xl px-4 pt-6 sm:px-6">
           <div className="flex items-center justify-between gap-4 rounded-2xl bg-jungle-900 px-5 py-3.5">
             <p className="text-xs text-jungle-300">
-              <span className="font-bold text-white">Plan Gratuito</span> — Activa Premium para subir fotos, catálogo y más.
+              <span className="font-bold text-white">Plan Gratuito</span> — Con Destacado sales primero en tu categoría y subes fotos, catálogo y ofertas.
             </p>
             <button
               onClick={() => setShowUpgradeModal(true)}
@@ -811,7 +810,7 @@ export default function OwnerDashboard() {
             <div className={`rounded-3xl bg-white p-6 ring-1 ring-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.06)] ${!isPaid ? "opacity-60 pointer-events-none" : ""}`}>
               <div className="mb-1 flex items-center justify-between">
                 <h3 className="text-sm font-bold text-jungle-950">Link de reserva / cita</h3>
-                {!isPaid && <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-bold text-amber-700">Premium</span>}
+                {!isPaid && <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-bold text-amber-700">Destacado</span>}
               </div>
               <p className="mb-4 text-xs text-jungle-600">Aparece como botón &quot;Agendar cita&quot; en tu página pública. Puede ser un link de Calendly, WhatsApp, o cualquier otro servicio.</p>
               <input
@@ -905,6 +904,42 @@ export default function OwnerDashboard() {
               />
             </div>
 
+            {/* Total de contactos: visible en todos los planes */}
+            {tier !== "featured" && (() => {
+              const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
+              const total = events?.length ?? 0;
+              const thisMonth = events?.filter(e => e.created_at >= monthStart).length ?? 0;
+              return (
+                <div className="rounded-3xl bg-white p-6 ring-1 ring-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
+                  <p className="text-sm font-bold text-jungle-950">Clientes que te contactaron</p>
+                  <p className="mt-1 text-xs text-jungle-600">Toques en los botones de WhatsApp y llamada de tu ficha.</p>
+                  {eventsLoading || events === null ? (
+                    <p className="mt-4 text-sm text-jungle-600">Cargando...</p>
+                  ) : (
+                    <div className="mt-4 flex items-end gap-3">
+                      <p className="text-4xl font-bold leading-none text-jungle-950" style={{ fontFamily: "var(--font-syne)" }}>
+                        {total.toLocaleString()}
+                      </p>
+                      <p className="pb-0.5 text-xs font-semibold text-jungle-600">
+                        en total · {thisMonth.toLocaleString()} este mes
+                      </p>
+                    </div>
+                  )}
+                  <div className="mt-5 flex flex-col gap-3 rounded-2xl bg-amber-50 p-4 ring-1 ring-amber-200 sm:flex-row sm:items-center sm:justify-between">
+                    <p className="text-xs leading-relaxed text-amber-900">
+                      <span className="font-bold">Con Destacado</span> apareces primero en tu categoría y ves cuántos llegaron por WhatsApp y cuántos por llamada, semana a semana.
+                    </p>
+                    <button
+                      onClick={() => setShowUpgradeModal(true)}
+                      className="flex-shrink-0 rounded-xl bg-amber-700 px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-amber-600"
+                    >
+                      Ver planes
+                    </button>
+                  </div>
+                </div>
+              );
+            })()}
+
             {/* Detailed click stats — featured only */}
             {tier === "featured" && (
               <div className="rounded-3xl bg-white p-6 ring-1 ring-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.06)]">
@@ -954,7 +989,8 @@ export default function OwnerDashboard() {
                     const isSaving = savingReply === r.id;
                     const draft = replyDrafts[r.id] ?? r.owner_reply ?? "";
                     const hasReply = !!r.owner_reply;
-                    const showForm = isEditing || !hasReply;
+                    // Responder reseñas es del plan de pago: en el plan gratuito se leen, no se contestan
+                    const showForm = isPaid && (isEditing || !hasReply);
 
                     return (
                       <div key={r.id} className="rounded-2xl bg-jungle-50 p-4 ring-1 ring-jungle-100">
@@ -977,6 +1013,10 @@ export default function OwnerDashboard() {
                         {/* Reply section */}
                         <div className="mt-3 border-t border-jungle-200 pt-3">
                           <p className="mb-2 text-[11px] font-semibold text-jungle-600">Tu respuesta</p>
+
+                          {!isPaid && !hasReply && (
+                            <p className="text-[11px] text-jungle-600">Responder reseñas es parte del plan Destacado.</p>
+                          )}
 
                           {/* Saved state — reply exists and not editing */}
                           {!showForm && (
@@ -1431,8 +1471,8 @@ export default function OwnerDashboard() {
             {/* Header */}
             <div className="mb-5 flex items-start justify-between">
               <div>
-                <h2 className="text-base font-bold text-jungle-950">Elige tu plan</h2>
-                <p className="mt-0.5 text-xs text-jungle-600">Serás redirigido a Stripe para completar el pago de forma segura.</p>
+                <h2 className="text-base font-bold text-jungle-950">Plan Destacado</h2>
+                <p className="mt-0.5 text-xs text-jungle-600">Aparecer es gratis. Destacado es para salir primero en tu categoría.</p>
               </div>
               <button
                 onClick={() => { setShowUpgradeModal(false); setUpgradeError(""); }}
@@ -1449,92 +1489,56 @@ export default function OwnerDashboard() {
               </div>
             )}
 
-            {/* Plan cards */}
-            <div className="grid gap-3 sm:grid-cols-2">
-              {/* Premium */}
-              <div className="flex flex-col rounded-2xl bg-jungle-50 p-4 ring-1 ring-jungle-200">
-                <p className="text-sm font-bold text-jungle-950">Premium</p>
-                <p className="mt-0.5 text-2xl font-bold text-jungle-800">
-                  $6<span className="text-xs font-semibold text-jungle-600">/mes</span>
-                </p>
-                <ul className="mt-3 flex-1 space-y-1.5 mb-4">
-                  {[
-                    "Galería de hasta 5 fotos",
-                    "Catálogo de hasta 10 productos",
-                    "Link de citas / reservas",
-                    "Responder reseñas de clientes",
-                    "Estadísticas de visitas",
-                  ].map(f => (
-                    <li key={f} className="flex items-start gap-1.5 text-[11px] text-jungle-700">
-                      <CheckIcon className="h-3.5 w-3.5 flex-shrink-0 mt-0.5 text-jungle-600" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  onClick={() => handleDirectCheckout("premium")}
-                  disabled={!!upgradeLoading}
-                  className="w-full rounded-xl bg-jungle-800 py-2.5 text-xs font-bold text-white hover:bg-jungle-700 disabled:opacity-50 transition-colors"
-                >
-                  {upgradeLoading === "premium" ? "Redirigiendo..." : "Contratar Premium"}
-                </button>
+            {/* Un solo plan de pago: Destacado, en lempiras y por transferencia */}
+            <div className="flex flex-col rounded-2xl bg-amber-50 p-4 ring-2 ring-amber-400">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-bold text-jungle-950">Destacado</p>
+                <span className="rounded-full bg-amber-400 px-2 py-0.5 text-[11px] font-bold text-amber-900">Máximo 3 por categoría</span>
               </div>
-
-              {/* Destacado */}
-              <div className="flex flex-col rounded-2xl bg-amber-50 p-4 ring-2 ring-amber-400">
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-bold text-jungle-950">Destacado</p>
-                  <span className="rounded-full bg-amber-400 px-2 py-0.5 text-[11px] font-bold text-amber-900">Más completo</span>
-                </div>
-                <p className="mt-0.5 text-2xl font-bold text-amber-700">
-                  $10<span className="text-xs font-semibold text-amber-500">/mes</span>
-                </p>
-                <ul className="mt-3 flex-1 space-y-1.5 mb-4">
-                  {[
-                    "Todo lo del plan Premium",
-                    "Galería de hasta 15 fotos",
-                    "Catálogo ilimitado de productos",
-                    "Ofertas y promociones con precios",
-                    "Anuncio destacado en tu página",
-                    "Estadísticas de clics WA y teléfono",
-                    "QR descargable para tu local",
-                    "Aparece primero en los listados",
-                    "Insignia de negocio destacado",
-                  ].map(f => (
-                    <li key={f} className="flex items-start gap-1.5 text-[11px] text-jungle-700">
-                      <CheckIcon className="h-3.5 w-3.5 flex-shrink-0 mt-0.5 text-amber-500" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  onClick={() => handleDirectCheckout("featured")}
-                  disabled={!!upgradeLoading}
-                  className="w-full rounded-xl bg-amber-500 py-2.5 text-xs font-bold text-white hover:bg-amber-400 disabled:opacity-50 transition-colors"
-                >
-                  {upgradeLoading === "featured" ? "Redirigiendo..." : "Contratar Destacado"}
-                </button>
-              </div>
-            </div>
-
-            <p className="mt-4 text-center text-[11px] text-jungle-600">
-              Pago seguro con Stripe · Cancela cuando quieras desde Configuración
-            </p>
-
-            <div className="mt-3 flex flex-col items-center gap-2 border-t border-jungle-100 pt-4">
-              <p className="text-[11px] text-jungle-600">¿Prefieres pagar por transferencia bancaria?</p>
+              <p className="mt-0.5 text-2xl font-bold text-amber-700">
+                L 2,500<span className="text-xs font-semibold text-amber-600">/año</span>
+                <span className="ml-2 text-xs font-semibold text-jungle-600">o L 250 al mes</span>
+              </p>
+              <ul className="mt-3 mb-4 grid gap-1.5 sm:grid-cols-2">
+                {[
+                  "Primer lugar en tu categoría y en las búsquedas",
+                  "Insignia de negocio destacado",
+                  "Galería de hasta 15 fotos",
+                  "Catálogo ilimitado de productos",
+                  "Ofertas y anuncio en tu ficha",
+                  "Responder reseñas y link de citas",
+                  "Contactos por WhatsApp y llamada, por semana",
+                  "QR descargable para tu local",
+                ].map(f => (
+                  <li key={f} className="flex items-start gap-1.5 text-[11px] text-jungle-700">
+                    <CheckIcon className="h-3.5 w-3.5 flex-shrink-0 mt-0.5 text-amber-500" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
               <a
-                href={`https://wa.me/50497952651?text=${encodeURIComponent("Hola, quiero activar un plan para mi negocio en el directorio de Olanchito y prefiero pagar por transferencia bancaria.")}`}
+                href={`https://wa.me/50497952651?text=${encodeURIComponent(`Hola, quiero el plan Destacado para ${business.name} en olanchito.com y pagar por transferencia.`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-xl bg-[#25D366]/10 px-4 py-2 text-xs font-semibold text-[#25D366] ring-1 ring-[#25D366]/30 hover:bg-[#25D366]/20 transition-colors"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#128C7E] py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#0f7a6e]"
               >
                 <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4 flex-shrink-0">
                   <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
                 </svg>
-                Contactar por WhatsApp
+                Pagar por transferencia (WhatsApp)
               </a>
+              <button
+                onClick={() => handleDirectCheckout("featured")}
+                disabled={!!upgradeLoading}
+                className="mt-2 w-full rounded-xl py-2.5 text-xs font-bold text-amber-800 ring-1 ring-amber-300 transition-colors hover:bg-amber-100 disabled:opacity-50"
+              >
+                {upgradeLoading === "featured" ? "Redirigiendo..." : "Pagar con tarjeta: $10 al mes"}
+              </button>
             </div>
+
+            <p className="mt-4 text-center text-[11px] text-jungle-600">
+              Por transferencia activamos tu plan el mismo día. Con tarjeta el pago es por Stripe y cancelas cuando quieras desde Configuración.
+            </p>
           </div>
         </div>
       )}

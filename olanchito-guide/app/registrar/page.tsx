@@ -207,9 +207,30 @@ export default function JoinPage() {
     }
   };
 
+  const validateStep = (s: number): string => {
+    if (s === 0) {
+      if (!form.business_name.trim()) return "Escriba el nombre de su negocio.";
+      if (!form.category) return "Elija la categoría que más se parece a su negocio.";
+    }
+    if (s === 1) {
+      if (form.phone.replace(/\D/g, "").length < 8) return "Escriba el teléfono completo (8 dígitos) para que los clientes puedan llamarle.";
+    }
+    if (s === 2) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) return "Escriba un correo válido. Ahí le llega el acceso a su portal gratuito.";
+    }
+    return "";
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (loading) return;
+    const problem = validateStep(step);
+    if (problem) {
+      // Se limpia primero para que la animación del aviso se repita en cada intento
+      setError("");
+      requestAnimationFrame(() => setError(problem));
+      return;
+    }
     if (step < STEPS.length - 1) {
       goTo(step + 1);
       return;
@@ -312,7 +333,7 @@ export default function JoinPage() {
               </ol>
             </div>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} noValidate>
               <div
                 key={step}
                 className={`space-y-5 ${direction === "next" ? "animate-step-next" : "animate-step-back"}`}
@@ -510,10 +531,10 @@ export default function JoinPage() {
                   Ninguna. Aparecer en el directorio es gratis: no pedimos tarjeta y no hay prueba que se venza.
                 </p>
                 <p className="mt-2 text-xs leading-relaxed" style={{ color: "var(--ink-2)" }}>
-                  El sitio se mantiene con planes opcionales desde $6 al mes para quien quiera galería de fotos, catálogo y estadísticas. Si no los quiere, su negocio sigue apareciendo igual.
+                  El sitio se mantiene con un plan opcional, Destacado (L 250 al mes), para quien quiera salir primero en su categoría y mostrar galería de fotos y catálogo. Si no lo quiere, su negocio sigue apareciendo igual.
                 </p>
                 <Link href="/precios" className="mt-3 inline-flex items-center gap-1 text-xs font-semibold hover:underline" style={{ color: "var(--accent-ink)" }}>
-                  Ver los planes
+                  Ver el plan
                   <ArrowRightIcon className="h-3 w-3" />
                 </Link>
               </div>
@@ -697,7 +718,7 @@ function SuccessScreen({
                 Entrar a mi portal
               </Link>
             )}
-            <button type="button" onClick={onAnother} className="btn-ghost w-full py-2.5 text-sm">
+            <button type="button" onClick={onAnother} className="w-full rounded-xl py-2.5 text-sm font-semibold underline-offset-4 hover:underline" style={{ color: "var(--primary)" }}>
               Registrar otro negocio
             </button>
           </div>

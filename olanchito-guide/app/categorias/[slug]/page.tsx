@@ -142,7 +142,7 @@ export default async function CategoriaPage({
 
   const { data: raw } = await supabase
     .from("businesses")
-    .select("id, name, slug, address, image, description, hours, featured, verified, view_count, created_at")
+    .select("id, name, slug, address, image, description, hours, featured, verified, view_count, created_at, subscription_tier, subscription_active")
     .eq("category_id", category.id);
 
   const { data: allReviews } = await supabase
@@ -166,8 +166,11 @@ export default async function CategoriaPage({
       const stats = reviewStats[b.slug];
       const score = (b.view_count ?? 0) + (stats?.positive ?? 0) * 3;
       const imageUrl = businessImageUrl(b.image, b.slug);
+      // El plan Destacado promete salir primero en su categoría: cuenta el plan activo, no solo la columna featured
+      const isDestacado = Boolean(b.featured) || (b.subscription_active === true && b.subscription_tier === "featured");
       return {
         ...b,
+        featured: isDestacado,
         isNew,
         score,
         image: imageUrl,

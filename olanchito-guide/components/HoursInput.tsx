@@ -165,7 +165,7 @@ export default function HoursInput({ value, onChange, required }: Props) {
         />
       </div>
       <p className="text-[11px]" style={{ color: "var(--ink-3)" }}>
-        Puedes editar el texto directamente si necesitas algo diferente.
+        El texto se puede editar directamente si hace falta algo diferente.
       </p>
     </div>
   );
