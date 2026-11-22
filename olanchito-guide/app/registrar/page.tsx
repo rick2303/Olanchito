@@ -697,7 +697,7 @@ function SuccessScreen({
                 Entrar a mi portal
               </Link>
             )}
-            <button type="button" onClick={onAnother} className="btn-ghost w-full py-2.5 text-sm">
+            <button type="button" onClick={onAnother} className="w-full rounded-xl py-2.5 text-sm font-semibold underline-offset-4 hover:underline" style={{ color: "var(--primary)" }}>
               Registrar otro negocio
             </button>
           </div>
