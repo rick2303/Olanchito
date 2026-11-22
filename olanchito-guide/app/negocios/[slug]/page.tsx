@@ -60,7 +60,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   // La categoría va en el título: la gente busca "ferretería en Olanchito", no solo el nombre
   const catRel = (data as { categories?: { name: string } | { name: string }[] | null }).categories;
-  const catName = (Array.isArray(catRel) ? catRel[0]?.name : catRel?.name) ?? null;
+  const rawCat = (Array.isArray(catRel) ? catRel[0]?.name : catRel?.name) ?? null;
+  // "Otros" no describe nada: en ese caso el título queda solo con el nombre
+  const catName = rawCat && rawCat.trim().toLowerCase() !== "otros" ? rawCat : null;
   const title = catName ? `${data.name} — ${catName} en Olanchito` : `${data.name} en Olanchito`;
   const socialTitle = `${title} | Directorio Olanchito`;
   const rawDesc = data.description?.trim() ?? "";
