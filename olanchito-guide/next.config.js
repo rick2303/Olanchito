@@ -20,6 +20,12 @@ const nextConfig = {
   // NOTA: la consolidación de dominio (www ↔ no-www) se gestiona en Vercel
   // (Settings → Domains → marcar el dominio principal), NO en el código.
   // Hacerlo aquí choca con el redirect de Vercel y causa un bucle infinito.
+  // Fichas duplicadas que se unieron: la dirección vieja lleva a la vigente.
+  async redirects() {
+    return [
+      { source: '/negocios/tiendas-jm', destination: '/negocios/tienda-jym', permanent: true },
+    ]
+  },
   async headers() {
     return [
       {
