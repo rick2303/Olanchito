@@ -9,6 +9,9 @@ const nextConfig = {
     },
   },
   images: {
+    // No usar el optimizador de Vercel (cupo mensual agotado → 402). Ver lib/imageLoader.js
+    loader: 'custom',
+    loaderFile: './lib/imageLoader.js',
     remotePatterns: [
       {
         protocol: 'https',
