@@ -23,6 +23,9 @@ import {
   GiftIcon,
 } from "@heroicons/react/24/outline";
 import HoursInput from "@/components/HoursInput";
+import LocationPickerWrapper from "@/components/LocationPickerWrapper";
+import { cleanLocation } from "@/lib/businessFields";
+import type { LatLng } from "@/lib/geo";
 
 function slugify(str: string) {
   return str.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "")
@@ -47,7 +50,8 @@ type DoneInfo = { name: string; slug: string; email: string; invite: InviteState
 
 const STEPS = [
   { title: "Su negocio", hint: "Cómo se llama y qué ofrece" },
-  { title: "Contacto", hint: "Cómo le escriben y dónde está" },
+  { title: "Contacto", hint: "Cómo le escriben y cuándo atiende" },
+  { title: "Ubicación", hint: "Dónde queda su negocio" },
   { title: "Foto y acceso", hint: "Una foto y su correo" },
 ];
 
@@ -73,6 +77,42 @@ export default function JoinPage() {
   const [sameWhatsapp, setSameWhatsapp] = useState(true);
   const [done, setDone] = useState<DoneInfo | null>(null);
   const [form, setForm] = useState(EMPTY_FORM);
+  const [location, setLocation] = useState<LatLng | null>(null);
+  const [locating, setLocating] = useState(false);
+  const [geoError, setGeoError] = useState("");
+
+  const pickLocation = (loc: LatLng | null) => {
+    setError("");
+    setGeoError("");
+    setLocation(loc);
+  };
+
+  // Para el dueño que se registra desde el celular estando en el negocio
+  const useMyLocation = () => {
+    if (!navigator.geolocation) {
+      setGeoError("Este teléfono no permite leer la ubicación. Toque el mapa donde queda su negocio.");
+      return;
+    }
+    setLocating(true);
+    setGeoError("");
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setLocating(false);
+        const here = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        if (!cleanLocation(here)) {
+          setGeoError("Usted no está en Olanchito en este momento. Toque el mapa donde queda su negocio.");
+          return;
+        }
+        setError("");
+        setLocation(here);
+      },
+      () => {
+        setLocating(false);
+        setGeoError("No se pudo leer su ubicación. Toque el mapa donde queda su negocio.");
+      },
+      { enableHighAccuracy: true, timeout: 10000 },
+    );
+  };
 
   useEffect(() => {
     supabase.from("categories").select("id, name").order("name", { ascending: true })
@@ -151,6 +191,7 @@ export default function JoinPage() {
           phone:       form.phone.trim() || null,
           whatsapp:    whatsappValue.trim() || null,
           address:     form.address.trim() || null,
+          location:    cleanLocation(location),
           owner_email: email,
           image:       imagePath,
           verified:    false,
@@ -197,6 +238,7 @@ export default function JoinPage() {
 
       setDone({ name, slug, email, invite });
       setForm(EMPTY_FORM);
+      setLocation(null);
       setStep(0);
       setSameWhatsapp(true);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -216,6 +258,9 @@ export default function JoinPage() {
       if (form.phone.replace(/\D/g, "").length < 8) return "Escriba el teléfono completo (8 dígitos) para que los clientes puedan llamarle.";
     }
     if (s === 2) {
+      if (location && !cleanLocation(location)) return "El punto del mapa debe quedar en Olanchito o sus alrededores.";
+    }
+    if (s === 3) {
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) return "Escriba un correo válido. Ahí le llega el acceso a su portal gratuito.";
     }
     return "";
@@ -302,7 +347,7 @@ export default function JoinPage() {
                   style={{ width: `${progress}%`, background: "var(--accent)" }}
                 />
               </div>
-              <ol className="mt-3 grid grid-cols-3 gap-2">
+              <ol className="mt-3 grid grid-cols-4 gap-2">
                 {STEPS.map((s, i) => {
                   const reached = i <= step;
                   return (
@@ -412,6 +457,35 @@ export default function JoinPage() {
 
                 {step === 2 && (
                   <>
+                    <p className="text-sm leading-relaxed" style={{ color: "var(--ink-2)" }}>
+                      Toque el mapa donde queda su negocio. Con el punto, el cliente abre la ruta en Google Maps o Waze y su negocio aparece en “Cerca de mí”.
+                    </p>
+
+                    <button
+                      type="button"
+                      onClick={useMyLocation}
+                      disabled={locating}
+                      className="btn-secondary w-full py-3 text-sm"
+                    >
+                      <MapPinIcon className="h-4 w-4" />
+                      {locating ? "Buscando su ubicación..." : "Estoy en el negocio: usar mi ubicación"}
+                    </button>
+                    {geoError ? (
+                      <p role="alert" className="-mt-2 text-xs text-red-600">{geoError}</p>
+                    ) : null}
+
+                    <LocationPickerWrapper value={location} onChange={pickLocation} />
+
+                    <p className="text-xs" style={{ color: "var(--ink-3)" }}>
+                      {location
+                        ? "Listo. Si el punto no quedó bien, toque otra vez el mapa para moverlo."
+                        : "Es opcional: si ahora no puede, continúe y lo agrega después desde su portal."}
+                    </p>
+                  </>
+                )}
+
+                {step === 3 && (
+                  <>
                     <div
                       className="rounded-2xl p-4"
                       style={{ border: "1.5px dashed var(--line-strong)", background: "var(--surface-2)" }}
@@ -498,7 +572,7 @@ export default function JoinPage() {
                 >
                   {loading
                     ? "Publicando su negocio..."
-                    : step < STEPS.length - 1 ? "Continuar" : "Publicar mi negocio gratis"}
+                    : step === 2 && !location ? "Continuar sin ubicación" : step < STEPS.length - 1 ? "Continuar" : "Publicar mi negocio gratis"}
                   {!loading && <ArrowRightIcon className="h-4 w-4" />}
                 </button>
               </div>
