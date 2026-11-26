@@ -885,7 +885,7 @@ export default async function BusinessDetail({ params }: Props) {
 
             {!hasOwner && (
               <Link
-                href={`/reclamar/${data.slug}`}
+                href={`/reclamar/${data.slug}`} rel="nofollow"
                 className="flex items-center justify-between gap-3 rounded-3xl bg-white p-5 ring-1 ring-black/5 shadow-[0_10px_30px_rgba(0,0,0,0.06)] hover:bg-jungle-50"
               >
                 <span>
@@ -927,7 +927,7 @@ export default async function BusinessDetail({ params }: Props) {
           </div>
           <div className="flex flex-shrink-0 items-center gap-2">
             <Link
-              href={hasOwner ? "/owner/login" : `/reclamar/${data.slug}`}
+              href={hasOwner ? "/owner/login" : `/reclamar/${data.slug}`} rel="nofollow"
               className="inline-flex items-center gap-1.5 rounded-xl bg-jungle-900 px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-jungle-800"
             >
               {hasOwner ? "Acceder al portal" : "Reclamar mi negocio"}
