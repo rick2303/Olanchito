@@ -30,6 +30,7 @@ const nextConfig = {
       { source: '/negocios/donde-willy-2', destination: '/negocios/donde-willy', permanent: true },
       { source: '/negocios/nexusrentcar', destination: '/negocios/nexus-rentacar', permanent: true },
       { source: '/negocios/inversiones-jimenez-limpieza', destination: '/negocios/inversiones-jimenez', permanent: true },
+      { source: '/negocios/panchos-wings', destination: '/negocios/panchos-wings-2', permanent: true },
     ]
   },
   async headers() {
