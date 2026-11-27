@@ -31,6 +31,7 @@ const nextConfig = {
       { source: '/negocios/nexusrentcar', destination: '/negocios/nexus-rentacar', permanent: true },
       { source: '/negocios/inversiones-jimenez-limpieza', destination: '/negocios/inversiones-jimenez', permanent: true },
       { source: '/negocios/panchos-wings', destination: '/negocios/panchos-wings-2', permanent: true },
+      { source: '/negocios/vidrieria-jonathan-2', destination: '/negocios/vidrieria-jonathan', permanent: true },
     ]
   },
   async headers() {
